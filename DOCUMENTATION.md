@@ -39,8 +39,7 @@ SendSmsResponse response = client.sendSms(
     templateId,
     phoneNumber,
     personalisation,
-    reference,
-    smsSenderId
+    reference
 );
 ```
 
