@@ -1,5 +1,6 @@
 package uk.gov.service.notify;
 
+
 import java.io.File;
 import java.io.InputStream;
 import java.util.Map;
@@ -17,9 +18,9 @@ public interface NotificationClientApi {
      *                        This reference can be unique or used used to refer to a batch of notifications.
      *                        Can be an empty string or null, when you do not require a reference for the notifications.
      * @return <code>SendEmailResponse</code>
-     * @throws NotificationClientException
+     * @throws NotificationClientException see https://docs.notifications.service.gov.uk/java.html#send-an-email-error-codes
      */
-    SendEmailResponse sendEmail(String templateId, String emailAddress, Map<String, String> personalisation, String reference) throws NotificationClientException;
+    SendEmailResponse sendEmail(String templateId, String emailAddress, Map<String, ?> personalisation, String reference) throws NotificationClientException;
 
 
     /**
@@ -36,9 +37,9 @@ public interface NotificationClientApi {
      *                        Service emailReplyToIds can be accessed via the service settings / manage email reply to addresses page.
      *                        Omit this argument to use the default service email reply to address.
      * @return <code>SendEmailResponse</code>
-     * @throws NotificationClientException
+     * @throws NotificationClientException see https://docs.notifications.service.gov.uk/java.html#send-an-email-error-codes
      */
-    SendEmailResponse sendEmail(String templateId, String emailAddress, Map<String, String> personalisation, String reference, String emailReplyToId) throws NotificationClientException;
+    SendEmailResponse sendEmail(String templateId, String emailAddress, Map<String, ?> personalisation, String reference, String emailReplyToId) throws NotificationClientException;
 
     /**
      * The sendSms method will create an HTTPS POST request. A JWT token will be created and added as an Authorization header to the request.
@@ -51,7 +52,7 @@ public interface NotificationClientApi {
      *                        This reference can be unique or used used to refer to a batch of notifications.
      *                        Can be an empty string or null, when you do not require a reference for the notifications.
      * @return <code>SendSmsResponse</code>
-     * @throws NotificationClientException
+     * @throws NotificationClientException see https://docs.notifications.service.gov.uk/java.html#error-codes
      */
     SendSmsResponse sendSms(String templateId, String phoneNumber, Map<String, String> personalisation, String reference) throws NotificationClientException;
 
@@ -69,7 +70,7 @@ public interface NotificationClientApi {
      *                        Service smsSenderIds can be accessed via the service settings / manage text message senders page.
      *                        Omit this argument to use the default service text message sender.
      * @return <code>SendSmsResponse</code>
-     * @throws NotificationClientException
+     * @throws NotificationClientException see https://docs.notifications.service.gov.uk/java.html#error-codes
      */
     SendSmsResponse sendSms(String templateId, String phoneNumber, Map<String, String> personalisation, String reference, String smsSenderId) throws NotificationClientException;
 
@@ -83,7 +84,7 @@ public interface NotificationClientApi {
      *                        This reference can be unique or used used to refer to a batch of notifications.
      *                        Can be an empty string or null, when you do not require a reference for the notifications.
      * @return <code>SendLetterResponse</code>
-     * @throws NotificationClientException
+     * @throws NotificationClientException see https://docs.notifications.service.gov.uk/java.html#send-a-letter-error-codes
      */
     SendLetterResponse sendLetter(String templateId, Map<String, String> personalisation, String reference) throws NotificationClientException;
 
@@ -97,7 +98,7 @@ public interface NotificationClientApi {
      *                                  The file must be a PDF and cannot be null.
      * @return <code>LetterResponse</code>
      *
-     * @throws NotificationClientException
+     * @throws NotificationClientException see https://docs.notifications.service.gov.uk/java.html#send-a-precompiled-letter-error-codes
      */
     LetterResponse sendPrecompiledLetter(String reference, File precompiledPDF) throws NotificationClientException;
 
@@ -111,7 +112,7 @@ public interface NotificationClientApi {
      *                                  The InputStream cannot be null.
      * @return <code>LetterResponse</code>
      *
-     * @throws NotificationClientException
+     * @throws NotificationClientException see https://docs.notifications.service.gov.uk/java.html#send-a-precompiled-letter-error-codes
      */
     public LetterResponse sendPrecompiledLetterWithInputStream(String reference, InputStream stream) throws NotificationClientException;
 
@@ -121,7 +122,7 @@ public interface NotificationClientApi {
      *
      * @param notificationId The id of the notification.
      * @return <code>Notification</code>
-     * @throws NotificationClientException
+     * @throws NotificationClientException see https://docs.notifications.service.gov.uk/java.html#get-the-status-of-one-message-error-codes
      */
     Notification getNotificationById(String notificationId) throws NotificationClientException;
 
@@ -135,7 +136,7 @@ public interface NotificationClientApi {
      * @param reference If reference is not empty or null only the notifications with that reference are returned.
      * @param olderThanId If olderThanId is not empty or null only the notifications older than that notification id are returned.
      * @return <code>NotificationList</code>
-     * @throws NotificationClientException
+     * @throws NotificationClientException see https://docs.notifications.service.gov.uk/java.html#get-the-status-of-multiple-messages-error-codes
      */
     NotificationList getNotifications(String status, String notification_type, String reference, String olderThanId) throws NotificationClientException;
 
@@ -144,7 +145,7 @@ public interface NotificationClientApi {
      *
      * @param templateId The template id is visible on the template page in the application.
      * @return <code>Template</code>
-     * @throws NotificationClientException
+     * @throws NotificationClientException see https://docs.notifications.service.gov.uk/java.html#get-a-template-by-id-error-codes
      */
     Template getTemplateById(String templateId) throws NotificationClientException;
 
@@ -154,7 +155,7 @@ public interface NotificationClientApi {
      * @param templateId The template id is visible on the template page in the application.
      * @param version The version of the template to return
      * @return <code>Template</code>
-     * @throws NotificationClientException
+     * @throws NotificationClientException see https://docs.notifications.service.gov.uk/java.html#get-a-template-by-id-and-version-error-codes
      */
     Template getTemplateVersion(String templateId, int version) throws NotificationClientException;
 
@@ -164,7 +165,7 @@ public interface NotificationClientApi {
      * @param templateType If templateType is not empty or null templates will be filtered by type.
      *          Possible template types are email|sms|letter
      * @return <code>TemplateList</code>
-     * @throws NotificationClientException
+     * @throws NotificationClientException see https://docs.notifications.service.gov.uk/java.html#generate-a-preview-template-error-codes
      */
     TemplateList getAllTemplates(String templateType) throws NotificationClientException;
 
@@ -175,7 +176,7 @@ public interface NotificationClientApi {
      * @param personalisation Map representing the placeholders for the template if any. For example, key=name value=Bob
      *                        Can be an empty map or null when the template does not require placeholders.
      * @return <code>Template</code>
-     * @throws NotificationClientException
+     * @throws NotificationClientException see https://docs.notifications.service.gov.uk/java.html#generate-a-preview-template-error-codes
      */
     TemplatePreview generateTemplatePreview(String templateId, Map<String, String> personalisation) throws NotificationClientException;
 
@@ -183,6 +184,7 @@ public interface NotificationClientApi {
      * The getReceivedTextMessages returns a list of <code>ReceivedTextMessage</code>, the list is sorted by createdAt descending.
      * @param olderThanId If olderThanId is not empty or null only the received text messages older than that id are returned.
      * @return <code>ReceivedTextMessageList</code>
+     * @throws NotificationClientException
      */
     ReceivedTextMessageList getReceivedTextMessages(String olderThanId) throws NotificationClientException;
 }

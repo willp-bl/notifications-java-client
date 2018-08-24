@@ -1,14 +1,11 @@
 package uk.gov.service.notify;
 
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
 import javax.net.ssl.SSLContext;
 import java.io.File;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
-import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
 
@@ -48,7 +45,7 @@ public class NotificationClientTest {
     @Test
     public void testCreateNotificationClientSetsUserAgent() {
         NotificationClient client = new NotificationClient(combinedApiKey, baseUrl);
-        assertEquals(client.getUserAgent(), "NOTIFY-API-JAVA-CLIENT/3.10.0-RELEASE");
+        assertEquals(client.getUserAgent(), "NOTIFY-API-JAVA-CLIENT/3.12.0-RELEASE");
     }
 
     @Test

@@ -232,6 +232,40 @@ If the request is not successful, the client returns a `NotificationClientExcept
 |`429`|`[{`<br>`"error": "TooManyRequestsError",`<br>`"message": "Exceeded send limits (LIMIT NUMBER) for today"`<br>`}]`|Refer to [service limits](#service-limits) for the limit number|
 |`500`|`[{`<br>`"error": "Exception",`<br>`"message": "Internal server error"`<br>`}]`|Notify was unable to process the request, resend your notification|
 
+##Send a document by email
+Send files without the need for email attachments.
+
+To send a document by email, add a placeholder field to the template then upload a file. The placeholder field will contain a secure link to download the document.
+
+[Contact the GOV.UK Notify team](https://www.notifications.service.gov.uk/support) to enable this function for your service.
+
+#### Add a placeholder field to the template
+
+In Notify, use double brackets to add a placeholder field to the email template. For example:
+
+"Download your document at: ((link_to_document))"
+
+#### Upload your document
+
+The document you upload must be a PDF file smaller than 2MB.
+
+
+Convert the PDF to a `byte[]` and pass that to the the personalisation argument, then call the [sendEmail method](#send-an-email) as usual. For example:
+
+```java
+ClassLoader classLoader = getClass().getClassLoader();
+File file = new File(classLoader.getResource("document_to_upload.pdf").getFile());
+byte [] fileContents = FileUtils.readFileToByteArray(file);
+
+HashMap<String, Object> personalisation = new HashMap();
+personalisation.put("link_to_document", client.prepareUpload(fileContents)
+client.sendEmail( templateId,
+                     emailAddress,
+                     personalisation,
+                     reference,
+                     emailReplyToId)
+```
+
 ## Send a letter
 
 When your service first signs up to GOV.UK Notify, you’ll start in trial mode. You can only send letters in live mode. You must ask GOV.UK Notify to make your service live.
@@ -618,6 +652,7 @@ If the request to the client is successful, the client returns a `Template`:
 
 ```java
 UUID id;
+String name;
 String templateType;
 DateTime createdAt;
 Optional<DateTime> updatedAt;
@@ -669,6 +704,7 @@ If the request to the client is successful, the client returns a `Template`:
 
 ```Java
 UUID id;
+String name;
 String templateType;
 DateTime createdAt;
 Optional<DateTime> updatedAt;
@@ -705,7 +741,7 @@ TemplateList templates = client.getAllTemplates(templateType);
 
 #### templateType (optional)
 
-If you donot use `templateType`, the client returns all templates. Otherwise you can filter by:
+If you don’t use `templateType`, the client returns all templates. Otherwise you can filter by:
 
 - `email`
 - `sms`
