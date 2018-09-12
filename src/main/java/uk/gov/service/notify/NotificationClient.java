@@ -297,7 +297,7 @@ public class NotificationClient implements NotificationClientApi {
      */
     public static JSONObject prepareUpload(final byte[] documentContents) throws UnsupportedEncodingException, NotificationClientException {
         if (documentContents.length > 2*1024*1024){
-            throw new NotificationClientException("File size must be under 2MB");
+            throw new NotificationClientException("Document is larger than 2MB");
         }
         byte[] fileContentAsByte = Base64.encodeBase64(documentContents);
         String fileContent = new String(fileContentAsByte, "ISO-8859-1");
