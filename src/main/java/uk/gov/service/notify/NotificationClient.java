@@ -295,7 +295,10 @@ public class NotificationClient implements NotificationClientApi {
      * @return <code>JSONObject</code> a json object to be added to the personalisation is returned
      * @throws UnsupportedEncodingException exception thrown if unable to create a String using "IS0-8859-1" character set.
      */
-    public static JSONObject prepareUpload(final byte[] documentContents) throws UnsupportedEncodingException {
+    public static JSONObject prepareUpload(final byte[] documentContents) throws UnsupportedEncodingException, NotificationClientException {
+        if (documentContents.length > 2*1024*1024){
+            throw new NotificationClientException("File size must be under 2MB");
+        }
         byte[] fileContentAsByte = Base64.encodeBase64(documentContents);
         String fileContent = new String(fileContentAsByte, "ISO-8859-1");
 

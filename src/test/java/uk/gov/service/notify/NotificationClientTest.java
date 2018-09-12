@@ -1,9 +1,12 @@
 package uk.gov.service.notify;
 
+import org.apache.commons.codec.binary.Base64;
+import org.json.JSONObject;
 import org.junit.Test;
 
 import javax.net.ssl.SSLContext;
 import java.io.File;
+import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.security.NoSuchAlgorithmException;
@@ -77,10 +80,30 @@ public class NotificationClientTest {
     }
 
     @Test(expected = NotificationClientException.class)
-    public void sendPrecompiledLetterNotPDF() throws Exception {
+    public void testSendPrecompiledLetterNotPDF() throws Exception {
         ClassLoader classLoader = getClass().getClassLoader();
         File file = new File(classLoader.getResource("not_a_pdf.txt").getFile());
         NotificationClient client = new NotificationClient(combinedApiKey, baseUrl);
         client.sendPrecompiledLetter("reference", file);
+    }
+
+    @Test
+    public void testPrepareUpload() throws UnsupportedEncodingException, NotificationClientException {
+        NotificationClient client = new NotificationClient(combinedApiKey, baseUrl);
+        byte[] documentContent = new String("this is a document to test with").getBytes();
+        JSONObject response = client.prepareUpload(documentContent);
+        JSONObject expectedResult = new JSONObject();
+        expectedResult.put("file", new String(Base64.encodeBase64(documentContent), "ISO-8859-1"));
+        assertEquals(expectedResult.getString("file"), response.getString("file"));
+    }
+
+    @Test(expected = NotificationClientException.class)
+    public void testPrepareUploadThrowsExceptionWhenExceeds2MB() throws UnsupportedEncodingException, NotificationClientException {
+        NotificationClient client = new NotificationClient(combinedApiKey, baseUrl);
+        char[] data = new char[(2*1024*1024)+50];
+        byte[] documentContents = new String(data).getBytes();
+
+        client.prepareUpload(documentContents);
+
     }
 }
