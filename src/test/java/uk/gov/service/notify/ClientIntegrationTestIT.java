@@ -1,9 +1,12 @@
 package uk.gov.service.notify;
 
+import org.apache.commons.io.FileUtils;
+import org.json.JSONObject;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -112,17 +115,14 @@ public class ClientIntegrationTestIT {
 
         boolean exceptionThrown = false;
 
-        try
-        {
+        try {
             SendEmailResponse response = client.sendEmail(
                     System.getenv("EMAIL_TEMPLATE_ID"),
                     System.getenv("FUNCTIONAL_TEST_EMAIL"),
                     personalisation,
                     uniqueName,
                     fake_uuid.toString());
-        }
-        catch (final NotificationClientException ex)
-        {
+        } catch (final NotificationClientException ex){
             exceptionThrown = true;
             assertTrue(ex.getMessage().contains("does not exist in database for service id"));
         }
@@ -130,6 +130,29 @@ public class ClientIntegrationTestIT {
         assertTrue(exceptionThrown);
 
     }
+
+    @Test
+    public void testEmailNotificationWithUploadedDocumentInPersonalisation() throws NotificationClientException, IOException {
+        NotificationClient client = getClient();
+        HashMap<String, Object> personalisation = new HashMap<>();
+
+        ClassLoader classLoader = getClass().getClassLoader();
+        File file = new File(classLoader.getResource("one_page_pdf.pdf").getFile());
+        byte [] fileContents = FileUtils.readFileToByteArray(file);
+
+        JSONObject documentFileObject = client.prepareUpload(fileContents);
+        personalisation.put("name", documentFileObject);
+
+        String reference = UUID.randomUUID().toString();
+        SendEmailResponse emailResponse = client.sendEmail(System.getenv("EMAIL_TEMPLATE_ID"),
+                System.getenv("FUNCTIONAL_TEST_EMAIL"),
+                personalisation,
+                reference
+        );
+
+        assertNotificationEmailResponseWithDocumentInPersonalisation(emailResponse, reference);
+    }
+
 
     @Test
     public void testSmsNotificationWithoutPersonalisationReturnsErrorMessageIT() {
@@ -176,17 +199,14 @@ public class ClientIntegrationTestIT {
 
         boolean exceptionThrown = false;
 
-        try
-        {
+        try {
             SendSmsResponse response = client.sendSms(
                     System.getenv("SMS_TEMPLATE_ID"),
                     System.getenv("FUNCTIONAL_TEST_NUMBER"),
                     personalisation,
                     uniqueName,
                     fake_uuid.toString());
-        }
-        catch (final NotificationClientException ex)
-        {
+        } catch (final NotificationClientException ex) {
             exceptionThrown = true;
             assertTrue(ex.getMessage().contains("does not exist in database for service id"));
         }
@@ -368,6 +388,18 @@ public class ClientIntegrationTestIT {
     private void assertNotificationEmailResponse(final SendEmailResponse response, final String uniqueName){
         assertNotNull(response);
         assertTrue(response.getBody().contains(uniqueName));
+        assertEquals(Optional.of(uniqueName), response.getReference());
+        assertNotNull(response.getNotificationId());
+        assertNotNull(response.getSubject());
+        assertNotNull(response.getFromEmail().orElse(null));
+        assertNotNull(response.getTemplateUri());
+        assertNotNull(response.getTemplateId());
+        assertNotNull(response.getTemplateVersion());
+    }
+
+    private void assertNotificationEmailResponseWithDocumentInPersonalisation(final SendEmailResponse response, final String uniqueName){
+        assertNotNull(response);
+        assertTrue(response.getBody().contains("https://documents."));
         assertEquals(Optional.of(uniqueName), response.getReference());
         assertNotNull(response.getNotificationId());
         assertNotNull(response.getSubject());

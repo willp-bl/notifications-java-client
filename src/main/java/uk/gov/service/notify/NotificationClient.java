@@ -1,5 +1,6 @@
 package uk.gov.service.notify;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Base64InputStream;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -16,6 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.Proxy;
 import java.net.URISyntaxException;
@@ -137,7 +139,7 @@ public class NotificationClient implements NotificationClientApi {
 
     public SendEmailResponse sendEmail(String templateId,
                                        String emailAddress,
-                                       Map<String, String> personalisation,
+                                       Map<String, ?> personalisation,
                                        String reference) throws NotificationClientException {
         return sendEmail(templateId, emailAddress, personalisation, reference, "");
     }
@@ -145,7 +147,7 @@ public class NotificationClient implements NotificationClientApi {
     @Override
     public SendEmailResponse sendEmail(String templateId,
                                        String emailAddress,
-                                       Map<String, String> personalisation,
+                                       Map<String, ?> personalisation,
                                        String reference,
                                        String emailReplyToId) throws NotificationClientException {
 
@@ -285,6 +287,26 @@ public class NotificationClient implements NotificationClientApi {
         }
     }
 
+    /**
+     * Use the prepareUpload method when uploading a document via sendEmail.
+     * The prepareUpload method creates a <code>JSONObject</code> which will need to be added to the personalisation map.
+     *
+     * @param documentContents byte[] of the document
+     * @return <code>JSONObject</code> a json object to be added to the personalisation is returned
+     * @throws UnsupportedEncodingException exception thrown if unable to create a String using "IS0-8859-1" character set.
+     */
+    public static JSONObject prepareUpload(final byte[] documentContents) throws UnsupportedEncodingException, NotificationClientException {
+        if (documentContents.length > 2*1024*1024){
+            throw new NotificationClientException("Document is larger than 2MB");
+        }
+        byte[] fileContentAsByte = Base64.encodeBase64(documentContents);
+        String fileContent = new String(fileContentAsByte, "ISO-8859-1");
+
+        JSONObject jsonFileObject = new JSONObject();
+        jsonFileObject.put("file", fileContent);
+        return jsonFileObject;
+    }
+
     private String performPostRequest(HttpURLConnection conn, JSONObject body, int expectedStatusCode) throws NotificationClientException {
         try{
             OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
@@ -369,7 +391,7 @@ public class NotificationClient implements NotificationClientApi {
     private JSONObject createBodyForPostRequest(final String templateId,
                                                 final String phoneNumber,
                                                 final String emailAddress,
-                                                final Map<String, String> personalisation,
+                                                final Map<String, ?> personalisation,
                                                 final String reference,
                                                 final String encodedFileData) {
         JSONObject body = new JSONObject();
@@ -387,7 +409,7 @@ public class NotificationClient implements NotificationClientApi {
         }
 
         if (personalisation != null && !personalisation.isEmpty()) {
-            body.put("personalisation", new JSONObject(personalisation));
+            body.put("personalisation", personalisation);
         }
 
         if(reference != null && !reference.isEmpty()){
