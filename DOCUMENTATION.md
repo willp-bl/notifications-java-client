@@ -331,7 +331,7 @@ personalisation.put("application_date", "2018-01-01"); // field from template
 
 If a template does not have any placeholder fields for personalised information, you must pass in an empty map or `null`.
 
-#### personalisation (required)
+#### personalisation (optional)
 
 The following parameters in the letter recipient's address are optional:
 
