@@ -558,7 +558,7 @@ If the request is not successful, the client returns a `NotificationClientExcept
 
 This API call returns one page of up to 250 messages and statuses. You can get either the most recent messages, or get older messages by specifying a particular notification ID in the [`olderThanId`](#olderthanid) argument.
 
-You can only get the status of messages that are 7 days old or less.
+You can only get the status of messages that are 7 days old or newer.
 
 ### Method
 
@@ -839,7 +839,7 @@ If the request is not successful, the client returns a `NotificationClientExcept
 
 This API call returns one page of up to 250 received text messages. You can get either the most recent messages, or get older messages by specifying a particular notification ID in the [`olderThanId`](#olderThanId) argument.
 
-You can only get messages that are 7 days old or less.
+You can only get messages that are 7 days old or newer.
 
 ### Method
 
