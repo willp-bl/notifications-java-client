@@ -241,7 +241,7 @@ To send a document by email, add a placeholder field to the template then upload
 
 #### Add a placeholder field to the template
 
-1. Sign in to [GOV.UK Notify](https://www.notifications.service.gov.uk/). 
+1. Sign in to [GOV.UK Notify](https://www.notifications.service.gov.uk/).
 1. Go to the __Templates__ page and select the relevant email template.
 1. Add a placeholder field to the email template using double brackets. For example:
 
@@ -253,7 +253,7 @@ The document you upload must be a PDF file smaller than 2MB.
 
 1. Convert the PDF to a `byte[]`.
 1. Pass the `byte[]` to the personalisation argument.
-1. Call the [sendEmail method](#send-an-email). 
+1. Call the [sendEmail method](#send-an-email).
 
 For example:
 
@@ -263,12 +263,12 @@ File file = new File(classLoader.getResource("document_to_upload.pdf").getFile()
 byte [] fileContents = FileUtils.readFileToByteArray(file);
 
 HashMap<String, Object> personalisation = new HashMap();
-personalisation.put("link_to_document", client.prepareUpload(fileContents)
-client.sendEmail( templateId,
-                     emailAddress,
-                     personalisation,
-                     reference,
-                     emailReplyToId)
+personalisation.put("link_to_document", client.prepareUpload(fileContents));
+client.sendEmail(templateId,
+                 emailAddress,
+                 personalisation,
+                 reference,
+                 emailReplyToId);
 ```
 
 ### Error codes
