@@ -75,7 +75,7 @@ If a template does not have any placeholder fields for personalised information,
 
 #### reference (required)
 
-A unique identifier you create. This reference identifies a single unique notification or a batch of notifications. If you do not have a reference, you must pass in an empty string or `null`.
+A unique identifier you create. This reference identifies a single unique notification or a batch of notifications. It must not contain any personal information such as name or postal address. If you do not have a reference, you must pass in an empty string or `null`. 
 
 ```
 String reference='STRING';
@@ -180,7 +180,7 @@ If a template does not have any placeholder fields for personalised information,
 
 #### reference (required)
 
-A unique identifier you create. This reference identifies a single unique notification or a batch of notifications. If you do not have a reference, you must pass in an empty string or `null`.
+A unique identifier you create. This reference identifies a single unique notification or a batch of notifications. It must not contain any personal information such as name or postal address. If you do not have a reference, you must pass in an empty string or `null`.
 
 ```
 String reference='STRING';
@@ -350,7 +350,7 @@ personalisation.put("address_line_6", "Middlesex"); // optional address field
 
 #### reference (required)
 
-A unique identifier you create. This reference identifies a single unique notification or a batch of notifications. If you do not have a reference, you must pass in an empty string or `null`.
+A unique identifier you create. This reference identifies a single unique notification or a batch of notifications. It must not contain any personal information such as name or postal address. If you do not have a reference, you must pass in an empty string or `null`.
 
 ```
 String reference='STRING';
@@ -610,7 +610,7 @@ You can filter by:
 
 #### reference (optional)
 
-A unique identifier you create if necessary. This reference identifies a single unique notification or a batch of notifications.
+A unique identifier you create if necessary. This reference identifies a single unique notification or a batch of notifications. It must not contain any personal information such as name or postal address.
 
 ```
 String reference='STRING';
