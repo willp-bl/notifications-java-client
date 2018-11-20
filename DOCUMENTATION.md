@@ -702,8 +702,6 @@ If the request is not successful, the client returns a `NotificationClientExcept
 
 ### Method
 
-This returns the latest version of the template.
-
 ```java
 Template template = client.getTemplateVersion(templateId, version);
 ```
