@@ -232,6 +232,7 @@ If the request is not successful, the client returns a `NotificationClientExcept
 |`500`|`[{`<br>`"error": "Exception",`<br>`"message": "Internal server error"`<br>`}]`|Notify was unable to process the request, resend your notification|
 
 ## Send a document by email
+
 Send files without the need for email attachments.
 
 To send a document by email, add a placeholder field to the template then upload a file. The placeholder field will contain a secure link to download the document.
@@ -240,7 +241,9 @@ To send a document by email, add a placeholder field to the template then upload
 
 #### Add a placeholder field to the template
 
-In Notify, use double brackets to add a placeholder field to the email template. For example:
+1. Sign in to [GOV.UK Notify](https://www.notifications.service.gov.uk/).
+1. Go to the __Templates__ page and select the relevant email template.
+1. Add a placeholder field to the email template using double brackets. For example:
 
 "Download your document at: ((link_to_document))"
 
@@ -248,8 +251,11 @@ In Notify, use double brackets to add a placeholder field to the email template.
 
 The document you upload must be a PDF file smaller than 2MB.
 
+1. Convert the PDF to a `byte[]`.
+1. Pass the `byte[]` to the personalisation argument.
+1. Call the [sendEmail method](#send-an-email).
 
-Convert the PDF to a `byte[]` and pass that to the the personalisation argument, then call the [sendEmail method](#send-an-email) as usual. For example:
+For example:
 
 ```java
 ClassLoader classLoader = getClass().getClassLoader();
@@ -257,12 +263,12 @@ File file = new File(classLoader.getResource("document_to_upload.pdf").getFile()
 byte [] fileContents = FileUtils.readFileToByteArray(file);
 
 HashMap<String, Object> personalisation = new HashMap();
-personalisation.put("link_to_document", client.prepareUpload(fileContents)
-client.sendEmail( templateId,
-                     emailAddress,
-                     personalisation,
-                     reference,
-                     emailReplyToId)
+personalisation.put("link_to_document", client.prepareUpload(fileContents));
+client.sendEmail(templateId,
+                 emailAddress,
+                 personalisation,
+                 reference,
+                 emailReplyToId);
 ```
 
 ### Error codes
@@ -454,42 +460,40 @@ If the request is not successful, the client returns a `NotificationClientExcept
 
 # Get message status
 
-Message status depends on the type of message that you have sent.
+Message status depends on the type of message you have sent.
 
-You can only get the status of messages that are 7 days old or less.
+You can only get the status of messages that are 7 days old or newer.
 
 ## Status - text and email
 
 |Status|Information|
 |:---|:---|
-|created|The message is queued to be sent to the provider. The notification usually remains in this state for a few seconds.|
-|sending|The message is queued to be sent by the provider to the recipient, and GOV.UK Notify is waiting for delivery information.|
-|delivered|The message was successfully delivered.|
-|permanent-failure|The provider was unable to deliver message, email or phone number does not exist; remove this recipient from your list.|
-|temporary-failure|The provider was unable to deliver message, email inbox was full or phone was turned off; you can try to send the message again.|
-|technical-failure|Notify had a technical failure; you can try to send the message again.|
+|Created|The message is queued to be sent to the provider. The notification usually remains in this state for a few seconds.|
+|Sending|The message is queued to be sent by the provider to the recipient, and GOV.UK Notify is waiting for delivery information.|
+|Delivered|The message was successfully delivered.|
+|Failed|This covers all failure statuses:<br>- `permanent-failure` - "The provider was unable to deliver message, email or phone number does not exist; remove this recipient from your list"<br>- `temporary-failure` - "The provider was unable to deliver message, email inbox was full or phone was turned off; you can try to send the message again"<br>- `technical-failure` - "Notify had a technical failure; you can try to send the message again"|
 
 ## Status - text only
 
 |Status|Information|
 |:---|:---|
-|pending|GOV.UK Notify received a callback from the provider but the device has not yet responded. Another callback from the provider determines the final status of the notification.|
-|sent|The text message was delivered internationally. This only applies to text messages sent to non-UK phone numbers. GOV.UK Notify may not receive additional status updates depending on the recipient's country and telecoms provider.|
+|Pending|GOV.UK Notify received a callback from the provider but the device has not yet responded. Another callback from the provider determines the final status of the notification.|
+|Sent|The text message was delivered internationally. This only applies to text messages sent to non-UK phone numbers. GOV.UK Notify may not receive additional status updates depending on the recipient's country and telecoms provider.|
 
 ## Status - letter
 
 |Status|information|
 |:---|:---|
-|technical-failure|The only failure status that applies to letters is `technical-failure`. GOV.UK Notify had an unexpected error while sending to our printing provider.|
-|accepted|GOV.UK Notify is printing and posting the letter.|
-|received|The provider has received the letter to deliver.|
+|Failed|The only failure status that applies to letters is `technical-failure`. GOV.UK Notify had an unexpected error while sending to our printing provider.|
+|Accepted|GOV.UK Notify is printing and posting the letter.|
+|Received|The provider has received the letter to deliver.|
 
 ## Status - pre-compiled letter
 
 |Status|information|
 |:---|:---|
-|pending-virus-check|GOV.UK Notify virus scan of the pre-compiled letter file is not yet complete.|
-|virus-scan-failed|GOV.UK Notify virus scan has identified a potential virus in the pre-compiled letter file.|
+|Pending virus check|GOV.UK Notify virus scan of the pre-compiled letter file is not yet complete.|
+|Virus scan failed|GOV.UK Notify virus scan has identified a potential virus in the pre-compiled letter file.|
 
 ## Get the status of one message
 
