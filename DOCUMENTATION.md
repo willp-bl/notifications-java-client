@@ -232,6 +232,7 @@ If the request is not successful, the client returns a `NotificationClientExcept
 |`500`|`[{`<br>`"error": "Exception",`<br>`"message": "Internal server error"`<br>`}]`|Notify was unable to process the request, resend your notification|
 
 ## Send a document by email
+
 Send files without the need for email attachments.
 
 To send a document by email, add a placeholder field to the template then upload a file. The placeholder field will contain a secure link to download the document.
@@ -240,7 +241,9 @@ To send a document by email, add a placeholder field to the template then upload
 
 #### Add a placeholder field to the template
 
-In Notify, use double brackets to add a placeholder field to the email template. For example:
+1. Sign in to [GOV.UK Notify](https://www.notifications.service.gov.uk/).
+1. Go to the __Templates__ page and select the relevant email template.
+1. Add a placeholder field to the email template using double brackets. For example:
 
 "Download your document at: ((link_to_document))"
 
@@ -248,8 +251,11 @@ In Notify, use double brackets to add a placeholder field to the email template.
 
 The document you upload must be a PDF file smaller than 2MB.
 
+1. Convert the PDF to a `byte[]`.
+1. Pass the `byte[]` to the personalisation argument.
+1. Call the [sendEmail method](#send-an-email).
 
-Convert the PDF to a `byte[]` and pass that to the the personalisation argument, then call the [sendEmail method](#send-an-email) as usual. For example:
+For example:
 
 ```java
 ClassLoader classLoader = getClass().getClassLoader();
@@ -257,12 +263,12 @@ File file = new File(classLoader.getResource("document_to_upload.pdf").getFile()
 byte [] fileContents = FileUtils.readFileToByteArray(file);
 
 HashMap<String, Object> personalisation = new HashMap();
-personalisation.put("link_to_document", client.prepareUpload(fileContents)
-client.sendEmail( templateId,
-                     emailAddress,
-                     personalisation,
-                     reference,
-                     emailReplyToId)
+personalisation.put("link_to_document", client.prepareUpload(fileContents));
+client.sendEmail(templateId,
+                 emailAddress,
+                 personalisation,
+                 reference,
+                 emailReplyToId);
 ```
 
 ### Error codes
