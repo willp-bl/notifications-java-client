@@ -887,3 +887,12 @@ private String content;
 private DateTime createdAt;
 ```
 If the notification specified in the `olderThanId` argument is older than 7 days, the client returns an empty response.
+
+### Error codes
+
+If the request is not successful, the client returns a `NotificationClientException` containing the relevant error code:
+
+|httpResult|Message|How to fix|
+|:---|:---|:---|
+|`403`|`[{`<br>`"error": "AuthError",`<br>`"message": "Error: Your system clock must be accurate to within 30 seconds"`<br>`}]`|Check your system clock|
+|`403`|`[{`<br>`"error": "AuthError",`<br>`"message": "Invalid token: signature, api token not found"`<br>`}]`|Use the correct API key. Refer to [API keys](#api-keys) for more information|
