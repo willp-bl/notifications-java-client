@@ -262,7 +262,7 @@ public class NotificationClient implements NotificationClientApi {
         }
     }
 
-    public TemplatePreview generateTemplatePreview(String templateId, Map<String, String> personalisation) throws NotificationClientException {
+    public TemplatePreview generateTemplatePreview(String templateId, Map<String, Object> personalisation) throws NotificationClientException {
         JSONObject body = new JSONObject();
         if (personalisation != null && !personalisation.isEmpty()) {
             body.put("personalisation", new JSONObject(personalisation));

@@ -264,7 +264,7 @@ public class ClientIntegrationTestIT {
     @Test
     public void testGetTemplatePreview() throws NotificationClientException {
         NotificationClient client = getClient();
-        HashMap<String, String> personalisation = new HashMap<>();
+        HashMap<String, Object> personalisation = new HashMap<>();
         String uniqueName = UUID.randomUUID().toString();
         personalisation.put("name", uniqueName);
         TemplatePreview template = client.generateTemplatePreview(System.getenv("EMAIL_TEMPLATE_ID"), personalisation);

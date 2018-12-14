@@ -178,7 +178,7 @@ public interface NotificationClientApi {
      * @return <code>Template</code>
      * @throws NotificationClientException see https://docs.notifications.service.gov.uk/java.html#generate-a-preview-template-error-codes
      */
-    TemplatePreview generateTemplatePreview(String templateId, Map<String, String> personalisation) throws NotificationClientException;
+    TemplatePreview generateTemplatePreview(String templateId, Map<String, Object> personalisation) throws NotificationClientException;
 
     /**
      * The getReceivedTextMessages returns a list of <code>ReceivedTextMessage</code>, the list is sorted by createdAt descending.
