@@ -9,6 +9,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Optional;
 import java.util.UUID;
@@ -353,9 +354,10 @@ public class ClientIntegrationTestIT {
     }
 
     private SendSmsResponse sendSmsAndAssertResponse(final NotificationClient client) throws NotificationClientException {
-        HashMap<String, String> personalisation = new HashMap<>();
+        HashMap<String, Object> personalisation = new HashMap<>();
         String uniqueName = UUID.randomUUID().toString();
         personalisation.put("name", uniqueName);
+        personalisation.put("list", Collections.singletonList("value"));
         SendSmsResponse response = client.sendSms(System.getenv("SMS_TEMPLATE_ID"), System.getenv("FUNCTIONAL_TEST_NUMBER"), personalisation, uniqueName);
         assertNotificationSmsResponse(response, uniqueName);
         return response;

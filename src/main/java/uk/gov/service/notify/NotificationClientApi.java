@@ -54,7 +54,7 @@ public interface NotificationClientApi {
      * @return <code>SendSmsResponse</code>
      * @throws NotificationClientException see https://docs.notifications.service.gov.uk/java.html#error-codes
      */
-    SendSmsResponse sendSms(String templateId, String phoneNumber, Map<String, String> personalisation, String reference) throws NotificationClientException;
+    SendSmsResponse sendSms(String templateId, String phoneNumber, Map<String, ?> personalisation, String reference) throws NotificationClientException;
 
     /**
      * The sendSms method will create an HTTPS POST request. A JWT token will be created and added as an Authorization header to the request.
@@ -72,7 +72,7 @@ public interface NotificationClientApi {
      * @return <code>SendSmsResponse</code>
      * @throws NotificationClientException see https://docs.notifications.service.gov.uk/java.html#error-codes
      */
-    SendSmsResponse sendSms(String templateId, String phoneNumber, Map<String, String> personalisation, String reference, String smsSenderId) throws NotificationClientException;
+    SendSmsResponse sendSms(String templateId, String phoneNumber, Map<String, ?> personalisation, String reference, String smsSenderId) throws NotificationClientException;
 
     /**
      * The sendLetter method will create an HTTPS POST request. A JWT token will be created and added as an Authorization header to the request.
@@ -86,7 +86,7 @@ public interface NotificationClientApi {
      * @return <code>SendLetterResponse</code>
      * @throws NotificationClientException see https://docs.notifications.service.gov.uk/java.html#send-a-letter-error-codes
      */
-    SendLetterResponse sendLetter(String templateId, Map<String, String> personalisation, String reference) throws NotificationClientException;
+    SendLetterResponse sendLetter(String templateId, Map<String, ?> personalisation, String reference) throws NotificationClientException;
 
     /**
      * The sendPrecompiledLetter method will create an HTTPS POST request. A JWT token will be created and added as an Authorization header to the request.
