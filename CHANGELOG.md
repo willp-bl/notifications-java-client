@@ -1,3 +1,6 @@
+## 3.13.0-RELEASE
+* Allow passing of `List`s into the personalisation Map to display as a bulleted list in the message.
+
 ## 3.12.0-RELEASE
 * Added `NotificationClient.prepareUpload` method that can be used if you want to upload a document and send a link to that docuemnt by email. 
   - Takes a byte[] of document contents
