@@ -67,9 +67,10 @@ String phoneNumber="+447900900123";
 If a template has placeholder fields for personalised information such as name or reference number, you must provide their values in a map. For example:
 
 ```java
-Map<String, String> personalisation = new HashMap<>();
+Map<String, Object> personalisation = new HashMap<>();
 personalisation.put("first_name", "Amala");
 personalisation.put("application_date", "2018-01-01");
+personalisation.put("list", listOfItems); // Will appear as a comma separated list in the message
 ```
 
 If a template does not have any placeholder fields for personalised information, you must pass in an empty map or `null`.
@@ -173,9 +174,11 @@ String emailAddress='sender@something.com';
 If a template has placeholder fields for personalised information such as name or application date, you must provide their values in a map. For example:
 
 ```java
-Map<String, String> personalisation = new HashMap<>();
+Map<String, Object> personalisation = new HashMap<>();
 personalisation.put("first_name", "Amala");
 personalisation.put("application_date", "2018-01-01");
+personalisation.put("list", listOfItems); // Will appear as a bulleted list in the message
+
 ```
 If a template does not have any placeholder fields for personalised information, you must pass in an empty map or `null`.
 
@@ -329,12 +332,13 @@ The personalisation argument always contains the following parameters for the le
 Any other placeholder fields included in the letter template also count as required parameters. You must provide their values in a map. For example:
 
 ```java
-HashMap<String, String> personalisation = new HashMap<>();
+Map<String, Object> personalisation = new HashMap<>();
 personalisation.put("address_line_1", "The Occupier"); // mandatory address field
 personalisation.put("address_line_2", "Flat 2"); // mandatory address field
 personalisation.put("postcode", "SW14 6BH"); // mandatory address field
 personalisation.put("first_name", "Amala"); // field from template
 personalisation.put("application_date", "2018-01-01"); // field from template
+personalisation.put("list", listOfItems); // Will appear as a bulleted list in the message
 ```
 
 If a template does not have any placeholder fields for personalised information, you must pass in an empty map or `null`.
@@ -810,7 +814,7 @@ String templateId='f33517ff-2a88-4f6e-b855-c550268ce08a';
 If a template has placeholder fields for personalised information such as name or application date, you must provide their values in a map. For example:
 
 ```java
-Map<String, String> personalisation = new HashMap<>();
+Map<String, Object> personalisation = new HashMap<>();
 personalisation.put("first_name", "Amala");
 personalisation.put("application_date", "2018-01-01");
 ```

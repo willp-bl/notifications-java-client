@@ -263,7 +263,7 @@ public class ClientIntegrationTestIT {
     @Test
     public void testGetTemplatePreview() throws NotificationClientException {
         NotificationClient client = getClient();
-        HashMap<String, String> personalisation = new HashMap<>();
+        HashMap<String, Object> personalisation = new HashMap<>();
         String uniqueName = UUID.randomUUID().toString();
         personalisation.put("name", uniqueName);
         TemplatePreview template = client.generateTemplatePreview(System.getenv("EMAIL_TEMPLATE_ID"), personalisation);
@@ -353,7 +353,7 @@ public class ClientIntegrationTestIT {
     }
 
     private SendSmsResponse sendSmsAndAssertResponse(final NotificationClient client) throws NotificationClientException {
-        HashMap<String, String> personalisation = new HashMap<>();
+        HashMap<String, Object> personalisation = new HashMap<>();
         String uniqueName = UUID.randomUUID().toString();
         personalisation.put("name", uniqueName);
         SendSmsResponse response = client.sendSms(System.getenv("SMS_TEMPLATE_ID"), System.getenv("FUNCTIONAL_TEST_NUMBER"), personalisation, uniqueName);

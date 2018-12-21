@@ -168,13 +168,13 @@ public class NotificationClient implements NotificationClientApi {
         return new SendEmailResponse(response);
     }
 
-    public SendSmsResponse sendSms(String templateId, String phoneNumber, Map<String, String> personalisation, String reference) throws NotificationClientException {
+    public SendSmsResponse sendSms(String templateId, String phoneNumber, Map<String, ?> personalisation, String reference) throws NotificationClientException {
         return sendSms(templateId, phoneNumber, personalisation, reference, "");
     }
 
     public SendSmsResponse sendSms(String templateId,
                                    String phoneNumber,
-                                   Map<String, String> personalisation,
+                                   Map<String, ?> personalisation,
                                    String reference,
                                    String smsSenderId) throws NotificationClientException {
 
@@ -193,7 +193,7 @@ public class NotificationClient implements NotificationClientApi {
         return new SendSmsResponse(response);
     }
 
-    public SendLetterResponse sendLetter(String templateId, Map<String, String> personalisation, String reference) throws NotificationClientException {
+    public SendLetterResponse sendLetter(String templateId, Map<String, ?> personalisation, String reference) throws NotificationClientException {
         JSONObject body = createBodyForPostRequest(templateId, null, null, personalisation, reference, null);
         HttpURLConnection conn = createConnectionAndSetHeaders(baseUrl + "/v2/notifications/letter", "POST");
         String response = performPostRequest(conn, body, HttpsURLConnection.HTTP_CREATED);
@@ -262,7 +262,7 @@ public class NotificationClient implements NotificationClientApi {
         }
     }
 
-    public TemplatePreview generateTemplatePreview(String templateId, Map<String, String> personalisation) throws NotificationClientException {
+    public TemplatePreview generateTemplatePreview(String templateId, Map<String, Object> personalisation) throws NotificationClientException {
         JSONObject body = new JSONObject();
         if (personalisation != null && !personalisation.isEmpty()) {
             body.put("personalisation", new JSONObject(personalisation));
