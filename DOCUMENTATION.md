@@ -850,13 +850,13 @@ This API call returns one page of up to 250 received text messages. You can get 
 
 You can only get messages that are 7 days old or newer.
 
+You can also set up [callbacks](/java.html#callbacks) for received text messages.
+
 ## Enable received text messages
 
 Contact the GOV.UK Notify team on the [support page](https://www.notifications.service.gov.uk/support) or through the [Slack channel](https://ukgovernmentdigital.slack.com/messages/govuk-notify) to enable receiving text messages for your service.
 
-For more information, refer to the [callbacks documentation](/java.html#callbacks).
-
-## Set up received text messages
+## Get a page of received text messages
 
 ### Method
 
