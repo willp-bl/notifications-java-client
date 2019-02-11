@@ -11,6 +11,7 @@ public class TemplatePreview {
         private int version;
         private String body;
         private String subject;
+        private String html;
 
 
         public TemplatePreview(String content){
@@ -30,6 +31,7 @@ public class TemplatePreview {
             version = data.getInt("version");
             body = data.getString("body");
             subject = data.isNull("subject") ? null : data.getString("subject");
+            html = data.isNull("html") ? null : data.getString("html");
         }
 
         public UUID getId() {
@@ -72,6 +74,14 @@ public class TemplatePreview {
             this.subject = subject;
         }
 
+        public Optional<String> getHtml() {
+            return Optional.ofNullable(html);
+        }
+        public void setHtml(String html) {
+            this.html = html;
+        }
+
+
         @Override
         public String toString() {
             return "Template{" +
@@ -80,6 +90,7 @@ public class TemplatePreview {
                     ", version=" + version +
                     ", body='" + body + '\'' +
                     ", subject='" + subject + '\'' +
+                    ", html='" + html + '\'' +
                     '}';
         }
     }
