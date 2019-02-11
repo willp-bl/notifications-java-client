@@ -294,7 +294,20 @@ public class ClientIntegrationTestIT {
         NotificationClient client = getClient();
         LetterResponse response =  client.sendPrecompiledLetter(reference, file);
 
-        assertPrecompiledLetterResponse(reference, response);
+        assertPrecompiledLetterResponse(reference, "second", response);
+
+    }
+
+    @Test
+    public void testSendPrecompiledLetterValidPDFFileITWithPostage() throws Exception {
+        String reference = UUID.randomUUID().toString();
+
+        ClassLoader classLoader = getClass().getClassLoader();
+        File file = new File(classLoader.getResource("one_page_pdf.pdf").getFile());
+        NotificationClient client = getClient();
+        LetterResponse response =  client.sendPrecompiledLetter(reference, file, "first");
+
+        assertPrecompiledLetterResponse(reference, "first", response);
 
     }
 
@@ -308,7 +321,21 @@ public class ClientIntegrationTestIT {
         NotificationClient client = getClient();
         LetterResponse response =  client.sendPrecompiledLetterWithInputStream(reference, stream);
 
-        assertPrecompiledLetterResponse(reference, response);
+        assertPrecompiledLetterResponse(reference, "second", response);
+
+    }
+
+    @Test
+    public void testSendPrecompiledLetterWithInputStreamWithPostage() throws Exception {
+        String reference = UUID.randomUUID().toString();
+
+        ClassLoader classLoader = getClass().getClassLoader();
+        File file = new File(classLoader.getResource("one_page_pdf.pdf").getFile());
+        InputStream stream = new FileInputStream(file);
+        NotificationClient client = getClient();
+        LetterResponse response =  client.sendPrecompiledLetterWithInputStream(reference, stream, "first");
+
+        assertPrecompiledLetterResponse(reference, "first", response);
 
     }
 
@@ -453,6 +480,7 @@ public class ClientIntegrationTestIT {
         assertTrue(notification.getLine1().isPresent());
         assertTrue(notification.getLine2().isPresent());
         assertTrue(notification.getPostcode().isPresent());
+        assertTrue(notification.getPostage().isPresent());
         // the other address lines are optional.
         assertFalse(notification.getEmailAddress().isPresent());
         assertFalse(notification.getPhoneNumber().isPresent());
@@ -469,6 +497,8 @@ public class ClientIntegrationTestIT {
         assertFalse(notification.getLine5().isPresent());
         assertFalse(notification.getLine6().isPresent());
         assertFalse(notification.getPostcode().isPresent());
+        assertFalse(notification.getPostage().isPresent());
+
     }
 
     private void assertNotificationWhenSms(Notification notification) {
@@ -482,12 +512,14 @@ public class ClientIntegrationTestIT {
         assertFalse(notification.getLine5().isPresent());
         assertFalse(notification.getLine6().isPresent());
         assertFalse(notification.getPostcode().isPresent());
+        assertFalse(notification.getPostage().isPresent());
     }
 
-    private void assertPrecompiledLetterResponse(String reference, LetterResponse response) {
+    private void assertPrecompiledLetterResponse(String reference, String postage, LetterResponse response) {
         assertNotNull(response);
         assertNotNull(response.getNotificationId());
         assertEquals(response.getReference().get(), reference);
+        assertEquals(response.getPostage(), Optional.ofNullable(postage));
     }
 
 }

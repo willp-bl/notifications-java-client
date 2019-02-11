@@ -156,6 +156,7 @@ public class NotificationClient implements NotificationClientApi {
                 emailAddress,
                 personalisation,
                 reference,
+                null,
                 null);
 
         if(emailReplyToId != null && !emailReplyToId.isEmpty())
@@ -183,6 +184,7 @@ public class NotificationClient implements NotificationClientApi {
                 null,
                 personalisation,
                 reference,
+                null,
                 null);
 
         if( smsSenderId != null && !smsSenderId.isEmpty()){
@@ -194,7 +196,7 @@ public class NotificationClient implements NotificationClientApi {
     }
 
     public SendLetterResponse sendLetter(String templateId, Map<String, ?> personalisation, String reference) throws NotificationClientException {
-        JSONObject body = createBodyForPostRequest(templateId, null, null, personalisation, reference, null);
+        JSONObject body = createBodyForPostRequest(templateId, null, null, personalisation, reference, null, null);
         HttpURLConnection conn = createConnectionAndSetHeaders(baseUrl + "/v2/notifications/letter", "POST");
         String response = performPostRequest(conn, body, HttpsURLConnection.HTTP_CREATED);
         return new SendLetterResponse(response);
@@ -393,7 +395,8 @@ public class NotificationClient implements NotificationClientApi {
                                                 final String emailAddress,
                                                 final Map<String, ?> personalisation,
                                                 final String reference,
-                                                final String encodedFileData) {
+                                                final String encodedFileData,
+                                                final String postage) {
         JSONObject body = new JSONObject();
 
         if(phoneNumber != null && !phoneNumber.isEmpty()) {
@@ -419,7 +422,9 @@ public class NotificationClient implements NotificationClientApi {
         if(encodedFileData != null && !encodedFileData.isEmpty()) {
             body.put("content", encodedFileData);
         }
-
+        if(postage != null && !postage.isEmpty()){
+            body.put("postage", postage);
+        }
         return body;
     }
 
@@ -493,7 +498,7 @@ public class NotificationClient implements NotificationClientApi {
         return prop.getProperty("project.version");
     }
 
-    private LetterResponse sendPrecompiledLetter(String reference, String base64EncodedPDFFile) throws NotificationClientException {
+    private LetterResponse sendPrecompiledLetter(String reference, String base64EncodedPDFFile, String postage) throws NotificationClientException {
         if( StringUtils.isBlank(reference) )
         {
             throw new NotificationClientException("reference cannot be null or empty");
@@ -514,7 +519,8 @@ public class NotificationClient implements NotificationClientApi {
                 null,
                 null,
                 reference,
-                base64EncodedPDFFile);
+                base64EncodedPDFFile,
+                postage);
 
         HttpURLConnection conn = createConnectionAndSetHeaders(
                 baseUrl + "/v2/notifications/letter",
@@ -528,6 +534,11 @@ public class NotificationClient implements NotificationClientApi {
 
     @Override
     public LetterResponse sendPrecompiledLetter(String reference, File precompiledPDF) throws NotificationClientException {
+        return sendPrecompiledLetter(reference, precompiledPDF, null);
+    }
+
+    @Override
+    public LetterResponse sendPrecompiledLetter(String reference, File precompiledPDF, String postage) throws NotificationClientException {
         if (precompiledPDF == null)
         {
             throw new NotificationClientException("File cannot be null");
@@ -538,11 +549,17 @@ public class NotificationClient implements NotificationClientApi {
         } catch (IOException e) {
             throw new NotificationClientException("Can't read file");
         }
-        return sendPrecompiledLetterWithInputStream(reference, new ByteArrayInputStream(buf));
+        return sendPrecompiledLetterWithInputStream(reference, new ByteArrayInputStream(buf), postage);
     }
 
     @Override
     public LetterResponse sendPrecompiledLetterWithInputStream(String reference, InputStream stream) throws NotificationClientException
+    {
+       return sendPrecompiledLetterWithInputStream(reference, stream, null);
+    }
+
+    @Override
+    public LetterResponse sendPrecompiledLetterWithInputStream(String reference, InputStream stream, String postage) throws NotificationClientException
     {
         if (stream == null)
         {
@@ -556,7 +573,7 @@ public class NotificationClient implements NotificationClientApi {
             throw new NotificationClientException("Error when turning Base64InputStream into a string");
         }
 
-        return this.sendPrecompiledLetter(reference, encoded);
+        return sendPrecompiledLetter(reference, encoded, postage);
     }
 
 }

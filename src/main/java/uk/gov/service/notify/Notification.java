@@ -18,6 +18,7 @@ public class Notification {
     private String line5;
     private String line6;
     private String postcode;
+    private String postage;
     private String notificationType;
     private String status;
     private UUID templateId;
@@ -52,6 +53,7 @@ public class Notification {
         line5 = data.isNull("line_5") ? null : data.getString("line_5");
         line6 = data.isNull("line_6") ? null : data.getString("line_6");
         postcode = data.isNull("postcode") ? null : data.getString("postcode");
+        postage = data.isNull("postage") ? null : data.getString("postage");
         notificationType = data.getString("type");
         JSONObject template = data.getJSONObject("template");
         templateId = UUID.fromString(template.getString("id"));
@@ -109,6 +111,9 @@ public class Notification {
 
     public Optional<String> getPostcode() {
         return Optional.ofNullable(postcode);
+    }
+    public Optional<String> getPostage() {
+        return Optional.ofNullable(postage);
     }
 
     public String getNotificationType() {

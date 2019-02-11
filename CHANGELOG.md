@@ -1,3 +1,9 @@
+## 3.14.0-RELEASE
+* Added `postage` argument to `NotificationClient.sendPrecompiledLetter` and `NotificationClient.sendPrecompiledLetterWithInputStream`
+* Added `postage` to `LetterResponse`
+* Added `postage` to `Notification` 
+* Added `html` to `TemplatePreview`
+
 ## 3.13.0-RELEASE
 * Allow passing of `List`s into the personalisation Map to display as a bulleted list in the message.
 
