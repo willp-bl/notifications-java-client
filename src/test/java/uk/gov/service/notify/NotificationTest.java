@@ -26,6 +26,7 @@ public class NotificationTest {
         content.put("line_5", null);
         content.put("line_6", null);
         content.put("postcode", null);
+        content.put("postage", null);
         content.put("type", "email");
         content.put("status", "delivered");
         JSONObject template = new JSONObject();
@@ -55,6 +56,7 @@ public class NotificationTest {
         assertEquals(Optional.<String>empty(), notification.getLine5());
         assertEquals(Optional.<String>empty(), notification.getLine6());
         assertEquals(Optional.<String>empty(), notification.getPostcode());
+        assertEquals(Optional.<String>empty(), notification.getPostage());
         assertEquals(UUID.fromString(templateId), notification.getTemplateId());
         assertEquals(1, notification.getTemplateVersion());
         assertEquals("https://api.notifications.service.gov.uk/templates/" + templateId, notification.getTemplateUri());
@@ -83,6 +85,7 @@ public class NotificationTest {
         content.put("line_5", null);
         content.put("line_6", null);
         content.put("postcode", null);
+        content.put("postage", null);
         content.put("type", "sms");
         content.put("status", "delivered");
         JSONObject template = new JSONObject();
@@ -114,6 +117,7 @@ public class NotificationTest {
         assertEquals(Optional.<String>empty(), notification.getLine5());
         assertEquals(Optional.<String>empty(), notification.getLine6());
         assertEquals(Optional.<String>empty(), notification.getPostcode());
+        assertEquals(Optional.<String>empty(), notification.getPostage());
         assertEquals(UUID.fromString(templateId), notification.getTemplateId());
         assertEquals(1, notification.getTemplateVersion());
         assertEquals("https://api.notifications.service.gov.uk/templates/" + templateId, notification.getTemplateUri());
@@ -143,6 +147,7 @@ public class NotificationTest {
         content.put("line_5", null);
         content.put("line_6", null);
         content.put("postcode", "sw1 1aa");
+        content.put("postage", "first");
         content.put("type", "letter");
         content.put("status", "delivered");
         JSONObject template = new JSONObject();
@@ -174,6 +179,7 @@ public class NotificationTest {
         assertEquals(Optional.<String>empty(), notification.getLine5());
         assertEquals(Optional.<String>empty(), notification.getLine6());
         assertEquals(Optional.of("sw1 1aa"), notification.getPostcode());
+        assertEquals(Optional.of("first"), notification.getPostage());
         assertEquals(UUID.fromString(templateId), notification.getTemplateId());
         assertEquals(1, notification.getTemplateVersion());
         assertEquals("https://api.notifications.service.gov.uk/templates/" + templateId, notification.getTemplateUri());

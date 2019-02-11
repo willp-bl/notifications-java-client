@@ -76,6 +76,7 @@ public class NotificationListTest {
         letter.put("line_5", null);
         letter.put("line_6", null);
         letter.put("postcode", "sw1 1aa");
+        letter.put("postage", "first");
         letter.put("type", "email");
         letter.put("status", "delivered");
         template.put("id", templateId);

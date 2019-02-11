@@ -407,6 +407,21 @@ LetterResponse response = client.sendPrecompiledLetterWithInputStream(
     precompiledPDFAsInputStream
     );
 ```
+```java
+LetterResponse response = client.sendPrecompiledLetter(
+    reference,
+    precompiledPDFAsFile,
+    postage
+    );
+```
+
+```java
+LetterResponse response = client.sendPrecompiledLetterWithInputStream(
+    reference,
+    precompiledPDFAsInputStream,
+    postage
+    );
+```
 
 ### Arguments
 
@@ -434,13 +449,18 @@ The precompiled letter must be an InputStream. This argument adds the precompile
 InputStream precompiledPDFAsInputStream = new FileInputStream(pdfContent);
 ```
 
+#### postage (optional)
+
+You can choose first or second class postage for your precompiled letter. Set the value to first for first class, or second for second class. If you do not pass in this argument, the postage will default to second class.
+
 ### Response
 
 If the request to the client is successful, the client returns a `LetterResponse`:
 
 ```java
 UUID notificationId;
-<String> reference;
+String reference;
+String postage
 ```
 
 ### Error codes
@@ -452,6 +472,8 @@ If the request is not successful, the client returns a `NotificationClientExcept
 |`400`|`[{`<br>`"error": "BadRequestError",`<br>`"message": "Cannot send letters with a team api key"`<br>`]}`|Use the correct type of [API key](#api-keys)|
 |`400`|`[{`<br>`"error": "BadRequestError",`<br>`"message": "Cannot send letters when service is in trial mode - see https://www.notifications.service.gov.uk/trial-mode"`<br>`}]`|Your service cannot send this notification in [trial mode](https://www.notifications.service.gov.uk/features/using-notify#trial-mode)|
 |`400`|`[{`<br>`"error": "ValidationError",`<br>`"message": "personalisation address_line_1 is a required property"`<br>`}]`|Send a valid PDF file|
+|`400`|`[{`<br>`"error": "ValidationError",`<br>`"message": "reference is a required property"`<br>`}]`|Add a reference argument to the method call|
+|`400`|`[{`<br>`"error": "ValidationError",`<br>`"message": "postage invalid. It must be either first or second. "`<br>`}]`|Change the value of postage argument in the method call to either 'first' or 'second'|
 |`400`|`[{`<br>`"error": "BadRequestError",`<br>`"message": "Service is not allowed to send precompiled letters"`<br>`}]`|Contact the GOV.UK Notify team|
 |`403`|`[{`<br>`"error": "AuthError",`<br>`"message": "Error: Your system clock must be accurate to within 30 seconds"`<br>`}]`|Check your system clock|
 |`403`|`[{`<br>`"error": "AuthError",`<br>`"message": "Invalid token: signature, api token not found"`<br>`}]`|Use the correct API key. Refer to [API keys](#api-keys) for more information|
@@ -535,6 +557,7 @@ Optional<String> line4;
 Optional<String> line5;
 Optional<String> line6;
 Optional<String> postcode;
+Optional<String> postage;
 String notificationType;
 String status;
 UUID templateId;
