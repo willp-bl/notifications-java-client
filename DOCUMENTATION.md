@@ -835,6 +835,7 @@ String templateType;
 int version;
 String body;
 Optional<String> subject;
+Optional<String> html;
 ```
 
 ### Error codes
