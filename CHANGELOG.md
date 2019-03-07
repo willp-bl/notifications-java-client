@@ -1,3 +1,7 @@
+## 3.14.1-RELEASE
+* Updated project properties to use UTF-8
+* Updated GET and POST to use UTF-8 readers and writers
+ 
 ## 3.14.0-RELEASE
 * Added `postage` argument to `NotificationClient.sendPrecompiledLetter` and `NotificationClient.sendPrecompiledLetterWithInputStream`
 * Added `postage` to `LetterResponse`
