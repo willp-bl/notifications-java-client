@@ -311,7 +311,7 @@ public class NotificationClient implements NotificationClientApi {
 
     private String performPostRequest(HttpURLConnection conn, JSONObject body, int expectedStatusCode) throws NotificationClientException {
         try{
-            OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
+            OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream(), "utf-8");
             wr.write(body.toString());
             wr.flush();
 
@@ -339,7 +339,7 @@ public class NotificationClient implements NotificationClientApi {
             int httpResult = conn.getResponseCode();
             StringBuilder stringBuilder;
             if (httpResult == 200) {
-                stringBuilder = readStream(new InputStreamReader(conn.getInputStream()));
+                stringBuilder = readStream(new InputStreamReader(conn.getInputStream(), "utf-8"));
                 conn.disconnect();
                 return stringBuilder.toString();
             } else {
