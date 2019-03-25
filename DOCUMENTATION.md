@@ -439,7 +439,9 @@ String reference="STRING";
 
 #### precompiledPDFAsFile (required for the sendPrecompiledLetter method)
 
-The precompiled letter must be a PDF file. This argument adds the precompiled letter PDF file to a Java file object. The method sends this Java file object to GOV.UK Notify.
+The precompiled letter must be a PDF file which meets [the GOV.UK Notify PDF letter specification](https://docs.notifications.service.gov.uk/documentation/images/notify-pdf-letter-spec-v2.3.pdf). 
+
+This argument adds the precompiled letter PDF file to a Java file object. The method sends this Java file object to GOV.UK Notify.
 
 ```java
 File precompiledPDF = new File("<PDF file path>");
@@ -523,7 +525,7 @@ You can only get the status of messages that are 7 days old or newer.
 |:---|:---|
 |Pending virus check|GOV.UK Notify has not completed a virus scan of the precompiled letter file.|
 |Virus scan failed|GOV.UK Notify found a potential virus in the precompiled letter file.|
-|Validation failed|Content in the precompiled letter file is outside the printable area.|
+|Validation failed|Content in the precompiled letter file is outside the printable area. See the [GOV.UK Notify PDF letter specification](https://docs.notifications.service.gov.uk/documentation/images/notify-pdf-letter-spec-v2.3.pdf) for more information.|
 
 ## Get the status of one message
 
