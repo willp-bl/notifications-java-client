@@ -508,7 +508,7 @@ public class ClientIntegrationTestIT {
     private void assertPrecompiledLetterResponse(String reference, String postage, LetterResponse response) {
         assertNotNull(response);
         assertNotNull(response.getNotificationId());
-        assertEquals(response.getReference().get(), reference);
+        assertEquals(response.getReference().orElse("dummy-value"), reference);
         assertEquals(response.getPostage(), Optional.ofNullable(postage));
     }
 
