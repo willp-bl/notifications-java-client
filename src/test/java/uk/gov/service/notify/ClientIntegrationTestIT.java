@@ -233,7 +233,6 @@ public class ClientIntegrationTestIT {
         NotificationClient client = getClient();
         Template template = client.getTemplateById(System.getenv("EMAIL_TEMPLATE_ID"));
         assertEquals(System.getenv("EMAIL_TEMPLATE_ID"), template.getId().toString());
-        assertNotNull(template.getVersion());
         assertNotNull(template.getCreatedAt());
         assertNotNull(template.getTemplateType());
         assertNotNull(template.getBody());
@@ -246,7 +245,6 @@ public class ClientIntegrationTestIT {
         NotificationClient client = getClient();
         Template template = client.getTemplateVersion(System.getenv("SMS_TEMPLATE_ID"), 1);
         assertEquals(System.getenv("SMS_TEMPLATE_ID"), template.getId().toString());
-        assertNotNull(template.getVersion());
         assertNotNull(template.getCreatedAt());
         assertNotNull(template.getTemplateType());
         assertNotNull(template.getBody());
@@ -268,7 +266,6 @@ public class ClientIntegrationTestIT {
         personalisation.put("name", uniqueName);
         TemplatePreview template = client.generateTemplatePreview(System.getenv("EMAIL_TEMPLATE_ID"), personalisation);
         assertEquals(System.getenv("EMAIL_TEMPLATE_ID"), template.getId().toString());
-        assertNotNull(template.getVersion());
         assertNotNull(template.getTemplateType());
         assertNotNull(template.getBody());
         assertNotNull(template.getSubject());
@@ -406,10 +403,8 @@ public class ClientIntegrationTestIT {
         assertTrue(response.getBody().contains(uniqueName));
         assertEquals(Optional.of(uniqueName), response.getReference());
         assertNotNull(response.getNotificationId());
-        assertNotNull(response.getTemplateVersion());
         assertNotNull(response.getTemplateId());
         assertNotNull(response.getTemplateUri());
-        assertNotNull(response.getTemplateVersion());
     }
 
     private void assertNotificationEmailResponse(final SendEmailResponse response, final String uniqueName){
@@ -421,7 +416,6 @@ public class ClientIntegrationTestIT {
         assertNotNull(response.getFromEmail().orElse(null));
         assertNotNull(response.getTemplateUri());
         assertNotNull(response.getTemplateId());
-        assertNotNull(response.getTemplateVersion());
     }
 
     private void assertNotificationEmailResponseWithDocumentInPersonalisation(final SendEmailResponse response, final String uniqueName){
@@ -433,7 +427,6 @@ public class ClientIntegrationTestIT {
         assertNotNull(response.getFromEmail().orElse(null));
         assertNotNull(response.getTemplateUri());
         assertNotNull(response.getTemplateId());
-        assertNotNull(response.getTemplateVersion());
     }
 
     private void assertNotificationLetterResponse(final SendLetterResponse response, final String addressLine1){
@@ -441,17 +434,14 @@ public class ClientIntegrationTestIT {
         assertTrue(response.getBody().contains(addressLine1));
         assertEquals(Optional.of(addressLine1), response.getReference());
         assertNotNull(response.getNotificationId());
-        assertNotNull(response.getTemplateVersion());
         assertNotNull(response.getTemplateId());
         assertNotNull(response.getTemplateUri());
-        assertNotNull(response.getTemplateVersion());
     }
 
     private Notification assertNotification(Notification notification){
         assertNotNull(notification);
         assertNotNull(notification.getId());
         assertNotNull(notification.getTemplateId());
-        assertNotNull(notification.getTemplateVersion());
         assertNotNull(notification.getTemplateUri());
         assertNotNull(notification.getCreatedAt());
         assertNotNull(notification.getStatus());
