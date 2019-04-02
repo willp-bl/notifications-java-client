@@ -66,9 +66,7 @@ public class JsonUtilsTest {
 
     @Test
     public void testJsonToMap_ifNull() {
-        JSONObject json = null;
-
-        Map map = JsonUtils.jsonToMap(json);
+        Map map = JsonUtils.jsonToMap(null);
 
         assertEquals(new HashMap<>(), map);
     }
@@ -151,13 +149,9 @@ public class JsonUtilsTest {
         assertEquals(expectedMap, map);
     }
 
-
-
     @Test
     public void testJsonToList_ifNull() {
-        JSONArray json = null;
-
-        List list = JsonUtils.jsonToList(json);
+        List list = JsonUtils.jsonToList(null);
 
         assertEquals(new ArrayList<>(), list);
     }
