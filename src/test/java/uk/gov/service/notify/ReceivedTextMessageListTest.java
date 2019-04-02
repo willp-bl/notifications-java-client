@@ -2,6 +2,7 @@ package uk.gov.service.notify;
 
 import org.jose4j.json.internal.json_simple.JSONArray;
 import org.jose4j.json.internal.json_simple.JSONObject;
+import org.junit.Test;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -10,6 +11,7 @@ import static org.junit.Assert.assertEquals;
 
 public class ReceivedTextMessageListTest {
 
+    @Test
     public void testReceivedTextMessageList_canCreateObjectFromJson(){
 
         JSONObject receivedTextMessage = new JSONObject();
@@ -19,6 +21,7 @@ public class ReceivedTextMessageListTest {
         receivedTextMessage.put("notify_number", "447700900111");
         receivedTextMessage.put("user_number", "447700900000");
         receivedTextMessage.put("service_id", serviceId);
+        receivedTextMessage.put("content", "message 1");
         receivedTextMessage.put("receivedTextMessage", "Content of the message from the user");
         receivedTextMessage.put("created_at", "2016-03-01T08:30:00.000Z");
 
@@ -28,6 +31,7 @@ public class ReceivedTextMessageListTest {
         receivedTextMessage2.put("notify_number", "447700900111");
         receivedTextMessage2.put("user_number", "447700900000");
         receivedTextMessage2.put("service_id", serviceId);
+        receivedTextMessage2.put("content", "message 2");
         receivedTextMessage2.put("receivedTextMessage", "Content of the second message");
         receivedTextMessage2.put("created_at", "2016-03-01T08:35:00.000Z");
 
