@@ -17,17 +17,18 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.Proxy;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static java.nio.charset.StandardCharsets.ISO_8859_1;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class NotificationClient implements NotificationClientApi {
 
@@ -292,14 +293,13 @@ public class NotificationClient implements NotificationClientApi {
      *
      * @param documentContents byte[] of the document
      * @return <code>JSONObject</code> a json object to be added to the personalisation is returned
-     * @throws UnsupportedEncodingException exception thrown if unable to create a String using "IS0-8859-1" character set.
      */
-    public static JSONObject prepareUpload(final byte[] documentContents) throws UnsupportedEncodingException, NotificationClientException {
+    public static JSONObject prepareUpload(final byte[] documentContents) throws NotificationClientException {
         if (documentContents.length > 2*1024*1024){
             throw new NotificationClientException("Document is larger than 2MB");
         }
         byte[] fileContentAsByte = Base64.encodeBase64(documentContents);
-        String fileContent = new String(fileContentAsByte, "ISO-8859-1");
+        String fileContent = new String(fileContentAsByte, ISO_8859_1);
 
         JSONObject jsonFileObject = new JSONObject();
         jsonFileObject.put("file", fileContent);
@@ -308,16 +308,16 @@ public class NotificationClient implements NotificationClientApi {
 
     private String performPostRequest(HttpURLConnection conn, JSONObject body, int expectedStatusCode) throws NotificationClientException {
         try{
-            OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream(), StandardCharsets.UTF_8);
+            OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream(), UTF_8);
             wr.write(body.toString());
             wr.flush();
 
             int httpResult = conn.getResponseCode();
             if (httpResult == expectedStatusCode) {
-                StringBuilder sb = readStream(new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8));
+                StringBuilder sb = readStream(new InputStreamReader(conn.getInputStream(), UTF_8));
                 return sb.toString();
             } else {
-                StringBuilder sb = readStream(new InputStreamReader(conn.getErrorStream(), StandardCharsets.UTF_8));
+                StringBuilder sb = readStream(new InputStreamReader(conn.getErrorStream(), UTF_8));
                 throw new NotificationClientException(httpResult, sb.toString());
             }
 
@@ -336,11 +336,11 @@ public class NotificationClient implements NotificationClientApi {
             int httpResult = conn.getResponseCode();
             StringBuilder stringBuilder;
             if (httpResult == 200) {
-                stringBuilder = readStream(new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8));
+                stringBuilder = readStream(new InputStreamReader(conn.getInputStream(), UTF_8));
                 conn.disconnect();
                 return stringBuilder.toString();
             } else {
-                stringBuilder = readStream(new InputStreamReader(conn.getErrorStream(), StandardCharsets.UTF_8));
+                stringBuilder = readStream(new InputStreamReader(conn.getErrorStream(), UTF_8));
                 throw new NotificationClientException(httpResult, stringBuilder.toString());
             }
         } catch (IOException e) {
