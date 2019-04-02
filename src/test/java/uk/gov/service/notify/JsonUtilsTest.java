@@ -65,7 +65,7 @@ public class JsonUtilsTest {
     }
 
     @Test
-    public void testJsonToMap_ifNull() throws Exception {
+    public void testJsonToMap_ifNull() {
         JSONObject json = null;
 
         Map map = JsonUtils.jsonToMap(json);
@@ -74,7 +74,7 @@ public class JsonUtilsTest {
     }
 
     @Test
-    public void testJsonToMap_ifJSONNull() throws Exception {
+    public void testJsonToMap_ifJSONNull() {
         JSONObject json = new JSONObject(JSONObject.NULL);
 
         Map map = JsonUtils.jsonToMap(json);
@@ -83,7 +83,7 @@ public class JsonUtilsTest {
     }
 
     @Test
-    public void testJsonToMap_ifMapNull() throws Exception {
+    public void testJsonToMap_ifMapNull() {
         JSONObject json = new JSONObject((Map)null);
 
         Map map = JsonUtils.jsonToMap(json);
@@ -92,7 +92,7 @@ public class JsonUtilsTest {
     }
 
     @Test
-    public void testJsonToMap_fromJsonObject() throws Exception {
+    public void testJsonToMap_fromJsonObject() {
         JSONObject json = new JSONObject();
         json.put("aKey", "aValue");
         json.put("bKey", new JSONObject("{\"bbKey\": \"bbValue\"}"));
@@ -105,7 +105,7 @@ public class JsonUtilsTest {
    }
 
     @Test
-    public void testJsonToMap_fromJsonObjectFromMap() throws Exception {
+    public void testJsonToMap_fromJsonObjectFromMap() {
 
         JSONObject json = new JSONObject(expectedMap);
 
@@ -115,7 +115,7 @@ public class JsonUtilsTest {
     }
 
     @Test
-    public void testJsonToMap_fromString_ifEmpty() throws Exception {
+    public void testJsonToMap_fromString_ifEmpty() {
         JSONObject json = new JSONObject("{}");
 
         Map map = JsonUtils.jsonToMap(json);
@@ -124,7 +124,7 @@ public class JsonUtilsTest {
     }
 
     @Test
-    public void testJsonToMap_fromString() throws Exception {
+    public void testJsonToMap_fromString() {
         JSONObject json = new JSONObject("{\n" +
                 "\"aKey\": \"aValue\",\n" +
                 "\"bKey\": {\"bbKey\": \"bbValue\"},\n" +
@@ -138,7 +138,7 @@ public class JsonUtilsTest {
     }
 
     @Test
-    public void testJsonToMap_orderDoesNotMatter() throws Exception {
+    public void testJsonToMap_orderDoesNotMatter() {
         JSONObject json = new JSONObject("{\n" +
                 "\"bKey\": {\"bbKey\": \"bbValue\"},\n" +
                 "\"aKey\": \"aValue\",\n" +
@@ -154,7 +154,7 @@ public class JsonUtilsTest {
 
 
     @Test
-    public void testJsonToList_ifNull() throws Exception {
+    public void testJsonToList_ifNull() {
         JSONArray json = null;
 
         List list = JsonUtils.jsonToList(json);
@@ -163,7 +163,7 @@ public class JsonUtilsTest {
     }
 
     @Test
-    public void testJsonToList_ifListNull() throws Exception {
+    public void testJsonToList_ifListNull() {
         JSONArray json = new JSONArray((List)null);
 
         List list = JsonUtils.jsonToList(json);
@@ -172,7 +172,7 @@ public class JsonUtilsTest {
     }
 
     @Test
-    public void testJsonToList_fromJsonArray() throws Exception {
+    public void testJsonToList_fromJsonArray() {
         JSONArray json = new JSONArray();
         json.put("dValue");
         json.put(true);
@@ -187,7 +187,7 @@ public class JsonUtilsTest {
     }
 
     @Test
-    public void testJsonToList_fromJsonArrayFromList() throws Exception {
+    public void testJsonToList_fromJsonArrayFromList() {
         JSONArray json = new JSONArray(expectedList);
 
         List list = JsonUtils.jsonToList(json);
@@ -196,7 +196,7 @@ public class JsonUtilsTest {
     }
 
     @Test
-    public void testJsonToList_fromString_ifEmpty() throws Exception {
+    public void testJsonToList_fromString_ifEmpty() {
         JSONArray json = new JSONArray("[]");
 
         List list = JsonUtils.jsonToList(json);
@@ -205,7 +205,7 @@ public class JsonUtilsTest {
     }
 
     @Test
-    public void testJsonToList_fromString() throws Exception {
+    public void testJsonToList_fromString() {
         JSONArray json = new JSONArray("[\n" +
                 "\"dValue\", \n" +
                 "true, \n" +
@@ -226,7 +226,7 @@ public class JsonUtilsTest {
     }
 
     @Test
-    public void testJsonToList_orderMatters() throws Exception {
+    public void testJsonToList_orderMatters() {
         JSONArray json = new JSONArray("[\n" +
                 "\"dValue\", \n" +
                 "true, \n" +

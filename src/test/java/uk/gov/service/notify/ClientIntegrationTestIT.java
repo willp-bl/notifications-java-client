@@ -22,7 +22,7 @@ import static org.junit.Assert.fail;
 public class ClientIntegrationTestIT {
 
     @Test
-    public void testEmailNotificationIT() throws NotificationClientException, InterruptedException {
+    public void testEmailNotificationIT() throws NotificationClientException {
         NotificationClient client = getClient();
         SendEmailResponse emailResponse = sendEmailAndAssertResponse(client);
         Notification notification = client.getNotificationById(emailResponse.getNotificationId().toString());
@@ -30,7 +30,7 @@ public class ClientIntegrationTestIT {
     }
 
     @Test
-    public void testSmsNotificationIT() throws NotificationClientException, InterruptedException {
+    public void testSmsNotificationIT() throws NotificationClientException {
         NotificationClient client = getClient();
         SendSmsResponse response = sendSmsAndAssertResponse(client);
         Notification notification = client.getNotificationById(response.getNotificationId().toString());
@@ -38,7 +38,7 @@ public class ClientIntegrationTestIT {
     }
 
     @Test
-    public void testLetterNotificationIT() throws NotificationClientException, InterruptedException {
+    public void testLetterNotificationIT() throws NotificationClientException {
         NotificationClient client = getClient();
         SendLetterResponse letterResponse = sendLetterAndAssertResponse(client);
         Notification notification = client.getNotificationById(letterResponse.getNotificationId().toString());
@@ -81,7 +81,7 @@ public class ClientIntegrationTestIT {
     }
 
     @Test
-    public void testEmailNotificationWithValidEmailReplyToIdIT() throws NotificationClientException, InterruptedException {
+    public void testEmailNotificationWithValidEmailReplyToIdIT() throws NotificationClientException {
         NotificationClient client = getClient();
         SendEmailResponse emailResponse = sendEmailAndAssertResponse(client);
 
@@ -103,7 +103,7 @@ public class ClientIntegrationTestIT {
     }
 
     @Test
-    public void testEmailNotificationWithInValidEmailReplyToIdIT() throws NotificationClientException, InterruptedException {
+    public void testEmailNotificationWithInValidEmailReplyToIdIT() throws NotificationClientException {
         NotificationClient client = getClient();
         SendEmailResponse emailResponse = sendEmailAndAssertResponse(client);
 
@@ -167,7 +167,7 @@ public class ClientIntegrationTestIT {
     }
 
     @Test
-    public void testSmsNotificationWithValidSmsSenderIdIT() throws NotificationClientException, InterruptedException {
+    public void testSmsNotificationWithValidSmsSenderIdIT() throws NotificationClientException {
         NotificationClient client = getClient("API_SENDING_KEY");
 
         HashMap<String, String> personalisation = new HashMap<>();
@@ -188,7 +188,7 @@ public class ClientIntegrationTestIT {
     }
 
     @Test
-    public void testSmsNotificationWithInValidSmsSenderIdIT() throws NotificationClientException, InterruptedException {
+    public void testSmsNotificationWithInValidSmsSenderIdIT() {
         NotificationClient client = getClient();
 
         HashMap<String, String> personalisation = new HashMap<>();

@@ -109,11 +109,7 @@ public class NotificationClient implements NotificationClientApi {
         this.baseUrl = baseUrl;
         this.proxy = proxy;
         if (sslContext != null){
-            try {
-                setCustomSSLContext(sslContext);
-            } catch (NoSuchAlgorithmException e) {
-                LOGGER.log(Level.SEVERE, e.toString(), e);
-            }
+            setCustomSSLContext(sslContext);
         }
         this.version = getVersion();
     }
@@ -447,14 +443,12 @@ public class NotificationClient implements NotificationClientApi {
      * (eg provide certification for client authentication).
      * <p/>
      * Use case: enterprise proxy requiring HTTPS client authentication
-     *
-     * @throws NoSuchAlgorithmException
      */
     private static void setDefaultSSLContext() throws NoSuchAlgorithmException {
         HttpsURLConnection.setDefaultSSLSocketFactory(SSLContext.getDefault().getSocketFactory());
     }
 
-    private static void setCustomSSLContext(final SSLContext sslContext) throws NoSuchAlgorithmException {
+    private static void setCustomSSLContext(final SSLContext sslContext) {
         HttpsURLConnection.setDefaultSSLSocketFactory(sslContext.getSocketFactory());
     }
 
