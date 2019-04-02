@@ -90,7 +90,7 @@ public class NotificationClientTest {
     @Test
     public void testPrepareUpload() throws UnsupportedEncodingException, NotificationClientException {
         NotificationClient client = new NotificationClient(combinedApiKey, baseUrl);
-        byte[] documentContent = new String("this is a document to test with").getBytes();
+        byte[] documentContent = "this is a document to test with".getBytes();
         JSONObject response = client.prepareUpload(documentContent);
         JSONObject expectedResult = new JSONObject();
         expectedResult.put("file", new String(Base64.encodeBase64(documentContent), "ISO-8859-1"));
