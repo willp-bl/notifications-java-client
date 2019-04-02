@@ -140,7 +140,7 @@ public class ClientIntegrationTestIT {
         File file = new File(classLoader.getResource("one_page_pdf.pdf").getFile());
         byte [] fileContents = FileUtils.readFileToByteArray(file);
 
-        JSONObject documentFileObject = client.prepareUpload(fileContents);
+        JSONObject documentFileObject = NotificationClient.prepareUpload(fileContents);
         personalisation.put("name", documentFileObject);
 
         String reference = UUID.randomUUID().toString();

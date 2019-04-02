@@ -89,9 +89,8 @@ public class NotificationClientTest {
 
     @Test
     public void testPrepareUpload() throws NotificationClientException {
-        NotificationClient client = new NotificationClient(combinedApiKey, baseUrl);
         byte[] documentContent = "this is a document to test with".getBytes();
-        JSONObject response = client.prepareUpload(documentContent);
+        JSONObject response = NotificationClient.prepareUpload(documentContent);
         JSONObject expectedResult = new JSONObject();
         expectedResult.put("file", new String(Base64.encodeBase64(documentContent), ISO_8859_1));
         assertEquals(expectedResult.getString("file"), response.getString("file"));
@@ -99,11 +98,10 @@ public class NotificationClientTest {
 
     @Test(expected = NotificationClientException.class)
     public void testPrepareUploadThrowsExceptionWhenExceeds2MB() throws NotificationClientException {
-        NotificationClient client = new NotificationClient(combinedApiKey, baseUrl);
         char[] data = new char[(2*1024*1024)+50];
         byte[] documentContents = new String(data).getBytes();
 
-        client.prepareUpload(documentContents);
+        NotificationClient.prepareUpload(documentContents);
 
     }
 }
