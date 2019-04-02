@@ -76,11 +76,11 @@ public class TemplateTest {
         assertEquals("my template", template.getName());
         assertEquals("email", template.getTemplateType());
         assertEquals(new DateTime("2017-05-01T08:30:00.000Z"), template.getCreatedAt());
-        assertEquals(Optional.ofNullable(null), template.getUpdatedAt());
+        assertEquals(Optional.empty(), template.getUpdatedAt());
         assertEquals(3, template.getVersion());
         assertEquals("The body of the template. For ((name)) eyes only.", template.getBody());
-        assertEquals(Optional.ofNullable(null), template.getSubject());
-        assertEquals(Optional.ofNullable(null), template.getPersonalisation());
+        assertEquals(Optional.empty(), template.getSubject());
+        assertEquals(Optional.empty(), template.getPersonalisation());
     }
 
 }
