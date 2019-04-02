@@ -10,16 +10,13 @@ public class SendLetterResponse extends LetterResponse {
     private String templateUri;
     private String body;
     private String subject;
-    private JSONObject content;
-    private JSONObject template;
-
 
     public SendLetterResponse(String response) {
         super(response);
-        content = getData().getJSONObject("content");
+        JSONObject content = getData().getJSONObject("content");
         body = tryToGetString(content, "body");
         subject = tryToGetString(content, "subject");
-        template = getData().getJSONObject("template");
+        JSONObject template = getData().getJSONObject("template");
         templateId = UUID.fromString(template.getString("id"));
         templateVersion = template.getInt("version");
         templateUri = template.getString("uri");
