@@ -218,7 +218,7 @@ public class ClientIntegrationTestIT {
     @Test
     public void testSendAndGetNotificationWithReference() throws NotificationClientException {
         NotificationClient client = getClient();
-        HashMap<String, String> personalisation = new HashMap<String, String>();
+        HashMap<String, String> personalisation = new HashMap<>();
         String uniqueString = UUID.randomUUID().toString();
         personalisation.put("name", uniqueString);
         SendEmailResponse response = client.sendEmail(System.getenv("EMAIL_TEMPLATE_ID"), System.getenv("FUNCTIONAL_TEST_EMAIL"), personalisation, uniqueString);
