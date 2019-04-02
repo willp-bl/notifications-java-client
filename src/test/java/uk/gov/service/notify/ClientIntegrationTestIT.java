@@ -105,7 +105,7 @@ public class ClientIntegrationTestIT {
     @Test
     public void testEmailNotificationWithInValidEmailReplyToIdIT() throws NotificationClientException {
         NotificationClient client = getClient();
-        SendEmailResponse emailResponse = sendEmailAndAssertResponse(client);
+        sendEmailAndAssertResponse(client);
 
         HashMap<String, String> personalisation = new HashMap<>();
         String uniqueName = UUID.randomUUID().toString();
@@ -116,7 +116,7 @@ public class ClientIntegrationTestIT {
         boolean exceptionThrown = false;
 
         try {
-            SendEmailResponse response = client.sendEmail(
+            client.sendEmail(
                     System.getenv("EMAIL_TEMPLATE_ID"),
                     System.getenv("FUNCTIONAL_TEST_EMAIL"),
                     personalisation,
@@ -200,7 +200,7 @@ public class ClientIntegrationTestIT {
         boolean exceptionThrown = false;
 
         try {
-            SendSmsResponse response = client.sendSms(
+            client.sendSms(
                     System.getenv("SMS_TEMPLATE_ID"),
                     System.getenv("FUNCTIONAL_TEST_NUMBER"),
                     personalisation,
