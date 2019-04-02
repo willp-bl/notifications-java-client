@@ -6,10 +6,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class LetterResponse {
-    private UUID notificationId;
-    private String reference;
-    private String postage;
-    private JSONObject data;
+    private final UUID notificationId;
+    private final String reference;
+    private final String postage;
+    private final JSONObject data;
 
     public LetterResponse(String response) {
         data = new JSONObject(response);

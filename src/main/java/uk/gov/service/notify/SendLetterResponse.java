@@ -5,11 +5,11 @@ import org.json.JSONObject;
 import java.util.UUID;
 
 public class SendLetterResponse extends LetterResponse {
-    private UUID templateId;
-    private int templateVersion;
-    private String templateUri;
-    private String body;
-    private String subject;
+    private final UUID templateId;
+    private final int templateVersion;
+    private final String templateUri;
+    private final String body;
+    private final String subject;
 
     public SendLetterResponse(String response) {
         super(response);
