@@ -29,6 +29,7 @@ public class TemplatePreviewTest {
         assertEquals(Optional.empty(), template.getHtml());
     }
 
+    @Test
     public void testTemplatePreview_canCreateObjectFromJsonWithHtml() {
         JSONObject content = new JSONObject();
         String id = UUID.randomUUID().toString();
