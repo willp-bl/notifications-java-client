@@ -438,7 +438,7 @@ public class ClientIntegrationTestIT {
         assertNotNull(response.getTemplateUri());
     }
 
-    private Notification assertNotification(Notification notification){
+    private void assertNotification(Notification notification){
         assertNotNull(notification);
         assertNotNull(notification.getId());
         assertNotNull(notification.getTemplateId());
@@ -462,8 +462,6 @@ public class ClientIntegrationTestIT {
         } else {
             assertTrue("expected status to be created, sending or delivered", Arrays.asList("created", "sending", "delivered").contains(notification.getStatus()));
         }
-
-        return notification;
     }
 
     private void assertNotificationWhenLetter(Notification notification) {
