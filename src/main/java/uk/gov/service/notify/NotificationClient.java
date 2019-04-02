@@ -428,9 +428,9 @@ public class NotificationClient implements NotificationClientApi {
     private StringBuilder readStream(InputStreamReader streamReader) throws IOException {
         StringBuilder sb = new StringBuilder();
         BufferedReader br = new BufferedReader(streamReader);
-        String line = null;
+        String line;
         while ((line = br.readLine()) != null) {
-            sb.append(line + "\n");
+            sb.append(line).append("\n");
         }
         br.close();
         return sb;
