@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class SendLetterResponseTest {
 
@@ -62,7 +63,7 @@ public class SendLetterResponseTest {
         assertEquals("1d7b2fac-bb0d-46c6-96e7-d4afa6e22a92", response.getTemplateId().toString());
         assertEquals("https://api.notify.works/services/service_id/templates/template_id", response.getTemplateUri());
         assertEquals(1, response.getTemplateVersion());
-        assertEquals(null, response.getBody());
+        assertNull(response.getBody());
         assertEquals("Pre-compiled PDF", response.getSubject());
     }
 }

@@ -7,7 +7,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 
 public class TemplatePreviewTest {
 
@@ -30,6 +29,7 @@ public class TemplatePreviewTest {
         assertEquals(Optional.empty(), template.getHtml());
     }
 
+    @Test
     public void testTemplatePreview_canCreateObjectFromJsonWithHtml() {
         JSONObject content = new JSONObject();
         String id = UUID.randomUUID().toString();

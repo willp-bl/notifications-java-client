@@ -6,12 +6,12 @@ import org.junit.Test;
 
 import javax.net.ssl.SSLContext;
 import java.io.File;
-import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
 
+import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
@@ -48,7 +48,7 @@ public class NotificationClientTest {
     @Test
     public void testCreateNotificationClientSetsUserAgent() {
         NotificationClient client = new NotificationClient(combinedApiKey, baseUrl);
-        assertEquals(client.getUserAgent(), "NOTIFY-API-JAVA-CLIENT/3.14.1-RELEASE");
+        assertEquals(client.getUserAgent(), "NOTIFY-API-JAVA-CLIENT/3.14.2-RELEASE");
     }
 
     @Test
@@ -88,22 +88,20 @@ public class NotificationClientTest {
     }
 
     @Test
-    public void testPrepareUpload() throws UnsupportedEncodingException, NotificationClientException {
-        NotificationClient client = new NotificationClient(combinedApiKey, baseUrl);
-        byte[] documentContent = new String("this is a document to test with").getBytes();
-        JSONObject response = client.prepareUpload(documentContent);
+    public void testPrepareUpload() throws NotificationClientException {
+        byte[] documentContent = "this is a document to test with".getBytes();
+        JSONObject response = NotificationClient.prepareUpload(documentContent);
         JSONObject expectedResult = new JSONObject();
-        expectedResult.put("file", new String(Base64.encodeBase64(documentContent), "ISO-8859-1"));
+        expectedResult.put("file", new String(Base64.encodeBase64(documentContent), ISO_8859_1));
         assertEquals(expectedResult.getString("file"), response.getString("file"));
     }
 
     @Test(expected = NotificationClientException.class)
-    public void testPrepareUploadThrowsExceptionWhenExceeds2MB() throws UnsupportedEncodingException, NotificationClientException {
-        NotificationClient client = new NotificationClient(combinedApiKey, baseUrl);
+    public void testPrepareUploadThrowsExceptionWhenExceeds2MB() throws NotificationClientException {
         char[] data = new char[(2*1024*1024)+50];
         byte[] documentContents = new String(data).getBytes();
 
-        client.prepareUpload(documentContents);
+        NotificationClient.prepareUpload(documentContents);
 
     }
 }

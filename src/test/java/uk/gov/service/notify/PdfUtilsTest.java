@@ -5,8 +5,8 @@ import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
 import java.io.File;
-import java.nio.charset.StandardCharsets;
 
+import static java.nio.charset.StandardCharsets.US_ASCII;
 import static org.junit.Assert.*;
 
 public class PdfUtilsTest
@@ -19,7 +19,7 @@ public class PdfUtilsTest
 
         byte[] encoded = Base64.encodeBase64(FileUtils.readFileToByteArray(file));
 
-        String base64encodedString = new String(encoded, StandardCharsets.US_ASCII);
+        String base64encodedString = new String(encoded, US_ASCII);
 
         assertFalse(PdfUtils.isBase64StringPDF(base64encodedString));
     }
@@ -33,7 +33,7 @@ public class PdfUtilsTest
 
         byte[] encoded = Base64.encodeBase64(FileUtils.readFileToByteArray(file));
 
-        String base64encodedString = new String(encoded, StandardCharsets.US_ASCII);
+        String base64encodedString = new String(encoded, US_ASCII);
 
         assertTrue(PdfUtils.isBase64StringPDF(base64encodedString));
     }

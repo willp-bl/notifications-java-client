@@ -1,18 +1,22 @@
+## 3.14.2-RELEASE
+* Updated old dependencies
+* Updated code to bring in linting standards.
+
 ## 3.14.1-RELEASE
 * Updated project properties to use UTF-8
 * Updated GET and POST to use UTF-8 readers and writers
- 
+
 ## 3.14.0-RELEASE
 * Added `postage` argument to `NotificationClient.sendPrecompiledLetter` and `NotificationClient.sendPrecompiledLetterWithInputStream`
 * Added `postage` to `LetterResponse`
-* Added `postage` to `Notification` 
+* Added `postage` to `Notification`
 * Added `html` to `TemplatePreview`
 
 ## 3.13.0-RELEASE
 * Allow passing of `List`s into the personalisation Map to display as a bulleted list in the message.
 
 ## 3.12.0-RELEASE
-* Added `NotificationClient.prepareUpload` method that can be used if you want to upload a document and send a link to that docuemnt by email. 
+* Added `NotificationClient.prepareUpload` method that can be used if you want to upload a document and send a link to that docuemnt by email.
   - Takes a byte[] of document contents
   - You then add the returned `JSONObject` to the personalisation map.
   - NOTE: the personalisation map for this call needs to be HashMap<String, Object>

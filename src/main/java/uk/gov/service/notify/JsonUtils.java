@@ -23,9 +23,7 @@ public class JsonUtils {
     private static Map<String, Object> toMap(JSONObject object) throws JSONException {
         Map<String, Object> map = new HashMap<>();
 
-        object.keySet().forEach(key -> {
-            map.put(key, parseValue(object.get(key)));
-        });
+        object.keySet().forEach(key -> map.put(key, parseValue(object.get(key))));
 
         return map;
     }
@@ -42,9 +40,7 @@ public class JsonUtils {
     private static List<Object> toList(JSONArray array) throws JSONException {
         List<Object> list = new ArrayList<>();
 
-        array.forEach(item -> {
-            list.add(parseValue(item));
-        });
+        array.forEach(item -> list.add(parseValue(item)));
 
         return list;
     }

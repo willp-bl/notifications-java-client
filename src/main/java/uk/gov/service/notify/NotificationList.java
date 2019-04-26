@@ -8,9 +8,9 @@ import org.json.JSONObject;
 import org.json.JSONArray;
 
 public class NotificationList {
-    private List<Notification> notifications;
-    private String currentPageLink;
-    private String nextPageLink;
+    private final List<Notification> notifications;
+    private final String currentPageLink;
+    private final String nextPageLink;
 
     public List<Notification> getNotifications() {
         return notifications;
