@@ -19,7 +19,7 @@ You will need to source an environment.sh file. The contents of that file are ex
 export NOTIFY_API_URL=https://api.notify.works
 export API_KEY= # vault_jenkins_notify_client.api_key
 export FUNCTIONAL_TEST_EMAIL=notify-tests-preview+client_funct_tests@digital.cabinet-office.gov.uk
-export FUNCTIONAL_TEST_NUMBER=+447481358476 # Twilio number
+export FUNCTIONAL_TEST_NUMBER=+447537417379 # Twilio number
 export EMAIL_TEMPLATE_ID=f0bb62f7-5ddb-4bf8-aac7-c1e6aefd1524
 export SMS_TEMPLATE_ID=31046c06-418a-49bf-86de-706b68415b47
 export LETTER_TEMPLATE_ID=de1252c4-d8c3-4435-92fb-02f136778b2b
