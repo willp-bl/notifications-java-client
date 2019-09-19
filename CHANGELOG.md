@@ -1,3 +1,8 @@
+## 3.15.0-RELEASE
+* Added `NotificationClient.getPdfForLetter` function
+  - accepts `String notificationId`
+  - returns a `byte[]` containing the final printable PDF for a precompiled or templated letter
+
 ## 3.14.2-RELEASE
 * Updated old dependencies
 * Updated code to bring in linting standards.

@@ -208,6 +208,13 @@ public class NotificationClient implements NotificationClientApi {
 
     }
 
+    public byte[] getPdfForLetter(String notificationId) throws NotificationClientException {
+        String url = baseUrl + "/v2/notifications/" + notificationId;
+        HttpURLConnection conn = createConnectionAndSetHeaders(url, "GET");
+        String response = performGetRequest(conn);
+        return response.getBytes();
+    }
+
     public NotificationList getNotifications(String status, String notification_type, String reference, String olderThanId) throws NotificationClientException {
         try {
             URIBuilder builder = new URIBuilder(baseUrl + "/v2/notifications");

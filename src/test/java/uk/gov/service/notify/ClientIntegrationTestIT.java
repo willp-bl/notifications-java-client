@@ -41,8 +41,10 @@ public class ClientIntegrationTestIT {
     public void testLetterNotificationIT() throws NotificationClientException {
         NotificationClient client = getClient();
         SendLetterResponse letterResponse = sendLetterAndAssertResponse(client);
-        Notification notification = client.getNotificationById(letterResponse.getNotificationId().toString());
+        String notificationId = letterResponse.getNotificationId().toString();
+        Notification notification = client.getNotificationById(notificationId);
         assertNotification(notification);
+        assertPdfResponse(client, notificationId);
     }
 
 
@@ -508,6 +510,34 @@ public class ClientIntegrationTestIT {
         assertNotNull(response.getNotificationId());
         assertEquals(response.getReference().orElse("dummy-value"), reference);
         assertEquals(response.getPostage(), Optional.ofNullable(postage));
+    }
+
+    private void assertPdfResponse(NotificationClient client, String notificationId) throws NotificationClientException {
+        byte[] pdf_data;
+        int count = 0;
+        while (true) {
+            try {
+                 pdf_data = client.getPdfForLetter(notificationId);
+                break;
+            } catch (NotificationClientException e) {
+                if (!e.getMessage().contains("PDFNotReadyError")) {
+                    throw e;
+                }
+
+                count += 1;
+                if (count > 6) { // total time slept at this point is 21 seconds
+                    throw e;
+                } else {
+                    try {
+                        Thread.sleep(count * 1000);
+                    } catch (InterruptedException e1) {
+                        Thread.currentThread().interrupt();
+                    }
+                }
+            }
+        }
+
+        assertFalse(pdf_data.length == 0);
     }
 
 }
