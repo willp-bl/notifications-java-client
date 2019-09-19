@@ -6,6 +6,7 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
@@ -294,7 +295,7 @@ public class ClientIntegrationTestIT {
         LetterResponse response =  client.sendPrecompiledLetter(reference, file);
 
         assertPrecompiledLetterResponse(reference, "second", response);
-
+        assertPdfResponse(client, response.getNotificationId().toString());
     }
 
     @Test
@@ -538,11 +539,11 @@ public class ClientIntegrationTestIT {
         }
 
         assertFalse(pdfData.length == 0);
-
         // check that we've got a pdf by looking for the magic bytes
         byte[] magicBytes = Arrays.copyOfRange(pdfData, 0, 5);
         String magicString = new String(magicBytes);
         assertEquals("%PDF-", magicString);
+        assertTrue(magicString.startsWith("%PDF-"));
     }
 
 }

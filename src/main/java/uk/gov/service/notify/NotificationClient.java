@@ -211,8 +211,8 @@ public class NotificationClient implements NotificationClientApi {
     public byte[] getPdfForLetter(String notificationId) throws NotificationClientException {
         String url = baseUrl + "/v2/notifications/" + notificationId + "/pdf";
         HttpURLConnection conn = createConnectionAndSetHeaders(url, "GET");
-        String response = performGetRequest(conn);
-        return response.getBytes();
+
+        return performRawGetRequest(conn);
     }
 
     public NotificationList getNotifications(String status, String notification_type, String reference, String olderThanId) throws NotificationClientException {
@@ -358,6 +358,29 @@ public class NotificationClient implements NotificationClientApi {
                 conn.disconnect();
             }
         }
+    }
+
+    private byte[] performRawGetRequest(HttpURLConnection conn) throws NotificationClientException {
+        byte[] out;
+        try{
+            int httpResult = conn.getResponseCode();
+            if (httpResult == 200) {
+                InputStream is = conn.getInputStream();
+                out = IOUtils.toByteArray(is);
+            } else {
+                // errors should be read as a string
+                String s = readStream(new InputStreamReader(conn.getErrorStream(), UTF_8)).toString();
+                throw new NotificationClientException(httpResult, s);
+            }
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, e.toString(), e);
+            throw new NotificationClientException(e);
+        } finally {
+            if (conn != null) {
+                conn.disconnect();
+            }
+        }
+        return out;
     }
 
     private HttpURLConnection createConnectionAndSetHeaders(String urlString, String method) throws NotificationClientException {
