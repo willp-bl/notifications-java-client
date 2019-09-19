@@ -209,7 +209,7 @@ public class NotificationClient implements NotificationClientApi {
     }
 
     public byte[] getPdfForLetter(String notificationId) throws NotificationClientException {
-        String url = baseUrl + "/v2/notifications/" + notificationId;
+        String url = baseUrl + "/v2/notifications/" + notificationId + "/pdf";
         HttpURLConnection conn = createConnectionAndSetHeaders(url, "GET");
         String response = performGetRequest(conn);
         return response.getBytes();

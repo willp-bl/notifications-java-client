@@ -513,11 +513,11 @@ public class ClientIntegrationTestIT {
     }
 
     private void assertPdfResponse(NotificationClient client, String notificationId) throws NotificationClientException {
-        byte[] pdf_data;
+        byte[] pdfData;
         int count = 0;
         while (true) {
             try {
-                 pdf_data = client.getPdfForLetter(notificationId);
+                 pdfData = client.getPdfForLetter(notificationId);
                 break;
             } catch (NotificationClientException e) {
                 if (!e.getMessage().contains("PDFNotReadyError")) {
@@ -537,7 +537,12 @@ public class ClientIntegrationTestIT {
             }
         }
 
-        assertFalse(pdf_data.length == 0);
+        assertFalse(pdfData.length == 0);
+
+        // check that we've got a pdf by looking for the magic bytes
+        byte[] magicBytes = Arrays.copyOfRange(pdfData, 0, 5);
+        String magicString = new String(magicBytes);
+        assertEquals("%PDF-", magicString);
     }
 
 }
