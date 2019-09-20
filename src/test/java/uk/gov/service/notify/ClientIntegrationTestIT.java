@@ -6,6 +6,7 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
@@ -41,8 +42,10 @@ public class ClientIntegrationTestIT {
     public void testLetterNotificationIT() throws NotificationClientException {
         NotificationClient client = getClient();
         SendLetterResponse letterResponse = sendLetterAndAssertResponse(client);
-        Notification notification = client.getNotificationById(letterResponse.getNotificationId().toString());
+        String notificationId = letterResponse.getNotificationId().toString();
+        Notification notification = client.getNotificationById(notificationId);
         assertNotification(notification);
+        assertPdfResponse(client, notificationId);
     }
 
 
@@ -292,7 +295,7 @@ public class ClientIntegrationTestIT {
         LetterResponse response =  client.sendPrecompiledLetter(reference, file);
 
         assertPrecompiledLetterResponse(reference, "second", response);
-
+        assertPdfResponse(client, response.getNotificationId().toString());
     }
 
     @Test
@@ -508,6 +511,39 @@ public class ClientIntegrationTestIT {
         assertNotNull(response.getNotificationId());
         assertEquals(response.getReference().orElse("dummy-value"), reference);
         assertEquals(response.getPostage(), Optional.ofNullable(postage));
+    }
+
+    private void assertPdfResponse(NotificationClient client, String notificationId) throws NotificationClientException {
+        byte[] pdfData;
+        int count = 0;
+        while (true) {
+            try {
+                 pdfData = client.getPdfForLetter(notificationId);
+                break;
+            } catch (NotificationClientException e) {
+                if (!e.getMessage().contains("PDFNotReadyError")) {
+                    throw e;
+                }
+
+                count += 1;
+                if (count > 6) { // total time slept at this point is 21 seconds
+                    throw e;
+                } else {
+                    try {
+                        Thread.sleep(count * 1000);
+                    } catch (InterruptedException e1) {
+                        Thread.currentThread().interrupt();
+                    }
+                }
+            }
+        }
+
+        assertFalse(pdfData.length == 0);
+        // check that we've got a pdf by looking for the magic bytes
+        byte[] magicBytes = Arrays.copyOfRange(pdfData, 0, 5);
+        String magicString = new String(magicBytes);
+        assertEquals("%PDF-", magicString);
+        assertTrue(magicString.startsWith("%PDF-"));
     }
 
 }

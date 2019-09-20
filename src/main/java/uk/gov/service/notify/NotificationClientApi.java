@@ -151,13 +151,23 @@ public interface NotificationClientApi {
 
     /**
      * The getNotificationById method will return a <code>Notification</code> for a given notification id.
-     * The id is can be retrieved from the <code>NotificationResponse</code> of a <code>sendEmail</code> or <code>sendSms</code> request.
+     * The id can be retrieved from the <code>NotificationResponse</code> of a <code>sendEmail</code>, <code>sendLetter</code> or <code>sendSms</code> request.
      *
      * @param notificationId The id of the notification.
      * @return <code>Notification</code>
      * @throws NotificationClientException see https://docs.notifications.service.gov.uk/java.html#get-the-status-of-one-message-error-codes
      */
     Notification getNotificationById(String notificationId) throws NotificationClientException;
+
+    /**
+     * The getPdfForLetter method will return a <code>byte[]</code> containing the PDF contents of a given letter notification.
+     * The id can be retrieved from the <code>NotificationResponse</code> of a <code>sendLetter</code>.
+     *
+     * @param notificationId The id of the notification.
+     * @return <code>byte[]</code> The raw pdf data.
+     * @throws NotificationClientException see https://docs.notifications.service.gov.uk/java.html#get-a-pdf-for-a-letter-notification-error-codes
+     */
+    byte[] getPdfForLetter(String notificationId) throws NotificationClientException;
 
     /**
      * The getNotifications method will create a GET HTTPS request to retrieve all the notifications.
@@ -198,7 +208,7 @@ public interface NotificationClientApi {
      * @param templateType If templateType is not empty or null templates will be filtered by type.
      *          Possible template types are email|sms|letter
      * @return <code>TemplateList</code>
-     * @throws NotificationClientException see https://docs.notifications.service.gov.uk/java.html#generate-a-preview-template-error-codes
+     * @throws NotificationClientException see https://docs.notifications.service.gov.uk/java.html#get-a-template-by-id-error-codes
      */
     TemplateList getAllTemplates(String templateType) throws NotificationClientException;
 
