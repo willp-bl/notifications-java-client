@@ -526,7 +526,7 @@ public class ClientIntegrationTestIT {
                 }
 
                 count += 1;
-                if (count > 6) { // total time slept at this point is 21 seconds
+                if (count > 10) { // total time slept at this point is 55 seconds
                     throw e;
                 } else {
                     try {
