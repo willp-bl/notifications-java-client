@@ -439,7 +439,7 @@ String reference="STRING";
 
 #### precompiledPDFAsFile (required for the sendPrecompiledLetter method)
 
-The precompiled letter must be a PDF file which meets [the GOV.UK Notify PDF letter specification](https://docs.notifications.service.gov.uk/documentation/images/notify-pdf-letter-spec-v2.3.pdf).
+The precompiled letter must be a PDF file which meets [the GOV.UK Notify PDF letter specification](https://docs.notifications.service.gov.uk/documentation/images/notify-pdf-letter-spec-v2.4.pdf).
 
 This argument adds the precompiled letter PDF file to a Java file object. The method sends this Java file object to GOV.UK Notify.
 
