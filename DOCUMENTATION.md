@@ -689,7 +689,7 @@ If the request is not successful, the client returns a `NotificationClientExcept
 This returns the pdf contents of a letter notification.
 
 ```java
-bytes[] pdfFile = client.getPdfForLetter(notificationId)
+byte[] pdfFile = client.getPdfForLetter(notificationId)
 ```
 
 ### Arguments
