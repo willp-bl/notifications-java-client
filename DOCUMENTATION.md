@@ -538,7 +538,7 @@ Notification notification = client.getNotificationById(notificationId);
 
 #### notificationId (required)
 
-The ID of the notification. You can find the notification ID in the response to the [original notification method call](/java.html#response).
+The ID of the notification. You can find the notification ID in the response to the [original notification method call](#response).
 
 You can also find it in your [GOV.UK Notify Dashboard](https://www.notifications.service.gov.uk).
 
@@ -696,7 +696,7 @@ byte[] pdfFile = client.getPdfForLetter(notificationId)
 
 #### notificationId (required)
 
-The ID of the notification. You can find the notification ID in the response to the [original notification method call](/java.html#get-the-status-of-one-message-response).
+The ID of the notification. You can find the notification ID in the response to the [original notification method call](#get-the-status-of-one-message-response).
 
 You can also find it in your [GOV.UK Notify Dashboard](https://www.notifications.service.gov.uk).
 
@@ -923,7 +923,7 @@ This API call returns one page of up to 250 received text messages. You can get 
 
 You can only get messages that are 7 days old or newer.
 
-You can also set up [callbacks](/java.html#callbacks) for received text messages.
+You can also set up [callbacks](#callbacks) for received text messages.
 
 ## Enable received text messages
 
