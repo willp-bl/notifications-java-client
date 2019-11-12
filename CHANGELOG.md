@@ -1,3 +1,7 @@
+## 3.15.1-RELEASE
+* Added 400 has a default value for the httpResult value of a NotificationClientException.
+ - there are some cases when the exception is thrown from the client and not from the API, even though a httpResult. All the exceptions raised can be classified as 400, therefore using 400 as a default.
+
 ## 3.15.0-RELEASE
 * Added `NotificationClient.getPdfForLetter` function
   - accepts `String notificationId`

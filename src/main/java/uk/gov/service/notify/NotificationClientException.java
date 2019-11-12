@@ -13,6 +13,7 @@ public class NotificationClientException extends Exception
     public NotificationClientException(String message)
     {
         super(message);
+        this.httpResult = 400;
     }
 
     public NotificationClientException(String message, Throwable cause)
