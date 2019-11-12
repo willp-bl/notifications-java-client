@@ -303,7 +303,7 @@ public class NotificationClient implements NotificationClientApi {
      */
     public static JSONObject prepareUpload(final byte[] documentContents) throws NotificationClientException {
         if (documentContents.length > 2*1024*1024){
-            throw new NotificationClientException("Document is larger than 2MB");
+            throw new NotificationClientException(413, "Document is larger than 2MB");
         }
         byte[] fileContentAsByte = Base64.encodeBase64(documentContents);
         String fileContent = new String(fileContentAsByte, ISO_8859_1);
