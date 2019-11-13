@@ -336,7 +336,7 @@ To find the template ID:
 1. [Sign in to GOV.UK Notify](https://www.notifications.service.gov.uk/sign-in).
 1. In the top left corner of the page, check you’re viewing the correct service. If not, select __Switch service__ in the top right corner of the page and select the relevant service.
 1. Go to the __Templates__ page and select the relevant template.
-1. Look for the template ID at the bottom of the page.
+1. Look for the template ID at the bottom of the page. For example:
 
 ```
 String templateId = "f33517ff-2a88-4f6e-b855-c550268ce08a";
