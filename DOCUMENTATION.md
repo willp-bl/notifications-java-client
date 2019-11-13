@@ -96,7 +96,7 @@ A unique identifier of the sender of the text message notification. You can find
 1. Go to the __Settings__ page.
 1. In the __Text Messages__ section, select __Manage__ on the __Text Message sender__ row.
 
-In this screen, you can then either:
+You can then either:
 
   - copy the sender ID that you want to use and paste it into the method
   - select __Change__ to change the default sender that the service will use, and select __Save__
