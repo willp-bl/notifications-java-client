@@ -48,7 +48,7 @@ public class NotificationClientTest {
     @Test
     public void testCreateNotificationClientSetsUserAgent() {
         NotificationClient client = new NotificationClient(combinedApiKey, baseUrl);
-        assertEquals(client.getUserAgent(), "NOTIFY-API-JAVA-CLIENT/3.15.0-RELEASE");
+        assertEquals(client.getUserAgent(), "NOTIFY-API-JAVA-CLIENT/3.15.1-RELEASE");
     }
 
     @Test
@@ -96,12 +96,16 @@ public class NotificationClientTest {
         assertEquals(expectedResult.getString("file"), response.getString("file"));
     }
 
-    @Test(expected = NotificationClientException.class)
+    @Test
     public void testPrepareUploadThrowsExceptionWhenExceeds2MB() throws NotificationClientException {
         char[] data = new char[(2*1024*1024)+50];
         byte[] documentContents = new String(data).getBytes();
 
-        NotificationClient.prepareUpload(documentContents);
-
+        try {
+            NotificationClient.prepareUpload(documentContents);
+        }catch(NotificationClientException e){
+            assertEquals(e.getHttpResult(), 413);
+            assertEquals(e.getMessage(), "Status code: 413 Document is larger than 2MB");
+        }
     }
 }

@@ -293,7 +293,7 @@ If the request is not successful, the client returns an `HTTPError` containing t
 |`429`|`[{`<br>`"error": "RateLimitError",`<br>`"message": "Exceeded rate limit for key type TEAM/TEST/LIVE of 3000 requests per 60 seconds"`<br>`}]`|Refer to [API rate limits](#api-rate-limits) for more information|
 |`429`|`[{`<br>`"error": "TooManyRequestsError",`<br>`"message": "Exceeded send limits (LIMIT NUMBER) for today"`<br>`}]`|Refer to [service limits](#service-limits) for the limit number|
 |`500`|`[{`<br>`"error": "Exception",`<br>`"message": "Internal server error"`<br>`}]`|Notify was unable to process the request, resend your notification.|
-|`N\A`|`Document is larger than 2MB`|`Document is larger than 2MB`|
+|`413`|`Document is larger than 2MB`|`Document is larger than 2MB`|
 
 ## Send a letter
 
@@ -484,9 +484,9 @@ If the request is not successful, the client returns a `NotificationClientExcept
 |`403`|`[{`<br>`"error": "AuthError",`<br>`"message": "Invalid token: signature, api token not found"`<br>`}]`|Use the correct API key. Refer to [API keys](#api-keys) for more information|
 |`429`|`[{`<br>`"error": "RateLimitError",`<br>`"message": "Exceeded rate limit for key type TEAM/TEST/LIVE of 3000 requests per 60 seconds"`<br>`}]`|Refer to [API rate limits](#api-rate-limits) for more information|
 |`429`|`[{`<br>`"error": "TooManyRequestsError",`<br>`"message": "Exceeded send limits (LIMIT NUMBER) for today"`<br>`}]`|Refer to [service limits](#service-limits) for the limit number|
-|N/A|`"message":"precompiledPDF must be a valid PDF file"`|Send a valid PDF file|
-|N/A|`"message":"reference cannot be null or empty"`|Populate the reference parameter|
-|N/A|`"message":"precompiledPDF cannot be null or empty"`|Send a PDF file with data in it|
+|`400`|`"message":"precompiledPDF must be a valid PDF file"`|Send a valid PDF file|
+|`400`|`"message":"reference cannot be null or empty"`|Populate the reference parameter|
+|`400`|`"message":"precompiledPDF cannot be null or empty"`|Send a PDF file with data in it|
 
 # Get message status
 
