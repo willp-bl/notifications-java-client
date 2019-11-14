@@ -50,7 +50,6 @@ SendSmsResponse response = client.sendSms(
 
 To find the template ID:
 1. [Sign in to GOV.UK Notify](https://www.notifications.service.gov.uk/sign-in).
-1. In the top left corner of the page, check you’re viewing the correct service. If not, select __Switch service__ in the top right corner of the page and select the relevant service.
 1. Go to the __Templates__ page and select the relevant template.
 1. Select __Copy template ID to clipboard__.
 
@@ -94,7 +93,6 @@ String reference='STRING';
 A unique identifier of the sender of the text message notification. You can find this information on the __Text Message sender__ settings page:
 
 1. [Sign in to GOV.UK Notify](https://www.notifications.service.gov.uk/sign-in).
-1. In the top left corner of the page, check you’re viewing the correct service. If not, select __Switch service__ in the top right corner of the page and select the relevant service.
 1. Go to the __Settings__ page.
 1. In the __Text Messages__ section, select __Manage__ on the __Text Message sender__ row.
 
@@ -163,7 +161,6 @@ SendEmailResponse response = client.sendEmail(
 
 To find the template ID:
 1. [Sign in to GOV.UK Notify](https://www.notifications.service.gov.uk/sign-in).
-1. In the top left corner of the page, check you’re viewing the correct service. If not, select __Switch service__ in the top right corner of the page and select the relevant service.
 1. Go to the __Templates__ page and select the relevant template.
 1. Select __Copy template ID to clipboard__.
 
@@ -208,7 +205,6 @@ This is an email address specified by you to receive replies from your users. Yo
 
 To add a reply-to address:
 1. [Sign in to GOV.UK Notify](https://www.notifications.service.gov.uk/sign-in).
-1. In the top left corner of the page, check you’re viewing the correct service. If not, select __Switch service__ in the top right corner of the page and select the relevant service.
 1. Go to the __Settings__ page.
 1. In the Email section, select __Manage__ on the __Email reply-to addresses__ row.
 1. Select __Add reply-to address__.
@@ -262,7 +258,6 @@ The links are unique and unguessable. GOV.UK Notify cannot access or decrypt you
 #### Add a placeholder field to the template
 
 1. [Sign in to GOV.UK Notify](https://www.notifications.service.gov.uk/sign-in).
-1. In the top left corner of the page, check you’re viewing the correct service. If not, select __Switch service__ in the top right corner of the page and select the relevant service.
 1. Go to the __Templates__ page and select the relevant email template.
 1. Select __Edit__.
 1. Add a placeholder field to the email template using double brackets. For example:
@@ -318,7 +313,6 @@ When you add a new service it will start in [trial mode](https://www.notificatio
 To send Notify a request to go live:
 
 1. [Sign in to GOV.UK Notify](https://www.notifications.service.gov.uk/sign-in).
-1. In the top left corner of the page, check you’re viewing the correct service. If not, select __Switch service__ in the top right corner of the page and select the relevant service.
 1. Go to the __Settings__ page.
 1. In the __Your service is in trial mode__ section, select __request to go live__.
 
@@ -338,7 +332,6 @@ SendLetterResponse response = client.sendLetter(
 
 To find the template ID:
 1. [Sign in to GOV.UK Notify](https://www.notifications.service.gov.uk/sign-in).
-1. In the top left corner of the page, check you’re viewing the correct service. If not, select __Switch service__ in the top right corner of the page and select the relevant service.
 1. Go to the __Templates__ page and select the relevant template.
 1. Select __Copy template ID to clipboard__.
 
