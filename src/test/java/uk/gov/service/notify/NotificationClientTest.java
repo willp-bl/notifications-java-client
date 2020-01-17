@@ -105,7 +105,7 @@ public class NotificationClientTest {
             NotificationClient.prepareUpload(documentContents);
         }catch(NotificationClientException e){
             assertEquals(e.getHttpResult(), 413);
-            assertEquals(e.getMessage(), "Status code: 413 Document is larger than 2MB");
+            assertEquals(e.getMessage(), "Status code: 413 File is larger than 2MB");
         }
     }
 }
