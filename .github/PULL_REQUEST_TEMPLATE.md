@@ -9,5 +9,7 @@
 - [x] I’ve used the pull request template
 - [ ] I’ve written unit tests for these changes
 - [ ] I’ve update the documentation (in `DOCUMENTATION.md`)
-- [ ] I’ve bumped the version number (in `src/main/resources/application.properties`)
-      and run the `update_version.sh` script
+- [ ] I’ve bumped the version number
+    - [ ] in `src/main/resources/application.properties`
+    - [ ] in `src/test/java/uk/gov/service/notify/NotificationClientTest.java::testCreateNotificationClientSetsUserAgent`
+    - [ ] and run the `update_version.sh` script
