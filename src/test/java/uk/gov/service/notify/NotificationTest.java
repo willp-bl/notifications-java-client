@@ -146,7 +146,7 @@ public class NotificationTest {
         content.put("line_4", null);
         content.put("line_5", null);
         content.put("line_6", null);
-        content.put("postcode", "sw1 1aa");
+        content.put("postcode", "SW1 1AA");
         content.put("postage", "first");
         content.put("type", "letter");
         content.put("status", "delivered");
@@ -178,7 +178,7 @@ public class NotificationTest {
         assertEquals(Optional.<String>empty(), notification.getLine4());
         assertEquals(Optional.<String>empty(), notification.getLine5());
         assertEquals(Optional.<String>empty(), notification.getLine6());
-        assertEquals(Optional.of("sw1 1aa"), notification.getPostcode());
+        assertEquals(Optional.of("SW1 1AA"), notification.getPostcode());
         assertEquals(Optional.of("first"), notification.getPostage());
         assertEquals(UUID.fromString(templateId), notification.getTemplateId());
         assertEquals(1, notification.getTemplateVersion());
