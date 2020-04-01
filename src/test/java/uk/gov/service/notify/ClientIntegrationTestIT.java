@@ -392,7 +392,7 @@ public class ClientIntegrationTestIT {
         HashMap<String, String> personalisation = new HashMap<>();
         String addressLine1 = UUID.randomUUID().toString();
         String addressLine2 = UUID.randomUUID().toString();
-        String postcode = UUID.randomUUID().toString();
+        String postcode = "SW1 1AA";
         personalisation.put("address_line_1", addressLine1);
         personalisation.put("address_line_2", addressLine2);
         personalisation.put("postcode", postcode);
