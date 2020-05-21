@@ -26,6 +26,13 @@ NotificationClient client = new NotificationClient(apiKey);
 
 To get an API key, [sign in to GOV.UK Notify](https://www.notifications.service.gov.uk/sign-in) and go to the __API integration__ page. You can find more information in the [API keys](#api-keys) section of this documentation.
 
+If you use a proxy you can pass it into the NotificationClient constructor.
+
+```java
+import uk.gov.service.notify.NotificationClient;
+NotificationClient client = new NotificationClient(apiKey, proxy);
+```
+
 # Send a message
 
 You can use GOV.UK Notify to send text messages, emails and letters.
