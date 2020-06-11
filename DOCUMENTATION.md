@@ -651,21 +651,14 @@ You can pass in empty arguments or `null` to ignore these filters.
 
 #### status (optional)
 
-| status | text | email | letter |Precompiled letter|
-|:--- |:--- |:--- |:--- |:--- |:--- |
-|created|Yes|Yes|||
-|sending|Yes|Yes|||
-|delivered|Yes||||
-|pending|Yes||||
-|failed|Yes|Yes|||
-|permanent-failure|Yes|Yes|||
-|temporary-failure|Yes|Yes|||
-|technical-failure|Yes|Yes|||
-|accepted|||Yes||
-|received|||Yes||
-|pending-virus-check||||Yes|
-|virus-scan-failed||||Yes|
-|validation-failed||||Yes|
+You can filter by each:
+
+* [email status](#status---email)
+* [text message status](#status---text-message)
+* [letter status](#status---letter)
+* [precompiled letter status](#status---precompiled-letter)
+
+You can leave out this argument to ignore this filter.
 
 #### notificationType (optional)
 
