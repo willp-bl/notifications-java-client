@@ -469,10 +469,8 @@ public class ClientIntegrationTestIT {
 
     private void assertNotificationWhenLetter(Notification notification) {
         assertTrue(notification.getLine1().isPresent());
-        assertTrue(notification.getLine2().isPresent());
-        assertTrue(notification.getPostcode().isPresent());
+        // the other address lines are optional. A precompiled letter will only have address_line_1
         assertTrue(notification.getPostage().isPresent());
-        // the other address lines are optional.
         assertFalse(notification.getEmailAddress().isPresent());
         assertFalse(notification.getPhoneNumber().isPresent());
     }
