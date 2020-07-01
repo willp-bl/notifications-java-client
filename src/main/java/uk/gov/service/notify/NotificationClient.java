@@ -452,15 +452,7 @@ public class NotificationClient implements NotificationClientApi {
         if (inputStream == null) {
             return null;
         }
-        InputStreamReader streamReader = new InputStreamReader(inputStream, UTF_8);
-        StringBuilder sb = new StringBuilder();
-        BufferedReader br = new BufferedReader(streamReader);
-        String line;
-        while ((line = br.readLine()) != null) {
-            sb.append(line).append("\n");
-        }
-        br.close();
-        return sb.toString();
+        return IOUtils.toString(inputStream, UTF_8);
     }
 
     /**
