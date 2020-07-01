@@ -321,11 +321,9 @@ public class NotificationClient implements NotificationClientApi {
 
             int httpResult = conn.getResponseCode();
             if (httpResult == expectedStatusCode) {
-                StringBuilder sb = readStream(new InputStreamReader(conn.getInputStream(), UTF_8));
-                return sb.toString();
+                return readStream(conn.getInputStream());
             } else {
-                StringBuilder sb = readStream(new InputStreamReader(conn.getErrorStream(), UTF_8));
-                throw new NotificationClientException(httpResult, sb.toString());
+                throw new NotificationClientException(httpResult, readStream(conn.getErrorStream()));
             }
 
         } catch (IOException e) {
@@ -343,12 +341,9 @@ public class NotificationClient implements NotificationClientApi {
             int httpResult = conn.getResponseCode();
             StringBuilder stringBuilder;
             if (httpResult == 200) {
-                stringBuilder = readStream(new InputStreamReader(conn.getInputStream(), UTF_8));
-                conn.disconnect();
-                return stringBuilder.toString();
+                return readStream(conn.getInputStream());
             } else {
-                stringBuilder = readStream(new InputStreamReader(conn.getErrorStream(), UTF_8));
-                throw new NotificationClientException(httpResult, stringBuilder.toString());
+                throw new NotificationClientException(httpResult, readStream(conn.getErrorStream()));
             }
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, e.toString(), e);
@@ -368,9 +363,7 @@ public class NotificationClient implements NotificationClientApi {
                 InputStream is = conn.getInputStream();
                 out = IOUtils.toByteArray(is);
             } else {
-                // errors should be read as a string
-                String s = readStream(new InputStreamReader(conn.getErrorStream(), UTF_8)).toString();
-                throw new NotificationClientException(httpResult, s);
+                throw new NotificationClientException(httpResult, readStream(conn.getErrorStream()));
             }
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, e.toString(), e);
@@ -455,7 +448,11 @@ public class NotificationClient implements NotificationClientApi {
         return body;
     }
 
-    private StringBuilder readStream(InputStreamReader streamReader) throws IOException {
+    private String readStream(InputStream inputStream) throws IOException {
+        if (inputStream == null) {
+            return null;
+        }
+        InputStreamReader streamReader = new InputStreamReader(inputStream, UTF_8);
         StringBuilder sb = new StringBuilder();
         BufferedReader br = new BufferedReader(streamReader);
         String line;
@@ -463,7 +460,7 @@ public class NotificationClient implements NotificationClientApi {
             sb.append(line).append("\n");
         }
         br.close();
-        return sb;
+        return sb.toString();
     }
 
     /**
