@@ -399,7 +399,7 @@ public class NotificationClient implements NotificationClientApi {
         }
     }
 
-    private HttpURLConnection getConnection(URL url) throws IOException {
+    HttpURLConnection getConnection(URL url) throws IOException {
         HttpURLConnection conn;
 
         if (null != proxy) {
