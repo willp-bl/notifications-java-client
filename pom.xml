@@ -118,7 +118,6 @@
             <version>3.0.0-M3</version>
             <configuration>
                 <useSystemClassLoader>false</useSystemClassLoader>
-                <argLine>-DforkCount=0 -Dhttp.proxyHost=${http-proxy-host} -Dhttp.proxyPort=${http-proxy-port} -Dhttps.proxyHost=${http-proxy-host} -Dhttps.proxyPort=${http-proxy-port} -Dhttp.nonProxyHosts="${non-proxy-hosts}"</argLine>
             </configuration>
             <executions>
                 <execution>
