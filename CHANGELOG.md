@@ -1,3 +1,9 @@
+## 3.16.0-RELEASE
+* Add support for an optional `isCsv` parameter in the `prepareUpload()` function. This fixes a bug when sending a CSV file by email. This ensures that the file is downloaded as a CSV rather than a TXT file.
+
+## 3.15.3-RELEASE
+* Fixes issue #171 with null pointer exception on reading the errorstream
+
 ## 3.15.2-RELEASE
 * Change error messages to refer to file, not document.
 

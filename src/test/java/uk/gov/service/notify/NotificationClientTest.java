@@ -52,7 +52,7 @@ public class NotificationClientTest {
     @Test
     public void testCreateNotificationClientSetsUserAgent() {
         NotificationClient client = new NotificationClient(combinedApiKey, baseUrl);
-        assertEquals(client.getUserAgent(), "NOTIFY-API-JAVA-CLIENT/3.15.3-RELEASE");
+        assertEquals(client.getUserAgent(), "NOTIFY-API-JAVA-CLIENT/3.16.0-RELEASE");
     }
 
     @Test
@@ -97,7 +97,20 @@ public class NotificationClientTest {
         JSONObject response = NotificationClient.prepareUpload(documentContent);
         JSONObject expectedResult = new JSONObject();
         expectedResult.put("file", new String(Base64.encodeBase64(documentContent), ISO_8859_1));
+        expectedResult.put("is_csv", false);
         assertEquals(expectedResult.getString("file"), response.getString("file"));
+        assertEquals(expectedResult.getBoolean("is_csv"), response.getBoolean("is_csv"));
+    }
+
+    @Test
+    public void testPrepareUploadForCSV() throws NotificationClientException {
+        byte[] documentContent = "this is a document to test with".getBytes();
+        JSONObject response = NotificationClient.prepareUpload(documentContent, true);
+        JSONObject expectedResult = new JSONObject();
+        expectedResult.put("file", new String(Base64.encodeBase64(documentContent), ISO_8859_1));
+        expectedResult.put("is_csv", true);
+        assertEquals(expectedResult.getString("file"), response.getString("file"));
+        assertEquals(expectedResult.getBoolean("is_csv"), response.getBoolean("is_csv"));
     }
 
     @Test
