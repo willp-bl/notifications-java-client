@@ -801,6 +801,7 @@ int version;
 String body;
 Optional<String> subject;
 Optional<Map<String, Object>> personalisation;
+Optional<String> letterContactBlock;
 ```
 
 ### Error codes
@@ -851,6 +852,7 @@ int version;
 String body;
 Optional<String> subject;
 Optional<Map<String, Object>> personalisation;
+Optional<String> letterContactBlock;
 ```
 
 ### Error codes
