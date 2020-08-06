@@ -18,6 +18,7 @@ public class Template {
     private String body;
     private String subject;
     private Map<String, Object> personalisation;
+    private String letterContactBlock;
 
 
     public Template(String content){
@@ -40,6 +41,7 @@ public class Template {
         version = data.getInt("version");
         body = data.getString("body");
         subject = data.isNull("subject") ? null : data.getString("subject");
+        letterContactBlock = data.isNull("letter_contact_block") ? null : data.getString("letter_contact_block");
         personalisation = data.isNull("personalisation") ? null :
                 JsonUtils.jsonToMap(data.getJSONObject("personalisation"));
     }
@@ -116,6 +118,14 @@ public class Template {
         this.subject = subject;
     }
 
+    public Optional<String> getLetterContactBlock() {
+        return Optional.ofNullable(letterContactBlock);
+    }
+
+    public void setLetterContactBlock(String letterContactBlock) {
+        this.letterContactBlock = letterContactBlock;
+    }
+
     public Optional<Map<String, Object>> getPersonalisation() {
         return Optional.ofNullable(personalisation);
     }
@@ -135,6 +145,7 @@ public class Template {
                 ", version=" + version +
                 ", body='" + body + '\'' +
                 ", subject='" + subject + '\'' +
+                ", letterContactBlock='" + letterContactBlock + '\'' +
                 ", personalisation='" + personalisation + '\'' +
                 '}';
     }

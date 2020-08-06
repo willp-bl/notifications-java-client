@@ -234,13 +234,15 @@ public class ClientIntegrationTestIT {
     @Test
     public void testGetTemplateById() throws NotificationClientException {
         NotificationClient client = getClient();
-        Template template = client.getTemplateById(System.getenv("EMAIL_TEMPLATE_ID"));
-        assertEquals(System.getenv("EMAIL_TEMPLATE_ID"), template.getId().toString());
+        Template template = client.getTemplateById(System.getenv("LETTER_TEMPLATE_ID"));
+        assertEquals(System.getenv("LETTER_TEMPLATE_ID"), template.getId().toString());
         assertNotNull(template.getCreatedAt());
         assertNotNull(template.getTemplateType());
         assertNotNull(template.getBody());
-        assertNotNull(template.getSubject());
         assertNotNull(template.getName());
+        assertNotNull(template.getVersion());
+        assertNotNull(template.getSubject());
+        assertNotNull(template.getLetterContactBlock());
     }
 
     @Test
@@ -252,6 +254,7 @@ public class ClientIntegrationTestIT {
         assertNotNull(template.getTemplateType());
         assertNotNull(template.getBody());
         assertNotNull(template.getName());
+        assertNotNull(template.getVersion());
     }
 
     @Test

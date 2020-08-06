@@ -1,3 +1,7 @@
+## 3.17.0-RELEASE
+* Add `letterContactBlock` to the `Template` model.
+- We've added `letter_contact_block` to our API responses when calling`getTemplateById`, `getTemplateVersion` and `getAllTemplates`. This release updates our `Template` model to include this new property.
+
 ## 3.16.0-RELEASE
 * Add support for an optional `isCsv` parameter in the `prepareUpload()` function. This fixes a bug when sending a CSV file by email. This ensures that the file is downloaded as a CSV rather than a TXT file.
 
