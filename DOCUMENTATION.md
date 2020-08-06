@@ -303,6 +303,24 @@ client.sendEmail(templateId,
                  emailReplyToId);
 ```
 
+#### CSV Files
+
+Uploads for CSV files should use the `isCsv` parameter on the `prepareUpload()` function.  For example:
+
+```java
+ClassLoader classLoader = getClass().getClassLoader();
+File file = new File(classLoader.getResource("document_to_upload.pdf").getFile());
+byte [] fileContents = FileUtils.readFileToByteArray(file);
+
+HashMap<String, Object> personalisation = new HashMap();
+personalisation.put("link_to_file", client.prepareUpload(fileContents, true));
+client.sendEmail(templateId,
+                 emailAddress,
+                 personalisation,
+                 reference,
+                 emailReplyToId);
+```
+
 ### Error codes
 
 If the request is not successful, the client returns an `HTTPError` containing the relevant error code.
