@@ -17,6 +17,7 @@ import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static java.util.Collections.emptyMap;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 
 public class NotificationClientTest {
@@ -52,7 +53,8 @@ public class NotificationClientTest {
     @Test
     public void testCreateNotificationClientSetsUserAgent() {
         NotificationClient client = new NotificationClient(combinedApiKey, baseUrl);
-        assertEquals(client.getUserAgent(), "NOTIFY-API-JAVA-CLIENT/3.17.0-RELEASE");
+        assertTrue(client.getUserAgent().contains("NOTIFY-API-JAVA-CLIENT/"));
+        assertTrue(client.getUserAgent().contains("-RELEASE"));
     }
 
     @Test
