@@ -720,7 +720,7 @@ Optional<String> nextPageLink;
 
 If the request is not successful, the client returns a `NotificationClientException` containing the relevant error code:
 
-|httpResult|Message||
+|httpResult|Message|How to fix|
 |:---|:---|:---|
 |`400`|`[{`<br>`"error": "ValidationError",`<br>`"message": "bad status is not one of [created, sending, sent, delivered, pending, failed, technical-failure, temporary-failure, permanent-failure, accepted, received]"`<br>`}]`|Contact the GOV.UK Notify team|
 |`400`|`[{`<br>`"error": "ValidationError",`<br>`"message": "Applet is not one of [sms, email, letter]"`<br>`}]`|Contact the GOV.UK Notify team|
