@@ -37,10 +37,15 @@ Increment the version in the `src/main/resources/application.properties` and `po
 ## Deploying
 
 [For internal notify use only]
-Make sure your `~/.m2/settings.xml` file is up to date with the file found at `credentials/bintray/settings.xml` and you have updated the versions in the required files.
+You'll need to make sure you have the `notify-gpg-key` private key available locally.
+
+```shell
+gpg --import <(notify-pass show credentials/concourse/gpg-key)
+```
 
 Then, from the notifications-java-client directory, run
 
 ```shell
+export MAVEN_CENTRAL_PASSWORD=$(notify-pass show credentials/maven-central/password)
 ./deploy.sh
 ```
