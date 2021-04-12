@@ -6,12 +6,12 @@ This documentation is for developers interested in using the GOV.UK Notify Java 
 
 ### Install the client
 
-The `notifications-java-client` deploys to Bintray.
+The `notifications-java-client` deploys to Maven Central.
 
-Go to the [GOV.UK Notify Java client page on Bintray](https://bintray.com/gov-uk-notify/maven/notifications-java-client) [external link]:
+Go to the [GOV.UK Notify Java client page on Maven Central](https://search.maven.org/artifact/uk.gov.service.notify/notifications-java-client) [external link]:
 
-1. Select __Set me up!__ and use the appropriate download instructions.
-1. Go to the Maven build settings section of the page and copy the appropriate dependency code snippet.
+1. Select the most recent version.
+1. Copy the dependency configuration snippet for your build tool.
 
 Refer to the [client changelog](https://github.com/alphagov/notifications-java-client/blob/master/CHANGELOG.md) for the version number and the latest updates.
 
