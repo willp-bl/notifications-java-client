@@ -1,3 +1,6 @@
+## 3.17.1-RELEASE
+* Minor patch release, changes to pom.xml including adding a license, contact details and more.
+
 ## 3.17.0-RELEASE
 * Add `letterContactBlock` to the `Template` model.
 - We've added `letter_contact_block` to our API responses when calling`getTemplateById`, `getTemplateVersion` and `getAllTemplates`. This release updates our `Template` model to include this new property.
