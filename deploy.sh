@@ -12,4 +12,4 @@ if [[ -z "${MAVEN_CENTRAL_PASSWORD}" ]]; then
   exit 1
 fi
 
-mvn --setings=maven-settings.xml clean javadoc:jar source:jar deploy
+mvn --settings=maven-settings.xml clean javadoc:jar source:jar deploy

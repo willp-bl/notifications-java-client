@@ -69,3 +69,8 @@ clean-docker-containers: ## Clean up any remaining docker containers
 
 clean:
 	rm -rf .m2
+
+
+.PHONY: get-client-version
+get-client-version: ## Retrieve client version number from source code (https://stackoverflow.com/a/26514030)
+	@mvn help:evaluate -Dexpression=project.version -q -DforceStdout
