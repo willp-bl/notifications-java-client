@@ -24,7 +24,7 @@ test: ## Run tests
 
 .PHONY: integration-test
 integration-test: ## Run integration tests
-	mvn --batch-mode clean verify
+	mvn --batch-mode clean integration-test
 
 .PHONY: generate-env-file
 generate-env-file: ## Generate the environment file for running the tests inside a Docker container
