@@ -7,7 +7,7 @@ Pull requests are welcome.
 On a command line build the project with Maven to run the unit tests:
 
 ```shell
-> mvn clean test
+> make test
 ```
 
 
@@ -21,18 +21,14 @@ export NOTIFY_API_URL=https://api.notify.works
 
 Use the following command to run the integration tests:
 ```shell
-mvn clean verify
+make integration-test
 ```
 NOTE: you'll get a build failure `[ERROR] Failed to execute goal org.apache.maven.plugins:maven-gpg-plugin:1.5:sign (sign-artifacts) on project notifications-java-client: Exit code: 2 -> [Help 1]
-` unless you import the gpg key, however, the you should see if the integration tests failed in the log message before the error. Import the key with this command:
-
-```shell
-gpg --import <(notify-pass show credentials/concourse/gpg-key)
-```
+` however, you should see if the integration tests passed in the log message before the error. 
 
 ## Update version
 Increment the version in the `src/main/resources/application.properties` and `pom.xml` files.
 
 ## Deploying
 
-Run the `release-java-client` concourse job after the `build-and-deploy-tech-docs-preview` is complete to publish the java client to maven central.
+Concourse will release and publish the java client to maven central

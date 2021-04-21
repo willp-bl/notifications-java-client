@@ -189,7 +189,7 @@
                         staging area but not release the package. For details see
                         https://central.sonatype.org/pages/releasing-the-deployment.html
                     -->
-                    <autoReleaseAfterClose>false</autoReleaseAfterClose>
+                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
                 </configuration>
             </plugin>
             <plugin>
