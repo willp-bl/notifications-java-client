@@ -1,3 +1,6 @@
+## 3.17.2-RELEASE
+* Updated dependencies to latest versions
+
 ## 3.17.1-RELEASE
 * Minor patch release, changes to pom.xml including adding a license, contact details and more.
 
