@@ -21,7 +21,7 @@
     <developers>
         <developer>
             <name>GOV.UK Notify Team</name>
-            <email>notify-support@digital.cabinet-office.gov.uk</email>
+            <url>http://www.notifications.service.gov.uk/support</url>
             <organization>Government Digital Service</organization>
             <organizationUrl>https://www.gov.uk/government/organisations/government-digital-service</organizationUrl>
         </developer>
