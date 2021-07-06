@@ -40,9 +40,6 @@ To run the integration tests:
 make integration-test-with-docker
 ```
 
-NOTE: you'll get a build failure `[ERROR] Failed to execute goal org.apache.maven.plugins:maven-gpg-plugin:1.5:sign (sign-artifacts) on project notifications-java-client: Exit code: 2 -> [Help 1]
-` however, you should see if the integration tests passed in the log message before the error.
-
 ## Update version
 
 Increment the version in the `src/main/resources/application.properties` and `pom.xml` files.
