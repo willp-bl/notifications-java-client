@@ -1,12 +1,6 @@
 .DEFAULT_GOAL := help
 SHELL := /bin/bash
 
-DOCKER_BUILDER_IMAGE_NAME = govuk/notify-java-client-builder
-
-BUILD_TAG ?= notifications-java-client-manual
-
-DOCKER_CONTAINER_PREFIX = ${USER}-${BUILD_TAG}
-
 .PHONY: help
 help:
 	@cat $(MAKEFILE_LIST) | grep -E '^[a-zA-Z_-]+:.*?## .*$$' | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
@@ -28,45 +22,23 @@ integration-test: ## Run integration tests
 
 .PHONY: generate-env-file
 generate-env-file: ## Generate the environment file for running the tests inside a Docker container
-	script/generate_docker_env.sh
+	scripts/generate_docker_env.sh
 
 .PHONY: bootstrap-with-docker
 bootstrap-with-docker: generate-env-file ## Prepare the Docker builder image
-	docker build -t ${DOCKER_BUILDER_IMAGE_NAME} .
-	docker run -i --rm \
-		--name "${DOCKER_CONTAINER_PREFIX}-build" \
-		-v "`pwd`:/var/project" \
-		-v `pwd`/.m2:/root/.m2 \
-		${DOCKER_BUILDER_IMAGE_NAME} \
-		make bootstrap
+	docker build -t notifications-java-client .
+	./scripts/run_with_docker.sh make bootstrap
 
 .PHONY: test-with-docker
 test-with-docker: ## Run tests inside a Docker container
-	docker run -i --rm \
-		--name "${DOCKER_CONTAINER_PREFIX}-test" \
-		-v "`pwd`:/var/project" \
-		-v `pwd`/.m2:/root/.m2 \
-		--env-file docker.env \
-		${DOCKER_BUILDER_IMAGE_NAME} \
-		make test
+	./scripts/run_with_docker.sh make test
 
 .PHONY: integration-test-with-docker
 integration-test-with-docker: ## Run integration tests inside a Docker container
-	docker run -i --rm \
-		--name "${DOCKER_CONTAINER_PREFIX}-integration-test" \
-		-v "`pwd`:/var/project" \
-		-v `pwd`/.m2:/root/.m2 \
-		--env-file docker.env \
-		${DOCKER_BUILDER_IMAGE_NAME} \
-		make integration-test
-
-.PHONY: clean-docker-containers
-clean-docker-containers: ## Clean up any remaining docker containers
-	docker rm -f $(shell docker ps -q -f "name=${DOCKER_CONTAINER_PREFIX}") 2> /dev/null || true
+	./scripts/run_with_docker.sh make integration-test
 
 clean:
 	rm -rf .m2
-
 
 .PHONY: get-client-version
 get-client-version: ## Retrieve client version number from source code (https://stackoverflow.com/a/26514030)
