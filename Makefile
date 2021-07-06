@@ -20,12 +20,8 @@ test: ## Run tests
 integration-test: ## Run integration tests
 	mvn --batch-mode clean integration-test
 
-.PHONY: generate-env-file
-generate-env-file: ## Generate the environment file for running the tests inside a Docker container
-	scripts/generate_docker_env.sh
-
 .PHONY: bootstrap-with-docker
-bootstrap-with-docker: generate-env-file ## Prepare the Docker builder image
+bootstrap-with-docker: ## Prepare the Docker builder image
 	docker build -t notifications-java-client .
 	./scripts/run_with_docker.sh make bootstrap
 

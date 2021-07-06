@@ -12,6 +12,16 @@ This app uses dependencies that are difficult to install locally. In order to ma
 make bootstrap-with-docker
 ```
 
+### `environment.sh`
+
+In the root directory of the repo, run:
+
+```
+notify-pass credentials/client-integration-tests > environment.sh
+```
+
+Unless you're part of the GOV.UK Notify team, you won't be able to run this command or the Integration Tests. However, the file still needs to exist - run `touch environment.sh` instead.
+
 ## Tests
 
 ### Unit tests
@@ -23,12 +33,6 @@ make test-with-docker
 ```
 
 ### Integration Tests
-
-You will need to source an environment.sh file. You can find a copy in notify-pass credentials/client-integration-tests. You will also need to include the following variable.
-
-```shell
-export NOTIFY_API_URL=https://api.notify.works
-```
 
 To run the integration tests:
 
