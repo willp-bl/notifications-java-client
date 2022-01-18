@@ -5,6 +5,6 @@ Use this client to send emails, text messages and letters using the [GOV.UK Noti
 Useful links:
 
 - [Documentation](https://docs.notifications.service.gov.uk/java.html)
-- [Bintray repository](https://bintray.com/gov-uk-notify)
+- [Maven Central repository](https://search.maven.org/artifact/uk.gov.service.notify/notifications-java-client)
 - [Changelog](https://github.com/alphagov/notifications-java-client/blob/master/CHANGELOG.md)
 - [Contributing to this client](https://github.com/alphagov/notifications-java-client/blob/master/CONTRIBUTING.md)
