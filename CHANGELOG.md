@@ -1,3 +1,6 @@
+## 3.17.3-RELEASE
+* Removed unused commons-cli dependency
+
 ## 3.17.2-RELEASE
 * Updated dependencies to latest versions
 
