@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    
+
     <groupId>uk.gov.service.notify</groupId>
     <artifactId>notifications-java-client</artifactId>
-    <version>3.17.2-RELEASE</version>
+    <version>3.17.3-RELEASE</version>
     <packaging>jar</packaging>
-    
+
     <name>GOV.UK Notify Java client</name>
     <description>Use this client to send emails, text messages and letters using the GOV.UK Notify API.</description>
     <url>http://www.notifications.service.gov.uk</url>
@@ -26,13 +26,13 @@
             <organizationUrl>https://www.gov.uk/government/organisations/government-digital-service</organizationUrl>
         </developer>
     </developers>
-    
+
     <scm>
         <connection>scm:git:git://github.com/alphagov/notifications-java-client.git</connection>
         <developerConnection>scm:git:ssh://github.com:alphagov/notifications-java-client.git</developerConnection>
         <url>http://github.com/alphagov/notifications-java-client/tree/master</url>
     </scm>
-    
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
