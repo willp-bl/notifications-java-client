@@ -100,6 +100,8 @@ public class NotificationClientTest {
         JSONObject expectedResult = new JSONObject();
         expectedResult.put("file", new String(Base64.encodeBase64(documentContent), ISO_8859_1));
         expectedResult.put("is_csv", false);
+        expectedResult.put("confirm_email_before_download", JSONObject.NULL);
+        expectedResult.put("retention_period", JSONObject.NULL);
         assertEquals(expectedResult.getString("file"), response.getString("file"));
         assertEquals(expectedResult.getBoolean("is_csv"), response.getBoolean("is_csv"));
     }
@@ -111,8 +113,25 @@ public class NotificationClientTest {
         JSONObject expectedResult = new JSONObject();
         expectedResult.put("file", new String(Base64.encodeBase64(documentContent), ISO_8859_1));
         expectedResult.put("is_csv", true);
+        expectedResult.put("confirm_email_before_download", JSONObject.NULL);
+        expectedResult.put("retention_period", JSONObject.NULL);
         assertEquals(expectedResult.getString("file"), response.getString("file"));
         assertEquals(expectedResult.getBoolean("is_csv"), response.getBoolean("is_csv"));
+    }
+
+    @Test
+    public void testPrepareUploadWithEmailConfirmationAndRetentionPeriod() throws NotificationClientException {
+        byte[] documentContent = "this is a document to test with".getBytes();
+        JSONObject response = NotificationClient.prepareUpload(documentContent, true, true, "1 weeks");
+        JSONObject expectedResult = new JSONObject();
+        expectedResult.put("file", new String(Base64.encodeBase64(documentContent), ISO_8859_1));
+        expectedResult.put("is_csv", true);
+        expectedResult.put("confirm_email_before_download", true);
+        expectedResult.put("retention_period", "1 weeks");
+        assertEquals(expectedResult.getString("file"), response.getString("file"));
+        assertEquals(expectedResult.getBoolean("is_csv"), response.getBoolean("is_csv"));
+        assertEquals(expectedResult.getBoolean("confirm_email_before_download"), response.getBoolean("confirm_email_before_download"));
+        assertEquals(expectedResult.getString("retention_period"), response.getString("retention_period"));
     }
 
     @Test

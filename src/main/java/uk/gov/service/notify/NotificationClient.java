@@ -300,6 +300,31 @@ public class NotificationClient implements NotificationClientApi {
      *
      * @param documentContents byte[] of the document
      * @param isCsv boolean True if a CSV file, False if not to ensure document is downloaded as correct file type
+     * @param confirmEmailBeforeDownload boolean True to require the user to enter their email address before accessing the file
+     * @param retentionPeriod a string '[1-78] weeks' to change how long the document should be available to the user
+     * @return <code>JSONObject</code> a json object to be added to the personalisation is returned
+     */
+    public static JSONObject prepareUpload(final byte[] documentContents, boolean isCsv, boolean confirmEmailBeforeDownload, String retentionPeriod) throws NotificationClientException {
+        if (documentContents.length > 2*1024*1024){
+            throw new NotificationClientException(413, "File is larger than 2MB");
+        }
+        byte[] fileContentAsByte = Base64.encodeBase64(documentContents);
+        String fileContent = new String(fileContentAsByte, ISO_8859_1);
+
+        JSONObject jsonFileObject = new JSONObject();
+        jsonFileObject.put("file", fileContent);
+        jsonFileObject.put("is_csv", isCsv);
+        jsonFileObject.put("confirm_email_before_download", confirmEmailBeforeDownload);
+        jsonFileObject.put("retention_period", retentionPeriod);
+        return jsonFileObject;
+    }
+
+    /**
+     * Use the prepareUpload method when uploading a document via sendEmail.
+     * The prepareUpload method creates a <code>JSONObject</code> which will need to be added to the personalisation map.
+     *
+     * @param documentContents byte[] of the document
+     * @param isCsv boolean True if a CSV file, False if not to ensure document is downloaded as correct file type
      * @return <code>JSONObject</code> a json object to be added to the personalisation is returned
      */
     public static JSONObject prepareUpload(final byte[] documentContents, boolean isCsv) throws NotificationClientException {
@@ -312,6 +337,8 @@ public class NotificationClient implements NotificationClientApi {
         JSONObject jsonFileObject = new JSONObject();
         jsonFileObject.put("file", fileContent);
         jsonFileObject.put("is_csv", isCsv);
+        jsonFileObject.put("confirm_email_before_download", JSONObject.NULL);
+        jsonFileObject.put("retention_period", JSONObject.NULL);
         return jsonFileObject;
     }
 
