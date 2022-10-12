@@ -362,15 +362,15 @@ public class NotificationClient implements NotificationClientApi {
      * @param documentContents byte[] of the document
      * @param isCsv boolean True if a CSV file, False if not to ensure document is downloaded as correct file type
      * @param confirmEmailBeforeDownload boolean True to require the user to enter their email address before accessing the file
-     * @param retentionPeriodDuration a RetentionPeriodDuration that defines how long a file is held for
+     * @param retentionPeriod a RetentionPeriodDuration that defines how long a file is held for
      * @return <code>JSONObject</code> a json object to be added to the personalisation is returned
      */
     public static JSONObject prepareUpload(final byte[] documentContents,
                                            boolean isCsv,
                                            boolean confirmEmailBeforeDownload,
-                                           RetentionPeriodDuration retentionPeriodDuration
+                                           RetentionPeriodDuration retentionPeriod
     ) throws NotificationClientException {
-        return prepareUpload(documentContents, isCsv, confirmEmailBeforeDownload, retentionPeriodDuration.toString());
+        return prepareUpload(documentContents, isCsv, confirmEmailBeforeDownload, retentionPeriod.toString());
     }
 
     private String performPostRequest(HttpURLConnection conn, JSONObject body, int expectedStatusCode) throws NotificationClientException {

@@ -393,9 +393,15 @@ client.sendEmail(templateId,
 
 Set the number of weeks you want the file to be available using the `retention_period` parameter.
 
-You can choose any value between 1 week and 78 weeks.
-
 To use this feature will need version 3.18.0-RELEASE of the Java client library, or a more recent version.
+
+You can choose any value between 1 week and 78 weeks. The value can be passed in as a `String`,
+or as of version 3.19.0-RELEASE a `RetentionPeriodDuration(Integer, ChronoUnit)`. 
+
+If you are dynamically assigning `retention_period`,
+using `RetentionPeriodDuration` is recommended to take advantage of the validation it performs on construction;
+an `IllegalArgumentException` is thrown if validation fails. Currently, only `ChronoUnit.WEEKS` is a supported value 
+for unit.
 
 If you do not choose a value, the file will be available for the default period of 78 weeks (18 months).
 
@@ -405,7 +411,33 @@ File file = new File(classLoader.getResource("document_to_upload.pdf").getFile()
 byte [] fileContents = FileUtils.readFileToByteArray(file);
 
 HashMap<String, Object> personalisation = new HashMap();
-personalisation.put("link_to_file", client.prepareUpload(fileContents, false, false, "52 weeks"));
+personalisation.put("link_to_file", 
+                    client.prepareUpload(
+                            fileContents, 
+                            false, 
+                            false, 
+                            "52 weeks"
+                    ));
+client.sendEmail(templateId,
+                 emailAddress,
+                 personalisation,
+                 reference,
+                 emailReplyToId);
+```
+
+```java
+ClassLoader classLoader = getClass().getClassLoader();
+File file = new File(classLoader.getResource("document_to_upload.pdf").getFile());
+byte [] fileContents = FileUtils.readFileToByteArray(file);
+
+HashMap<String, Object> personalisation = new HashMap();
+personalisation.put("link_to_file", 
+                    client.prepareUpload(
+                            fileContents, 
+                            false, 
+                            false, 
+                            new RetentionPeriodDuration(52, ChronoUnit.WEEKS)
+                    ));
 client.sendEmail(templateId,
                  emailAddress,
                  personalisation,
