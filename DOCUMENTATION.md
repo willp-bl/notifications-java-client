@@ -398,10 +398,9 @@ To use this feature will need version 3.18.0-RELEASE of the Java client library,
 You can choose any value between 1 week and 78 weeks. The value can be passed in as a `String`,
 or as of version 3.19.0-RELEASE a `RetentionPeriodDuration(Integer, ChronoUnit)`. 
 
-If you are dynamically assigning `retention_period`,
-using `RetentionPeriodDuration` is recommended to take advantage of the validation it performs on construction;
-an `IllegalArgumentException` is thrown if validation fails. Currently, only `ChronoUnit.WEEKS` is a supported value 
-for unit.
+If you want to dynamically assign the value for `retention_period`,
+using `RetentionPeriodDuration` is recommended to avoid having to deal with string . Currently, only `ChronoUnit.WEEKS` 
+is a supported value for unit.
 
 If you do not choose a value, the file will be available for the default period of 78 weeks (18 months).
 
