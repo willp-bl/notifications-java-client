@@ -270,7 +270,7 @@ To help protect your files you can also:
 * ask recipients to confirm their email address before downloading
 * choose the length of time that a file is available to download
 
-To turn these features on or off, you will need version 3.18.0-RELEASE of the Java client library or a more recent version.
+To turn these features on or off, you will need version 3.19.0-RELEASE of the Java client library or a more recent version.
 
 #### Add contact details to the file download page
 
@@ -340,7 +340,7 @@ From 29 March 2023, we will turn this feature on by default for every file you s
 
 ##### Turn on email address check
 
-To use this feature before 29 March 2023 you will need version 3.18.0-RELEASE of the Java client library, or a more recent version.
+To use this feature before 29 March 2023 you will need version 3.19.0-RELEASE of the Java client library, or a more recent version.
 
 To make the recipient confirm their email address before downloading the file, set the `confirmEmailBeforeDownload` flag to `true`.
 
@@ -364,7 +364,7 @@ client.sendEmail(templateId,
 
 If you do not want to use this feature after 29 March 2023, you can turn it off on a file-by-file basis.
 
-To do this you will need version 3.18.0-RELEASE of the Java client library, or a more recent version.
+To do this you will need version 3.19.0-RELEASE of the Java client library, or a more recent version.
 
 You should not turn this feature off if you send files that contain:
 

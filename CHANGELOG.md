@@ -1,9 +1,11 @@
-## 3.18.0-RELEASE
+## 3.19.0-RELEASE
+* Adds a new interface for specifying custom retention periods when sending a file by email:
+  * `retentionPeriod` can be set using a `new RetentionPeriodDuration(int, ChronoUnit)`
 
+## 3.18.0-RELEASE
 * Add support for new security features when sending a file by email:
   * `confirmEmailBeforeDownload` can be set to `True` to require the user to enter their email address before accessing the file.
   * `retentionPeriod` can be set to `<1-78> weeks` to set how long the file should be made available.
-
 
 ## 3.17.3-RELEASE
 * Removed unused commons-cli dependency
