@@ -10,12 +10,10 @@ import org.json.JSONObject;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.Proxy;
@@ -351,6 +349,28 @@ public class NotificationClient implements NotificationClientApi {
      */
     public static JSONObject prepareUpload(final byte[] documentContents) throws NotificationClientException {
         return prepareUpload(documentContents, false);
+    }
+
+    /**
+     * Use the prepareUpload method when uploading a document via sendEmail.
+     * The prepareUpload method creates a <code>JSONObject</code> which will need to be added to the personalisation map.
+     *
+     * This version of the class overloads prepareUpload to allow for the use of the RetentionPeriodDuration class if
+     * desired.
+     * @see RetentionPeriodDuration
+     *
+     * @param documentContents byte[] of the document
+     * @param isCsv boolean True if a CSV file, False if not to ensure document is downloaded as correct file type
+     * @param confirmEmailBeforeDownload boolean True to require the user to enter their email address before accessing the file
+     * @param retentionPeriod a RetentionPeriodDuration that defines how long a file is held for
+     * @return <code>JSONObject</code> a json object to be added to the personalisation is returned
+     */
+    public static JSONObject prepareUpload(final byte[] documentContents,
+                                           boolean isCsv,
+                                           boolean confirmEmailBeforeDownload,
+                                           RetentionPeriodDuration retentionPeriod
+    ) throws NotificationClientException {
+        return prepareUpload(documentContents, isCsv, confirmEmailBeforeDownload, retentionPeriod.toString());
     }
 
     private String performPostRequest(HttpURLConnection conn, JSONObject body, int expectedStatusCode) throws NotificationClientException {
