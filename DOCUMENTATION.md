@@ -13,7 +13,7 @@ Go to the [GOV.UK Notify Java client page on Maven Central](https://search.maven
 1. Select the most recent version.
 1. Copy the dependency configuration snippet for your build tool.
 
-Refer to the [client changelog](https://github.com/alphagov/notifications-java-client/blob/master/CHANGELOG.md) for the version number and the latest updates.
+Refer to the [client changelog](https://github.com/alphagov/notifications-java-client/blob/main/CHANGELOG.md) for the version number and the latest updates.
 
 ### Create a new instance of the client
 
