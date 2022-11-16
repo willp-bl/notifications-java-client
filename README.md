@@ -6,5 +6,5 @@ Useful links:
 
 - [Documentation](https://docs.notifications.service.gov.uk/java.html)
 - [Maven Central repository](https://search.maven.org/artifact/uk.gov.service.notify/notifications-java-client)
-- [Changelog](https://github.com/alphagov/notifications-java-client/blob/master/CHANGELOG.md)
-- [Contributing to this client](https://github.com/alphagov/notifications-java-client/blob/master/CONTRIBUTING.md)
+- [Changelog](https://github.com/alphagov/notifications-java-client/blob/main/CHANGELOG.md)
+- [Contributing to this client](https://github.com/alphagov/notifications-java-client/blob/main/CONTRIBUTING.md)
