@@ -1,3 +1,6 @@
+## 4.1.0-RELEASE
+* Remove a dependency on `commons-lang3` by implementing `isBlank` ourselves.
+
 ## 4.0.0-RELEASE
 * Joda-Time has been removed and replaced with java.time
   * The client now uses [`ZonedDateTime` instead of `DateTime`](https://blog.joda.org/2014/11/converting-from-joda-time-to-javatime.html)

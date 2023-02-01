@@ -4,7 +4,7 @@
 
     <groupId>uk.gov.service.notify</groupId>
     <artifactId>notifications-java-client</artifactId>
-    <version>4.0.0-RELEASE</version>
+    <version>4.1.0-RELEASE</version>
     <packaging>jar</packaging>
 
     <name>GOV.UK Notify Java client</name>
@@ -71,11 +71,6 @@
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
             <version>2.8.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <version>3.12.0</version>
         </dependency>
     </dependencies>
     <distributionManagement>

@@ -4,7 +4,6 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Base64InputStream;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
 import org.json.JSONObject;
 
@@ -21,6 +20,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.NoSuchAlgorithmException;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -573,12 +573,12 @@ public class NotificationClient implements NotificationClientApi {
     }
 
     private LetterResponse sendPrecompiledLetter(String reference, String base64EncodedPDFFile, String postage) throws NotificationClientException {
-        if( StringUtils.isBlank(reference) )
+        if( isBlank(reference) )
         {
             throw new NotificationClientException("reference cannot be null or empty");
         }
 
-        if ( StringUtils.isBlank(base64EncodedPDFFile) )
+        if ( isBlank(base64EncodedPDFFile) )
         {
             throw new NotificationClientException("precompiledPDF cannot be null or empty");
         }
@@ -604,6 +604,14 @@ public class NotificationClient implements NotificationClientApi {
         String response = performPostRequest(conn, body, HttpsURLConnection.HTTP_CREATED);
         return new LetterResponse(response);
 
+    }
+
+    private boolean isBlank(String string) {
+        if(Objects.isNull(string)
+                || string.trim().length()==0) {
+            return true;
+        }
+        return false;
     }
 
     @Override
