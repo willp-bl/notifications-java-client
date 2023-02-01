@@ -1,18 +1,18 @@
 package uk.gov.service.notify;
 
-import org.joda.time.DateTime;
 import org.json.JSONObject;
 
+import java.time.ZonedDateTime;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.Map;
 
 public class Template {
     private UUID id;
     private String name;
     private String templateType;
-    private DateTime createdAt;
-    private DateTime updatedAt;
+    private ZonedDateTime createdAt;
+    private ZonedDateTime updatedAt;
     private String createdBy;
     private int version;
     private String body;
@@ -36,8 +36,8 @@ public class Template {
         id = UUID.fromString(data.getString("id"));
         name = data.getString("name");
         templateType = data.getString("type");
-        createdAt = new DateTime(data.getString("created_at"));
-        updatedAt = data.isNull("updated_at") ? null : new DateTime(data.getString("updated_at"));
+        createdAt = ZonedDateTime.parse(data.getString("created_at"));
+        updatedAt = data.isNull("updated_at") ? null : ZonedDateTime.parse(data.getString("updated_at"));
         version = data.getInt("version");
         body = data.getString("body");
         subject = data.isNull("subject") ? null : data.getString("subject");
@@ -70,19 +70,19 @@ public class Template {
         this.name = name;
     }
 
-    public DateTime getCreatedAt() {
+    public ZonedDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(DateTime createdAt) {
+    public void setCreatedAt(ZonedDateTime createdAt) {
         this.createdAt = createdAt;
     }
 
-    public Optional<DateTime> getUpdatedAt() {
+    public Optional<ZonedDateTime> getUpdatedAt() {
         return Optional.ofNullable(updatedAt);
     }
 
-    public void setUpdatedAt(DateTime updatedAt) {
+    public void setUpdatedAt(ZonedDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
 
