@@ -1,3 +1,6 @@
+## 3.19.1-RELEASE
+* Bump org.json to version 20230227. Although the Notify API client is unaffected by CVE-2022-45688, we bump this package to a version that fixes this vulnerability.
+
 ## 3.19.0-RELEASE
 * Adds a new interface for specifying custom retention periods when sending a file by email:
   * `retentionPeriod` can be set using a `new RetentionPeriodDuration(int, ChronoUnit)`
