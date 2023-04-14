@@ -265,7 +265,7 @@ public class ClientIntegrationTestIT {
     }
 
     @Test
-    public void testGetTemplatePreview() throws NotificationClientException {
+    public void testGenerateTemplatePreview() throws NotificationClientException {
         NotificationClient client = getClient();
         HashMap<String, Object> personalisation = new HashMap<>();
         String uniqueName = UUID.randomUUID().toString();
