@@ -994,7 +994,7 @@ If no templates exist for a template type or there no templates for a service, t
 This generates a preview version of a template.
 
 ```java
-TemplatePreview templatePreview = client.getTemplatePreview(
+TemplatePreview templatePreview = client.generateTemplatePreview(
     templateId,
     personalisation
 );
