@@ -1,3 +1,6 @@
+## 3.19.2-RELEASE
+* Bump jose4j from 0.7.7 to 0.9.3.
+
 ## 3.19.1-RELEASE
 * Bump org.json to version 20230227. Although the Notify API client is unaffected by CVE-2022-45688, we bump this package to a version that fixes this vulnerability.
 
