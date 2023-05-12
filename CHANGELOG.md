@@ -1,3 +1,7 @@
+## 4.0.0-RELEASE
+* Joda-Time has been removed and replaced with java.time
+  * The client now uses [`ZonedDateTime` instead of `DateTime`](https://blog.joda.org/2014/11/converting-from-joda-time-to-javatime.html)
+
 ## 3.19.2-RELEASE
 * Bump jose4j from 0.7.7 to 0.9.3.
 
