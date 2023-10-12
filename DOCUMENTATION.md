@@ -623,6 +623,20 @@ If the request is not successful, the client returns a `NotificationClientExcept
 |`400`|`"message":"reference cannot be null or empty"`|Populate the reference parameter|
 |`400`|`"message":"precompiledPDF cannot be null or empty"`|Send a PDF file with data in it|
 
+
+You can only get the status of messages that are 7 days old or newer.
+
+## Status - text and email
+
+|Status|Information|
+|:---|:---|
+|Created|GOV.UK Notify has placed the message in a queue, ready to be sent to the provider. It should only remain in this state for a few seconds.|
+|Sending|GOV.UK Notify has sent the message to the provider. The provider will try to deliver the message to the recipient. GOV.UK Notify is waiting for delivery information.|
+|Delivered|The message was successfully delivered. If a recipient blocks your sender name or mobile number, your message will still show as delivered.|
+|Failed|This covers all failure statuses:<br>- `permanent-failure` - "The provider could not deliver the message because the email address or phone number was wrong. You should remove these email addresses or phone numbers from your database. You’ll still be charged for text messages to numbers that do not exist."<br>- `temporary-failure` - "The provider could not deliver the message after trying for 72 hours. This can happen when the recipient's inbox is full or their phone is off. You can try to send the message again. You’ll still be charged for text messages to phones that are not accepting messages."<br>- `technical-failure` - "Your message was not sent because there was a problem between Notify and the provider.<br>You’ll have to try sending your messages again. You will not be charged for text messages that are affected by a technical failure."|
+
+## Status - text only
+
 ## Get message status
 
 
