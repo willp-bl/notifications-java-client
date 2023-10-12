@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.Optional;
 
 public class ReceivedTextMessageList {
-    private List<ReceivedTextMessage> receivedTextMessages;
-    private String currentPageLink;
-    private String nextPageLink;
+    private final List<ReceivedTextMessage> receivedTextMessages;
+    private final String currentPageLink;
+    private final String nextPageLink;
 
     public ReceivedTextMessageList(String json) {
         JSONObject data = new JSONObject(json);

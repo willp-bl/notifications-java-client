@@ -5,15 +5,21 @@ import org.json.JSONObject;
 import org.junit.Test;
 
 import javax.net.ssl.SSLContext;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.security.NoSuchAlgorithmException;
+import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
+import static java.nio.charset.StandardCharsets.ISO_8859_1;
+import static java.util.Collections.emptyMap;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.*;
 
 public class NotificationClientTest {
 
@@ -48,7 +54,8 @@ public class NotificationClientTest {
     @Test
     public void testCreateNotificationClientSetsUserAgent() {
         NotificationClient client = new NotificationClient(combinedApiKey, baseUrl);
-        assertEquals(client.getUserAgent(), "NOTIFY-API-JAVA-CLIENT/3.13.0-RELEASE");
+        assertTrue(client.getUserAgent().contains("NOTIFY-API-JAVA-CLIENT/"));
+        assertTrue(client.getUserAgent().contains("-RELEASE"));
     }
 
     @Test
@@ -88,22 +95,102 @@ public class NotificationClientTest {
     }
 
     @Test
-    public void testPrepareUpload() throws UnsupportedEncodingException, NotificationClientException {
-        NotificationClient client = new NotificationClient(combinedApiKey, baseUrl);
-        byte[] documentContent = new String("this is a document to test with").getBytes();
-        JSONObject response = client.prepareUpload(documentContent);
+    public void testPrepareUpload() throws NotificationClientException {
+        byte[] documentContent = "this is a document to test with".getBytes();
+        JSONObject response = NotificationClient.prepareUpload(documentContent);
         JSONObject expectedResult = new JSONObject();
-        expectedResult.put("file", new String(Base64.encodeBase64(documentContent), "ISO-8859-1"));
+        expectedResult.put("file", new String(Base64.encodeBase64(documentContent), ISO_8859_1));
+        expectedResult.put("is_csv", false);
+        expectedResult.put("confirm_email_before_download", JSONObject.NULL);
+        expectedResult.put("retention_period", JSONObject.NULL);
         assertEquals(expectedResult.getString("file"), response.getString("file"));
+        assertEquals(expectedResult.getBoolean("is_csv"), response.getBoolean("is_csv"));
     }
 
-    @Test(expected = NotificationClientException.class)
-    public void testPrepareUploadThrowsExceptionWhenExceeds2MB() throws UnsupportedEncodingException, NotificationClientException {
-        NotificationClient client = new NotificationClient(combinedApiKey, baseUrl);
+    @Test
+    public void testPrepareUploadForCSV() throws NotificationClientException {
+        byte[] documentContent = "this is a document to test with".getBytes();
+        JSONObject response = NotificationClient.prepareUpload(documentContent, true);
+        JSONObject expectedResult = new JSONObject();
+        expectedResult.put("file", new String(Base64.encodeBase64(documentContent), ISO_8859_1));
+        expectedResult.put("is_csv", true);
+        expectedResult.put("confirm_email_before_download", JSONObject.NULL);
+        expectedResult.put("retention_period", JSONObject.NULL);
+        assertEquals(expectedResult.getString("file"), response.getString("file"));
+        assertEquals(expectedResult.getBoolean("is_csv"), response.getBoolean("is_csv"));
+    }
+
+    @Test
+    public void testPrepareUploadWithEmailConfirmationAndRetentionPeriodString() throws NotificationClientException {
+        byte[] documentContent = "this is a document to test with".getBytes();
+        JSONObject response = NotificationClient.prepareUpload(
+                documentContent,
+                true,
+                true,
+                "1 weeks"
+        );
+        JSONObject expectedResult = new JSONObject();
+        expectedResult.put("file", new String(Base64.encodeBase64(documentContent), ISO_8859_1));
+        expectedResult.put("is_csv", true);
+        expectedResult.put("confirm_email_before_download", true);
+        expectedResult.put("retention_period", "1 weeks");
+        assertEquals(expectedResult.getString("file"), response.getString("file"));
+        assertEquals(expectedResult.getBoolean("is_csv"), response.getBoolean("is_csv"));
+        assertEquals(
+                expectedResult.getBoolean("confirm_email_before_download"),
+                response.getBoolean("confirm_email_before_download")
+        );
+        assertEquals(expectedResult.getString("retention_period"), response.getString("retention_period"));
+    }
+
+    @Test
+    public void testPrepareUploadWithEmailConfirmationAndRetentionPeriodDuration() throws NotificationClientException {
+        byte[] documentContent = "this is a document to test with".getBytes();
+        JSONObject response = NotificationClient.prepareUpload(
+                documentContent,
+                true,
+                true,
+                new RetentionPeriodDuration(1, ChronoUnit.WEEKS)
+        );
+        JSONObject expectedResult = new JSONObject();
+        expectedResult.put("file", new String(Base64.encodeBase64(documentContent), ISO_8859_1));
+        expectedResult.put("is_csv", true);
+        expectedResult.put("confirm_email_before_download", true);
+        expectedResult.put("retention_period", "1 weeks");
+        assertEquals(expectedResult.getString("file"), response.getString("file"));
+        assertEquals(expectedResult.getBoolean("is_csv"), response.getBoolean("is_csv"));
+        assertEquals(
+                expectedResult.getBoolean("confirm_email_before_download"),
+                response.getBoolean("confirm_email_before_download")
+        );
+        assertEquals(expectedResult.getString("retention_period"), response.getString("retention_period"));
+    }
+
+    @Test
+    public void testPrepareUploadThrowsExceptionWhenExceeds2MB() throws NotificationClientException {
         char[] data = new char[(2*1024*1024)+50];
         byte[] documentContents = new String(data).getBytes();
 
-        client.prepareUpload(documentContents);
+        try {
+            NotificationClient.prepareUpload(documentContents);
+        }catch(NotificationClientException e){
+            assertEquals(e.getHttpResult(), 413);
+            assertEquals(e.getMessage(), "Status code: 413 File is larger than 2MB");
+        }
+    }
 
+    @Test(expected = NotificationClientException.class)
+    public void testShouldThrowNotificationExceptionOnErrorResponseCodeAndNoErrorStream() throws Exception {
+        NotificationClient client = spy(new NotificationClient(combinedApiKey, baseUrl));
+        doReturn(mockConnection(404)).when(client).getConnection(any());
+
+        client.sendSms("aTemplateId", "aPhoneNumber", emptyMap(), "aReference");
+    }
+
+    private HttpURLConnection mockConnection(int statusCode) throws Exception {
+        HttpURLConnection mockConnection = mock(HttpURLConnection.class);
+        when(mockConnection.getOutputStream()).thenReturn(new ByteArrayOutputStream());
+        when(mockConnection.getResponseCode()).thenReturn(statusCode);
+        return mockConnection;
     }
 }

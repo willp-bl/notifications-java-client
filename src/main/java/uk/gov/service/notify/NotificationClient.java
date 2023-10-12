@@ -4,29 +4,29 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Base64InputStream;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
 import org.json.JSONObject;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.Proxy;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.NoSuchAlgorithmException;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static java.nio.charset.StandardCharsets.ISO_8859_1;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class NotificationClient implements NotificationClientApi {
 
@@ -108,11 +108,7 @@ public class NotificationClient implements NotificationClientApi {
         this.baseUrl = baseUrl;
         this.proxy = proxy;
         if (sslContext != null){
-            try {
-                setCustomSSLContext(sslContext);
-            } catch (NoSuchAlgorithmException e) {
-                LOGGER.log(Level.SEVERE, e.toString(), e);
-            }
+            setCustomSSLContext(sslContext);
         }
         this.version = getVersion();
     }
@@ -156,6 +152,7 @@ public class NotificationClient implements NotificationClientApi {
                 emailAddress,
                 personalisation,
                 reference,
+                null,
                 null);
 
         if(emailReplyToId != null && !emailReplyToId.isEmpty())
@@ -183,6 +180,7 @@ public class NotificationClient implements NotificationClientApi {
                 null,
                 personalisation,
                 reference,
+                null,
                 null);
 
         if( smsSenderId != null && !smsSenderId.isEmpty()){
@@ -194,7 +192,7 @@ public class NotificationClient implements NotificationClientApi {
     }
 
     public SendLetterResponse sendLetter(String templateId, Map<String, ?> personalisation, String reference) throws NotificationClientException {
-        JSONObject body = createBodyForPostRequest(templateId, null, null, personalisation, reference, null);
+        JSONObject body = createBodyForPostRequest(templateId, null, null, personalisation, reference, null, null);
         HttpURLConnection conn = createConnectionAndSetHeaders(baseUrl + "/v2/notifications/letter", "POST");
         String response = performPostRequest(conn, body, HttpsURLConnection.HTTP_CREATED);
         return new SendLetterResponse(response);
@@ -206,6 +204,13 @@ public class NotificationClient implements NotificationClientApi {
         String response = performGetRequest(conn);
         return new Notification(response);
 
+    }
+
+    public byte[] getPdfForLetter(String notificationId) throws NotificationClientException {
+        String url = baseUrl + "/v2/notifications/" + notificationId + "/pdf";
+        HttpURLConnection conn = createConnectionAndSetHeaders(url, "GET");
+
+        return performRawGetRequest(conn);
     }
 
     public NotificationList getNotifications(String status, String notification_type, String reference, String olderThanId) throws NotificationClientException {
@@ -292,34 +297,93 @@ public class NotificationClient implements NotificationClientApi {
      * The prepareUpload method creates a <code>JSONObject</code> which will need to be added to the personalisation map.
      *
      * @param documentContents byte[] of the document
+     * @param isCsv boolean True if a CSV file, False if not to ensure document is downloaded as correct file type
+     * @param confirmEmailBeforeDownload boolean True to require the user to enter their email address before accessing the file
+     * @param retentionPeriod a string '[1-78] weeks' to change how long the document should be available to the user
      * @return <code>JSONObject</code> a json object to be added to the personalisation is returned
-     * @throws UnsupportedEncodingException exception thrown if unable to create a String using "IS0-8859-1" character set.
      */
-    public static JSONObject prepareUpload(final byte[] documentContents) throws UnsupportedEncodingException, NotificationClientException {
+    public static JSONObject prepareUpload(final byte[] documentContents, boolean isCsv, boolean confirmEmailBeforeDownload, String retentionPeriod) throws NotificationClientException {
         if (documentContents.length > 2*1024*1024){
-            throw new NotificationClientException("Document is larger than 2MB");
+            throw new NotificationClientException(413, "File is larger than 2MB");
         }
         byte[] fileContentAsByte = Base64.encodeBase64(documentContents);
-        String fileContent = new String(fileContentAsByte, "ISO-8859-1");
+        String fileContent = new String(fileContentAsByte, ISO_8859_1);
 
         JSONObject jsonFileObject = new JSONObject();
         jsonFileObject.put("file", fileContent);
+        jsonFileObject.put("is_csv", isCsv);
+        jsonFileObject.put("confirm_email_before_download", confirmEmailBeforeDownload);
+        jsonFileObject.put("retention_period", retentionPeriod);
         return jsonFileObject;
+    }
+
+    /**
+     * Use the prepareUpload method when uploading a document via sendEmail.
+     * The prepareUpload method creates a <code>JSONObject</code> which will need to be added to the personalisation map.
+     *
+     * @param documentContents byte[] of the document
+     * @param isCsv boolean True if a CSV file, False if not to ensure document is downloaded as correct file type
+     * @return <code>JSONObject</code> a json object to be added to the personalisation is returned
+     */
+    public static JSONObject prepareUpload(final byte[] documentContents, boolean isCsv) throws NotificationClientException {
+        if (documentContents.length > 2*1024*1024){
+            throw new NotificationClientException(413, "File is larger than 2MB");
+        }
+        byte[] fileContentAsByte = Base64.encodeBase64(documentContents);
+        String fileContent = new String(fileContentAsByte, ISO_8859_1);
+
+        JSONObject jsonFileObject = new JSONObject();
+        jsonFileObject.put("file", fileContent);
+        jsonFileObject.put("is_csv", isCsv);
+        jsonFileObject.put("confirm_email_before_download", JSONObject.NULL);
+        jsonFileObject.put("retention_period", JSONObject.NULL);
+        return jsonFileObject;
+    }
+
+    /**
+     * Use the prepareUpload method when uploading a document via sendEmail.
+     * The prepareUpload method creates a <code>JSONObject</code> which will need to be added to the personalisation map.
+     *
+     * @param documentContents byte[] of the document
+     * @return <code>JSONObject</code> a json object to be added to the personalisation is returned
+     */
+    public static JSONObject prepareUpload(final byte[] documentContents) throws NotificationClientException {
+        return prepareUpload(documentContents, false);
+    }
+
+    /**
+     * Use the prepareUpload method when uploading a document via sendEmail.
+     * The prepareUpload method creates a <code>JSONObject</code> which will need to be added to the personalisation map.
+     *
+     * This version of the class overloads prepareUpload to allow for the use of the RetentionPeriodDuration class if
+     * desired.
+     * @see RetentionPeriodDuration
+     *
+     * @param documentContents byte[] of the document
+     * @param isCsv boolean True if a CSV file, False if not to ensure document is downloaded as correct file type
+     * @param confirmEmailBeforeDownload boolean True to require the user to enter their email address before accessing the file
+     * @param retentionPeriod a RetentionPeriodDuration that defines how long a file is held for
+     * @return <code>JSONObject</code> a json object to be added to the personalisation is returned
+     */
+    public static JSONObject prepareUpload(final byte[] documentContents,
+                                           boolean isCsv,
+                                           boolean confirmEmailBeforeDownload,
+                                           RetentionPeriodDuration retentionPeriod
+    ) throws NotificationClientException {
+        return prepareUpload(documentContents, isCsv, confirmEmailBeforeDownload, retentionPeriod.toString());
     }
 
     private String performPostRequest(HttpURLConnection conn, JSONObject body, int expectedStatusCode) throws NotificationClientException {
         try{
-            OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
+            OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream(), UTF_8);
             wr.write(body.toString());
             wr.flush();
 
             int httpResult = conn.getResponseCode();
             if (httpResult == expectedStatusCode) {
-                StringBuilder sb = readStream(new InputStreamReader(conn.getInputStream(), "utf-8"));
-                return sb.toString();
+                return readStream(conn.getInputStream());
             } else {
-                StringBuilder sb = readStream(new InputStreamReader(conn.getErrorStream(), "utf-8"));
-                throw new NotificationClientException(httpResult, sb.toString());
+                throw new NotificationClientException(httpResult, readStream(conn.getErrorStream()));
             }
 
         } catch (IOException e) {
@@ -337,12 +401,9 @@ public class NotificationClient implements NotificationClientApi {
             int httpResult = conn.getResponseCode();
             StringBuilder stringBuilder;
             if (httpResult == 200) {
-                stringBuilder = readStream(new InputStreamReader(conn.getInputStream()));
-                conn.disconnect();
-                return stringBuilder.toString();
+                return readStream(conn.getInputStream());
             } else {
-                stringBuilder = readStream(new InputStreamReader(conn.getErrorStream(), "utf-8"));
-                throw new NotificationClientException(httpResult, stringBuilder.toString());
+                throw new NotificationClientException(httpResult, readStream(conn.getErrorStream()));
             }
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, e.toString(), e);
@@ -352,6 +413,27 @@ public class NotificationClient implements NotificationClientApi {
                 conn.disconnect();
             }
         }
+    }
+
+    private byte[] performRawGetRequest(HttpURLConnection conn) throws NotificationClientException {
+        byte[] out;
+        try{
+            int httpResult = conn.getResponseCode();
+            if (httpResult == 200) {
+                InputStream is = conn.getInputStream();
+                out = IOUtils.toByteArray(is);
+            } else {
+                throw new NotificationClientException(httpResult, readStream(conn.getErrorStream()));
+            }
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, e.toString(), e);
+            throw new NotificationClientException(e);
+        } finally {
+            if (conn != null) {
+                conn.disconnect();
+            }
+        }
+        return out;
     }
 
     private HttpURLConnection createConnectionAndSetHeaders(String urlString, String method) throws NotificationClientException {
@@ -377,7 +459,7 @@ public class NotificationClient implements NotificationClientApi {
         }
     }
 
-    private HttpURLConnection getConnection(URL url) throws IOException {
+    HttpURLConnection getConnection(URL url) throws IOException {
         HttpURLConnection conn;
 
         if (null != proxy) {
@@ -393,7 +475,8 @@ public class NotificationClient implements NotificationClientApi {
                                                 final String emailAddress,
                                                 final Map<String, ?> personalisation,
                                                 final String reference,
-                                                final String encodedFileData) {
+                                                final String encodedFileData,
+                                                final String postage) {
         JSONObject body = new JSONObject();
 
         if(phoneNumber != null && !phoneNumber.isEmpty()) {
@@ -419,19 +502,17 @@ public class NotificationClient implements NotificationClientApi {
         if(encodedFileData != null && !encodedFileData.isEmpty()) {
             body.put("content", encodedFileData);
         }
-
+        if(postage != null && !postage.isEmpty()){
+            body.put("postage", postage);
+        }
         return body;
     }
 
-    private StringBuilder readStream(InputStreamReader streamReader) throws IOException {
-        StringBuilder sb = new StringBuilder();
-        BufferedReader br = new BufferedReader(streamReader);
-        String line = null;
-        while ((line = br.readLine()) != null) {
-            sb.append(line + "\n");
+    private String readStream(InputStream inputStream) throws IOException {
+        if (inputStream == null) {
+            return null;
         }
-        br.close();
-        return sb;
+        return IOUtils.toString(inputStream, UTF_8);
     }
 
     /**
@@ -441,14 +522,12 @@ public class NotificationClient implements NotificationClientApi {
      * (eg provide certification for client authentication).
      * <p/>
      * Use case: enterprise proxy requiring HTTPS client authentication
-     *
-     * @throws NoSuchAlgorithmException
      */
     private static void setDefaultSSLContext() throws NoSuchAlgorithmException {
         HttpsURLConnection.setDefaultSSLSocketFactory(SSLContext.getDefault().getSocketFactory());
     }
 
-    private static void setCustomSSLContext(final SSLContext sslContext) throws NoSuchAlgorithmException {
+    private static void setCustomSSLContext(final SSLContext sslContext) {
         HttpsURLConnection.setDefaultSSLSocketFactory(sslContext.getSocketFactory());
     }
 
@@ -493,13 +572,13 @@ public class NotificationClient implements NotificationClientApi {
         return prop.getProperty("project.version");
     }
 
-    private LetterResponse sendPrecompiledLetter(String reference, String base64EncodedPDFFile) throws NotificationClientException {
-        if( StringUtils.isBlank(reference) )
+    private LetterResponse sendPrecompiledLetter(String reference, String base64EncodedPDFFile, String postage) throws NotificationClientException {
+        if( isBlank(reference) )
         {
             throw new NotificationClientException("reference cannot be null or empty");
         }
 
-        if ( StringUtils.isBlank(base64EncodedPDFFile) )
+        if ( isBlank(base64EncodedPDFFile) )
         {
             throw new NotificationClientException("precompiledPDF cannot be null or empty");
         }
@@ -514,7 +593,8 @@ public class NotificationClient implements NotificationClientApi {
                 null,
                 null,
                 reference,
-                base64EncodedPDFFile);
+                base64EncodedPDFFile,
+                postage);
 
         HttpURLConnection conn = createConnectionAndSetHeaders(
                 baseUrl + "/v2/notifications/letter",
@@ -526,8 +606,21 @@ public class NotificationClient implements NotificationClientApi {
 
     }
 
+    private boolean isBlank(String string) {
+        if(Objects.isNull(string)
+                || string.trim().length()==0) {
+            return true;
+        }
+        return false;
+    }
+
     @Override
     public LetterResponse sendPrecompiledLetter(String reference, File precompiledPDF) throws NotificationClientException {
+        return sendPrecompiledLetter(reference, precompiledPDF, null);
+    }
+
+    @Override
+    public LetterResponse sendPrecompiledLetter(String reference, File precompiledPDF, String postage) throws NotificationClientException {
         if (precompiledPDF == null)
         {
             throw new NotificationClientException("File cannot be null");
@@ -538,11 +631,17 @@ public class NotificationClient implements NotificationClientApi {
         } catch (IOException e) {
             throw new NotificationClientException("Can't read file");
         }
-        return sendPrecompiledLetterWithInputStream(reference, new ByteArrayInputStream(buf));
+        return sendPrecompiledLetterWithInputStream(reference, new ByteArrayInputStream(buf), postage);
     }
 
     @Override
     public LetterResponse sendPrecompiledLetterWithInputStream(String reference, InputStream stream) throws NotificationClientException
+    {
+       return sendPrecompiledLetterWithInputStream(reference, stream, null);
+    }
+
+    @Override
+    public LetterResponse sendPrecompiledLetterWithInputStream(String reference, InputStream stream, String postage) throws NotificationClientException
     {
         if (stream == null)
         {
@@ -556,7 +655,7 @@ public class NotificationClient implements NotificationClientApi {
             throw new NotificationClientException("Error when turning Base64InputStream into a string");
         }
 
-        return this.sendPrecompiledLetter(reference, encoded);
+        return sendPrecompiledLetter(reference, encoded, postage);
     }
 
 }

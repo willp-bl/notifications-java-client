@@ -1,23 +1,24 @@
 package uk.gov.service.notify;
 
-import org.joda.time.DateTime;
 import org.json.JSONObject;
 
+import java.time.ZonedDateTime;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.Map;
 
 public class Template {
     private UUID id;
     private String name;
     private String templateType;
-    private DateTime createdAt;
-    private DateTime updatedAt;
+    private ZonedDateTime createdAt;
+    private ZonedDateTime updatedAt;
     private String createdBy;
     private int version;
     private String body;
     private String subject;
     private Map<String, Object> personalisation;
+    private String letterContactBlock;
 
 
     public Template(String content){
@@ -35,11 +36,12 @@ public class Template {
         id = UUID.fromString(data.getString("id"));
         name = data.getString("name");
         templateType = data.getString("type");
-        createdAt = new DateTime(data.getString("created_at"));
-        updatedAt = data.isNull("updated_at") ? null : new DateTime(data.getString("updated_at"));
+        createdAt = ZonedDateTime.parse(data.getString("created_at"));
+        updatedAt = data.isNull("updated_at") ? null : ZonedDateTime.parse(data.getString("updated_at"));
         version = data.getInt("version");
         body = data.getString("body");
         subject = data.isNull("subject") ? null : data.getString("subject");
+        letterContactBlock = data.isNull("letter_contact_block") ? null : data.getString("letter_contact_block");
         personalisation = data.isNull("personalisation") ? null :
                 JsonUtils.jsonToMap(data.getJSONObject("personalisation"));
     }
@@ -68,19 +70,19 @@ public class Template {
         this.name = name;
     }
 
-    public DateTime getCreatedAt() {
+    public ZonedDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(DateTime createdAt) {
+    public void setCreatedAt(ZonedDateTime createdAt) {
         this.createdAt = createdAt;
     }
 
-    public Optional<DateTime> getUpdatedAt() {
+    public Optional<ZonedDateTime> getUpdatedAt() {
         return Optional.ofNullable(updatedAt);
     }
 
-    public void setUpdatedAt(DateTime updatedAt) {
+    public void setUpdatedAt(ZonedDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
 
@@ -116,6 +118,14 @@ public class Template {
         this.subject = subject;
     }
 
+    public Optional<String> getLetterContactBlock() {
+        return Optional.ofNullable(letterContactBlock);
+    }
+
+    public void setLetterContactBlock(String letterContactBlock) {
+        this.letterContactBlock = letterContactBlock;
+    }
+
     public Optional<Map<String, Object>> getPersonalisation() {
         return Optional.ofNullable(personalisation);
     }
@@ -135,6 +145,7 @@ public class Template {
                 ", version=" + version +
                 ", body='" + body + '\'' +
                 ", subject='" + subject + '\'' +
+                ", letterContactBlock='" + letterContactBlock + '\'' +
                 ", personalisation='" + personalisation + '\'' +
                 '}';
     }

@@ -1,10 +1,9 @@
 package uk.gov.service.notify;
 
-
-import org.joda.time.DateTime;
 import org.jose4j.json.internal.json_simple.JSONObject;
 import org.junit.Test;
 
+import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -40,8 +39,8 @@ public class TemplateTest {
         assertEquals(UUID.fromString(id), template.getId());
         assertEquals("my template", template.getName());
         assertEquals("email", template.getTemplateType());
-        assertEquals(new DateTime("2017-05-01T08:30:00.000Z"), template.getCreatedAt());
-        assertEquals(Optional.of(new DateTime("2017-05-01T08:34:00.000Z")), template.getUpdatedAt());
+        assertEquals(ZonedDateTime.parse("2017-05-01T08:30:00.000Z"), template.getCreatedAt());
+        assertEquals(Optional.of(ZonedDateTime.parse("2017-05-01T08:34:00.000Z")), template.getUpdatedAt());
         assertEquals(3, template.getVersion());
         assertEquals("The body of the template. For ((name)) eyes only.", template.getBody());
         assertEquals(Optional.of("Private email"), template.getSubject());
@@ -75,12 +74,12 @@ public class TemplateTest {
         assertEquals(UUID.fromString(id), template.getId());
         assertEquals("my template", template.getName());
         assertEquals("email", template.getTemplateType());
-        assertEquals(new DateTime("2017-05-01T08:30:00.000Z"), template.getCreatedAt());
-        assertEquals(Optional.ofNullable(null), template.getUpdatedAt());
+        assertEquals(ZonedDateTime.parse("2017-05-01T08:30:00.000Z"), template.getCreatedAt());
+        assertEquals(Optional.empty(), template.getUpdatedAt());
         assertEquals(3, template.getVersion());
         assertEquals("The body of the template. For ((name)) eyes only.", template.getBody());
-        assertEquals(Optional.ofNullable(null), template.getSubject());
-        assertEquals(Optional.ofNullable(null), template.getPersonalisation());
+        assertEquals(Optional.empty(), template.getSubject());
+        assertEquals(Optional.empty(), template.getPersonalisation());
     }
 
 }

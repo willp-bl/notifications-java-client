@@ -6,14 +6,16 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class LetterResponse {
-    private UUID notificationId;
-    private String reference;
-    private JSONObject data;
+    private final UUID notificationId;
+    private final String reference;
+    private final String postage;
+    private final JSONObject data;
 
     public LetterResponse(String response) {
         data = new JSONObject(response);
         notificationId = UUID.fromString(data.getString("id"));
         reference = data.isNull("reference") ? null : data.getString("reference");
+        postage = data.isNull("postage") ? null : data.getString("postage");
 
     }
 
@@ -27,6 +29,10 @@ public class LetterResponse {
 
     public JSONObject getData() {
         return data;
+    }
+
+    public Optional<String> getPostage() {
+        return Optional.ofNullable(postage);
     }
 
     @Override

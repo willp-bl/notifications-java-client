@@ -1,8 +1,8 @@
 package uk.gov.service.notify;
 
-import org.joda.time.DateTime;
 import org.json.JSONObject;
 
+import java.time.ZonedDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -18,6 +18,7 @@ public class Notification {
     private String line5;
     private String line6;
     private String postcode;
+    private String postage;
     private String notificationType;
     private String status;
     private UUID templateId;
@@ -25,10 +26,10 @@ public class Notification {
     private String templateUri;
     private String body;
     private String subject;
-    private DateTime createdAt;
-    private DateTime sentAt;
-    private DateTime completedAt;
-    private DateTime estimatedDelivery;
+    private ZonedDateTime createdAt;
+    private ZonedDateTime sentAt;
+    private ZonedDateTime completedAt;
+    private ZonedDateTime estimatedDelivery;
     private String createdByName;
 
     public Notification(String content){
@@ -52,6 +53,7 @@ public class Notification {
         line5 = data.isNull("line_5") ? null : data.getString("line_5");
         line6 = data.isNull("line_6") ? null : data.getString("line_6");
         postcode = data.isNull("postcode") ? null : data.getString("postcode");
+        postage = data.isNull("postage") ? null : data.getString("postage");
         notificationType = data.getString("type");
         JSONObject template = data.getJSONObject("template");
         templateId = UUID.fromString(template.getString("id"));
@@ -60,10 +62,10 @@ public class Notification {
         body = data.getString("body");
         subject = data.isNull("subject") ? null : data.getString("subject");
         status = data.getString("status");
-        createdAt = new DateTime(data.getString("created_at"));
-        sentAt =  data.isNull("sent_at") ? null : new DateTime(data.getString("sent_at"));
-        completedAt = data.isNull("completed_at") ? null : new DateTime(data.getString("completed_at"));
-        estimatedDelivery = data.isNull("estimated_delivery") ? null : new DateTime(data.getString("estimated_delivery"));
+        createdAt = ZonedDateTime.parse(data.getString("created_at"));
+        sentAt =  data.isNull("sent_at") ? null : ZonedDateTime.parse(data.getString("sent_at"));
+        completedAt = data.isNull("completed_at") ? null : ZonedDateTime.parse(data.getString("completed_at"));
+        estimatedDelivery = data.isNull("estimated_delivery") ? null : ZonedDateTime.parse(data.getString("estimated_delivery"));
         createdByName = data.isNull("created_by_name") ? null : data.getString("created_by_name");
     }
 
@@ -110,6 +112,9 @@ public class Notification {
     public Optional<String> getPostcode() {
         return Optional.ofNullable(postcode);
     }
+    public Optional<String> getPostage() {
+        return Optional.ofNullable(postage);
+    }
 
     public String getNotificationType() {
         return notificationType;
@@ -139,15 +144,15 @@ public class Notification {
         return Optional.ofNullable(subject);
     }
 
-    public DateTime getCreatedAt() {
+    public ZonedDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public Optional<DateTime> getSentAt() {
+    public Optional<ZonedDateTime> getSentAt() {
         return Optional.ofNullable(sentAt);
     }
 
-    public Optional<DateTime> getCompletedAt() {
+    public Optional<ZonedDateTime> getCompletedAt() {
         return Optional.ofNullable(completedAt);
     }
 
@@ -158,7 +163,7 @@ public class Notification {
     /**
      * estimatedDelivery is only present on letters
      */
-    public Optional<DateTime> getEstimatedDelivery() {
+    public Optional<ZonedDateTime> getEstimatedDelivery() {
         return Optional.ofNullable(estimatedDelivery);
     }
 

@@ -2,7 +2,7 @@ package uk.gov.service.notify;
 
 public class NotificationClientException extends Exception
 {
-    private static final long serialVersionUID = 2l;
+    private static final long serialVersionUID = 2L;
     private int httpResult;
 
     public NotificationClientException(Exception ex)
@@ -13,6 +13,7 @@ public class NotificationClientException extends Exception
     public NotificationClientException(String message)
     {
         super(message);
+        this.httpResult = 400;
     }
 
     public NotificationClientException(String message, Throwable cause)
