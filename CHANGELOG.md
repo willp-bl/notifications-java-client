@@ -1,3 +1,6 @@
+## 4.1.1-RELEASE
+* Bump json to 20231013 to address https://github.com/advisories/GHSA-4jq9-2xhw-jpx7.
+
 ## 4.1.0-RELEASE
 * Remove a dependency on `commons-lang3` by implementing `isBlank` ourselves.
 
