@@ -197,7 +197,8 @@ If a template has placeholder fields for personalised information such as name o
 Map<String, Object> personalisation = new HashMap<>();
 personalisation.put("first_name", "Amala");
 personalisation.put("application_date", "2018-01-01");
-personalisation.put("list", listOfItems); // Will appear as a bulleted list in the message
+// pass in a list and it will appear as bullet points in the message:
+personalisation.put("list", listOfItems);
 
 ```
 If a template does not have any placeholder fields for personalised information, you must pass in an empty map or `null`.
@@ -484,7 +485,8 @@ personalisation.put("address_line_2", "Flat 2"); // mandatory address field
 personalisation.put("address_line_3", "SW14 6BH"); // mandatory address field, must be a real UK postcode
 personalisation.put("first_name", "Amala"); // field from template
 personalisation.put("application_date", "2018-01-01"); // field from template
-personalisation.put("list", listOfItems); // Will appear as a bulleted list in the message
+// pass in a list and it will appear as bullet points in the letter:
+personalisation.put("list", listOfItems);
 ```
 
 If a template does not have any placeholder fields for personalised information, you must pass in an empty map or `null`.
