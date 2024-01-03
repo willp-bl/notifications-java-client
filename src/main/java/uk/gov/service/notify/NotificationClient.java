@@ -398,7 +398,6 @@ public class NotificationClient implements NotificationClientApi {
         }
         byte[] fileContentAsByte = Base64.encodeBase64(documentContents);
         String fileContent = new String(fileContentAsByte, ISO_8859_1);
-
         JSONObject jsonFileObject = new JSONObject();
         jsonFileObject.put("file", fileContent);
         jsonFileObject.put("filename", JSONObject.NULL);

@@ -311,9 +311,22 @@ client.sendEmail(templateId,
                  emailReplyToId);
 ```
 
-##### CSV Files
+#### Set the filename
 
-Uploads for CSV files should use the `isCsv` parameter on the `prepareUpload()` function.  For example:
+To do this you will need version 5.0.0-RELEASE of the Java client library, or a more recent version.
+
+You should provide a filename when you upload your file.
+
+The filename should tell the recipient what the file contains. A memorable filename can help the recipient to find the file again later.
+
+The filename must end with a file extension. For example, `.csv` for a CSV file. If you include the wrong file extension, recipients may not be able to open your file.
+
+If you do not provide a filename for your file, Notify will:
+
+* generate a random filename
+* try to add the correct file extension
+
+If Notify cannot add the correct file extension, recipients may not be able to open your file.
 
 ```java
 ClassLoader classLoader = getClass().getClassLoader();
@@ -321,7 +334,7 @@ File file = new File(classLoader.getResource("document_to_upload.pdf").getFile()
 byte [] fileContents = FileUtils.readFileToByteArray(file);
 
 HashMap<String, Object> personalisation = new HashMap();
-personalisation.put("link_to_file", client.prepareUpload(fileContents, true));
+personalisation.put("link_to_file", client.prepareUpload(fileContents, "report.csv"));
 client.sendEmail(templateId,
                  emailAddress,
                  personalisation,
