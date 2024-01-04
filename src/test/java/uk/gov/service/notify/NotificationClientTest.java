@@ -100,24 +100,28 @@ public class NotificationClientTest {
         JSONObject response = NotificationClient.prepareUpload(documentContent);
         JSONObject expectedResult = new JSONObject();
         expectedResult.put("file", new String(Base64.encodeBase64(documentContent), ISO_8859_1));
-        expectedResult.put("is_csv", false);
+        expectedResult.put("filename", JSONObject.NULL);
         expectedResult.put("confirm_email_before_download", JSONObject.NULL);
         expectedResult.put("retention_period", JSONObject.NULL);
         assertEquals(expectedResult.getString("file"), response.getString("file"));
-        assertEquals(expectedResult.getBoolean("is_csv"), response.getBoolean("is_csv"));
+        assertEquals(response.optJSONObject("filename"), null);
+        assertEquals(response.optJSONObject("confirm_email_before_download"), null);
+        assertEquals(response.optJSONObject("retention_period"), null);
     }
 
     @Test
-    public void testPrepareUploadForCSV() throws NotificationClientException {
+    public void testPrepareUploadWithFilename() throws NotificationClientException {
         byte[] documentContent = "this is a document to test with".getBytes();
-        JSONObject response = NotificationClient.prepareUpload(documentContent, true);
+        JSONObject response = NotificationClient.prepareUpload(documentContent, "report.csv");
         JSONObject expectedResult = new JSONObject();
         expectedResult.put("file", new String(Base64.encodeBase64(documentContent), ISO_8859_1));
-        expectedResult.put("is_csv", true);
+        expectedResult.put("filename", "report.csv");
         expectedResult.put("confirm_email_before_download", JSONObject.NULL);
         expectedResult.put("retention_period", JSONObject.NULL);
         assertEquals(expectedResult.getString("file"), response.getString("file"));
-        assertEquals(expectedResult.getBoolean("is_csv"), response.getBoolean("is_csv"));
+        assertEquals(expectedResult.getString("filename"), response.getString("filename"));
+        assertEquals(response.optJSONObject("confirm_email_before_download"), null);
+        assertEquals(response.optJSONObject("retention_period"), null);
     }
 
     @Test
@@ -125,21 +129,40 @@ public class NotificationClientTest {
         byte[] documentContent = "this is a document to test with".getBytes();
         JSONObject response = NotificationClient.prepareUpload(
                 documentContent,
+                "report.csv",
                 true,
-                true,
-                "1 weeks"
-        );
+                "1 weeks");
         JSONObject expectedResult = new JSONObject();
         expectedResult.put("file", new String(Base64.encodeBase64(documentContent), ISO_8859_1));
-        expectedResult.put("is_csv", true);
+        expectedResult.put("filename", "report.csv");
         expectedResult.put("confirm_email_before_download", true);
         expectedResult.put("retention_period", "1 weeks");
         assertEquals(expectedResult.getString("file"), response.getString("file"));
-        assertEquals(expectedResult.getBoolean("is_csv"), response.getBoolean("is_csv"));
+        assertEquals(expectedResult.getString("filename"), response.getString("filename"));
         assertEquals(
                 expectedResult.getBoolean("confirm_email_before_download"),
-                response.getBoolean("confirm_email_before_download")
-        );
+                response.getBoolean("confirm_email_before_download"));
+        assertEquals(expectedResult.getString("retention_period"), response.getString("retention_period"));
+    }
+
+    @Test
+    public void testPrepareUploadWithFilenameAndEmailConfirmationAndRetentionPeriodDuration() throws NotificationClientException {
+        byte[] documentContent = "this is a document to test with".getBytes();
+        JSONObject response = NotificationClient.prepareUpload(
+                documentContent,
+                "report.csv",
+                true,
+                new RetentionPeriodDuration(1, ChronoUnit.WEEKS));
+        JSONObject expectedResult = new JSONObject();
+        expectedResult.put("file", new String(Base64.encodeBase64(documentContent), ISO_8859_1));
+        expectedResult.put("filename", "report.csv");
+        expectedResult.put("confirm_email_before_download", true);
+        expectedResult.put("retention_period", "1 weeks");
+        assertEquals(expectedResult.getString("file"), response.getString("file"));
+        assertEquals(expectedResult.getString("filename"), response.getString("filename"));
+        assertEquals(
+                expectedResult.getBoolean("confirm_email_before_download"),
+                response.getBoolean("confirm_email_before_download"));
         assertEquals(expectedResult.getString("retention_period"), response.getString("retention_period"));
     }
 
@@ -149,20 +172,17 @@ public class NotificationClientTest {
         JSONObject response = NotificationClient.prepareUpload(
                 documentContent,
                 true,
-                true,
-                new RetentionPeriodDuration(1, ChronoUnit.WEEKS)
-        );
+                new RetentionPeriodDuration(1, ChronoUnit.WEEKS));
         JSONObject expectedResult = new JSONObject();
         expectedResult.put("file", new String(Base64.encodeBase64(documentContent), ISO_8859_1));
-        expectedResult.put("is_csv", true);
+        expectedResult.put("filename", JSONObject.NULL);
         expectedResult.put("confirm_email_before_download", true);
         expectedResult.put("retention_period", "1 weeks");
         assertEquals(expectedResult.getString("file"), response.getString("file"));
-        assertEquals(expectedResult.getBoolean("is_csv"), response.getBoolean("is_csv"));
+        assertEquals(expectedResult.optJSONObject("filename"), null);
         assertEquals(
                 expectedResult.getBoolean("confirm_email_before_download"),
-                response.getBoolean("confirm_email_before_download")
-        );
+                response.getBoolean("confirm_email_before_download"));
         assertEquals(expectedResult.getString("retention_period"), response.getString("retention_period"));
     }
 

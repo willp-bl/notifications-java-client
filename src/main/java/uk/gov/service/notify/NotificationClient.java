@@ -294,16 +294,24 @@ public class NotificationClient implements NotificationClientApi {
 
     /**
      * Use the prepareUpload method when uploading a document via sendEmail.
-     * The prepareUpload method creates a <code>JSONObject</code> which will need to be added to the personalisation map.
+     * The prepareUpload method creates a <code>JSONObject</code> which will need to
+     * be added to the personalisation map.
      *
-     * @param documentContents byte[] of the document
-     * @param isCsv boolean True if a CSV file, False if not to ensure document is downloaded as correct file type
-     * @param confirmEmailBeforeDownload boolean True to require the user to enter their email address before accessing the file
-     * @param retentionPeriod a string '[1-78] weeks' to change how long the document should be available to the user
-     * @return <code>JSONObject</code> a json object to be added to the personalisation is returned
+     * @param documentContents           byte[] of the document
+     * @param filename                   a string setting the filename of the
+     *                                   document upon download
+     * @param confirmEmailBeforeDownload boolean True to require the user to enter
+     *                                   their email address before accessing the
+     *                                   file
+     * @param retentionPeriod            a string '[1-78] weeks' to change how long
+     *                                   the document should be available to the
+     *                                   user
+     * @return <code>JSONObject</code> a json object to be added to the
+     *         personalisation is returned
      */
-    public static JSONObject prepareUpload(final byte[] documentContents, boolean isCsv, boolean confirmEmailBeforeDownload, String retentionPeriod) throws NotificationClientException {
-        if (documentContents.length > 2*1024*1024){
+    public static JSONObject prepareUpload(final byte[] documentContents, String filename,
+            boolean confirmEmailBeforeDownload, String retentionPeriod) throws NotificationClientException {
+        if (documentContents.length > 2 * 1024 * 1024) {
             throw new NotificationClientException(413, "File is larger than 2MB");
         }
         byte[] fileContentAsByte = Base64.encodeBase64(documentContents);
@@ -311,7 +319,7 @@ public class NotificationClient implements NotificationClientApi {
 
         JSONObject jsonFileObject = new JSONObject();
         jsonFileObject.put("file", fileContent);
-        jsonFileObject.put("is_csv", isCsv);
+        jsonFileObject.put("filename", filename);
         jsonFileObject.put("confirm_email_before_download", confirmEmailBeforeDownload);
         jsonFileObject.put("retention_period", retentionPeriod);
         return jsonFileObject;
@@ -319,14 +327,23 @@ public class NotificationClient implements NotificationClientApi {
 
     /**
      * Use the prepareUpload method when uploading a document via sendEmail.
-     * The prepareUpload method creates a <code>JSONObject</code> which will need to be added to the personalisation map.
+     * The prepareUpload method creates a <code>JSONObject</code> which will need to
+     * be added to the personalisation map.
      *
-     * @param documentContents byte[] of the document
-     * @param isCsv boolean True if a CSV file, False if not to ensure document is downloaded as correct file type
-     * @return <code>JSONObject</code> a json object to be added to the personalisation is returned
+     * @param documentContents           byte[] of the document
+     * @param confirmEmailBeforeDownload boolean True to require the user to enter
+     *                                   their email address before accessing the
+     *                                   file
+     * @param retentionPeriod            a string '[1-78] weeks' to change how long
+     *                                   the document should be available to the
+     *                                   user
+     * @return <code>JSONObject</code> a json object to be added to the
+     *         personalisation is returned
      */
-    public static JSONObject prepareUpload(final byte[] documentContents, boolean isCsv) throws NotificationClientException {
-        if (documentContents.length > 2*1024*1024){
+    public static JSONObject prepareUpload(final byte[] documentContents,
+            boolean confirmEmailBeforeDownload, RetentionPeriodDuration retentionPeriod)
+            throws NotificationClientException {
+        if (documentContents.length > 2 * 1024 * 1024) {
             throw new NotificationClientException(413, "File is larger than 2MB");
         }
         byte[] fileContentAsByte = Base64.encodeBase64(documentContents);
@@ -334,7 +351,34 @@ public class NotificationClient implements NotificationClientApi {
 
         JSONObject jsonFileObject = new JSONObject();
         jsonFileObject.put("file", fileContent);
-        jsonFileObject.put("is_csv", isCsv);
+        jsonFileObject.put("filename", JSONObject.NULL);
+        jsonFileObject.put("confirm_email_before_download", confirmEmailBeforeDownload);
+        jsonFileObject.put("retention_period", retentionPeriod.toString());
+        return jsonFileObject;
+    }
+
+    /**
+     * Use the prepareUpload method when uploading a document via sendEmail.
+     * The prepareUpload method creates a <code>JSONObject</code> which will need to
+     * be added to the personalisation map.
+     *
+     * @param documentContents byte[] of the document
+     * @param filename         a string setting the filename of the
+     *                         document upon download
+     * @return <code>JSONObject</code> a json object to be added to the
+     *         personalisation is returned
+     */
+    public static JSONObject prepareUpload(final byte[] documentContents, String filename)
+            throws NotificationClientException {
+        if (documentContents.length > 2 * 1024 * 1024) {
+            throw new NotificationClientException(413, "File is larger than 2MB");
+        }
+        byte[] fileContentAsByte = Base64.encodeBase64(documentContents);
+        String fileContent = new String(fileContentAsByte, ISO_8859_1);
+
+        JSONObject jsonFileObject = new JSONObject();
+        jsonFileObject.put("file", fileContent);
+        jsonFileObject.put("filename", filename);
         jsonFileObject.put("confirm_email_before_download", JSONObject.NULL);
         jsonFileObject.put("retention_period", JSONObject.NULL);
         return jsonFileObject;
@@ -342,35 +386,53 @@ public class NotificationClient implements NotificationClientApi {
 
     /**
      * Use the prepareUpload method when uploading a document via sendEmail.
-     * The prepareUpload method creates a <code>JSONObject</code> which will need to be added to the personalisation map.
+     * The prepareUpload method creates a <code>JSONObject</code> which will need to
+     * be added to the personalisation map.
      *
      * @param documentContents byte[] of the document
      * @return <code>JSONObject</code> a json object to be added to the personalisation is returned
      */
     public static JSONObject prepareUpload(final byte[] documentContents) throws NotificationClientException {
-        return prepareUpload(documentContents, false);
+        if (documentContents.length > 2 * 1024 * 1024) {
+            throw new NotificationClientException(413, "File is larger than 2MB");
+        }
+        byte[] fileContentAsByte = Base64.encodeBase64(documentContents);
+        String fileContent = new String(fileContentAsByte, ISO_8859_1);
+        JSONObject jsonFileObject = new JSONObject();
+        jsonFileObject.put("file", fileContent);
+        jsonFileObject.put("filename", JSONObject.NULL);
+        jsonFileObject.put("confirm_email_before_download", JSONObject.NULL);
+        jsonFileObject.put("retention_period", JSONObject.NULL);
+        return jsonFileObject;
     }
 
     /**
      * Use the prepareUpload method when uploading a document via sendEmail.
-     * The prepareUpload method creates a <code>JSONObject</code> which will need to be added to the personalisation map.
+     * The prepareUpload method creates a <code>JSONObject</code> which will need to
+     * be added to the personalisation map.
      *
-     * This version of the class overloads prepareUpload to allow for the use of the RetentionPeriodDuration class if
+     * This version of the class overloads prepareUpload to allow for the use of the
+     * RetentionPeriodDuration class if
      * desired.
+     *
      * @see RetentionPeriodDuration
      *
-     * @param documentContents byte[] of the document
-     * @param isCsv boolean True if a CSV file, False if not to ensure document is downloaded as correct file type
-     * @param confirmEmailBeforeDownload boolean True to require the user to enter their email address before accessing the file
-     * @param retentionPeriod a RetentionPeriodDuration that defines how long a file is held for
-     * @return <code>JSONObject</code> a json object to be added to the personalisation is returned
+     * @param documentContents           byte[] of the document
+     * @param filename                   a string setting the filename of the
+     *                                   document upon download
+     * @param confirmEmailBeforeDownload boolean True to require the user to enter
+     *                                   their email address before accessing the
+     *                                   file
+     * @param retentionPeriod            a RetentionPeriodDuration that defines how
+     *                                   long a file is held for
+     * @return <code>JSONObject</code> a json object to be added to the
+     *         personalisation is returned
      */
     public static JSONObject prepareUpload(final byte[] documentContents,
-                                           boolean isCsv,
-                                           boolean confirmEmailBeforeDownload,
-                                           RetentionPeriodDuration retentionPeriod
-    ) throws NotificationClientException {
-        return prepareUpload(documentContents, isCsv, confirmEmailBeforeDownload, retentionPeriod.toString());
+            String filename,
+            boolean confirmEmailBeforeDownload,
+            RetentionPeriodDuration retentionPeriod) throws NotificationClientException {
+        return prepareUpload(documentContents, filename, confirmEmailBeforeDownload, retentionPeriod.toString());
     }
 
     private String performPostRequest(HttpURLConnection conn, JSONObject body, int expectedStatusCode) throws NotificationClientException {

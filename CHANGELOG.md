@@ -1,3 +1,7 @@
+## 5.0.0-RELEASE
+* Remove the `isCsv` parameter to `prepareUpload`.
+* Add a `filename` parameter to `prepareUpload` to set the document's filename upon download. See our documentation for more specific guidance.
+
 ## 4.1.1-RELEASE
 * Bump json to 20231013 to address https://github.com/advisories/GHSA-4jq9-2xhw-jpx7.
 
