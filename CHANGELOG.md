@@ -1,3 +1,6 @@
+## 5.0.1-RELEASE
+* Bump jose4j from 0.9.3 to 0.9.6
+
 ## 5.0.0-RELEASE
 * Remove the `isCsv` parameter to `prepareUpload`.
 * Add a `filename` parameter to `prepareUpload` to set the document's filename upon download. See our documentation for more specific guidance.
