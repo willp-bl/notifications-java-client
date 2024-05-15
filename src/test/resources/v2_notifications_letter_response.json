@@ -1,0 +1,15 @@
+{
+  "id": "317392ba-91d9-4599-b0a4-b03922a435d9",
+  "reference": "a reference",
+  "content": {
+    "body": "a content`body",
+    "subject": "a subject"
+  },
+  "uri": null,
+  "template": {
+    "id": "c8347a63-edfc-4777-8809-8ab3d1372557",
+    "version": -1,
+    "uri": "http://localhost"
+  },
+  "scheduled_for": "tomorrow"
+}
