@@ -115,20 +115,20 @@ public class NotifyEmailResponse {
     private final Content content;
     private final URI uri;
     private final Template template;
-    private final URI oneClickUnsubscribeLink;
+    private final URI oneClickUnsubscribeURL;
 
     public NotifyEmailResponse(@JsonProperty("id") UUID notificationId,
                                @JsonProperty("reference") String reference,
                                @JsonProperty("content") Content content,
                                @JsonProperty("uri") URI uri,
                                @JsonProperty("template") Template template,
-                               @JsonProperty("one_click_unsubscribe_url") URI oneClickUnsubscribeLink) {
+                               @JsonProperty("one_click_unsubscribe_url") URI oneClickUnsubscribeURL) {
         this.notificationId = notificationId;
         this.reference = reference;
         this.content = content;
         this.uri = uri;
         this.template = template;
-        this.oneClickUnsubscribeLink = oneClickUnsubscribeLink;
+        this.oneClickUnsubscribeURL = oneClickUnsubscribeURL;
     }
 
     @JsonProperty("id")
@@ -157,8 +157,8 @@ public class NotifyEmailResponse {
     }
 
     @JsonProperty("one_click_unsubscribe_url")
-    public URI getOneClickUnsubscribeLink() {
-        return oneClickUnsubscribeLink;
+    public URI getOneClickUnsubscribeURL() {
+        return oneClickUnsubscribeURL;
     }
 
     @Override
@@ -166,12 +166,12 @@ public class NotifyEmailResponse {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         NotifyEmailResponse that = (NotifyEmailResponse) o;
-        return Objects.equals(notificationId, that.notificationId) && Objects.equals(reference, that.reference) && Objects.equals(content, that.content) && Objects.equals(uri, that.uri) && Objects.equals(template, that.template) && Objects.equals(oneClickUnsubscribeLink, that.oneClickUnsubscribeLink);
+        return Objects.equals(notificationId, that.notificationId) && Objects.equals(reference, that.reference) && Objects.equals(content, that.content) && Objects.equals(uri, that.uri) && Objects.equals(template, that.template) && Objects.equals(oneClickUnsubscribeURL, that.oneClickUnsubscribeURL);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(notificationId, reference, content, uri, template, oneClickUnsubscribeLink);
+        return Objects.hash(notificationId, reference, content, uri, template, oneClickUnsubscribeURL);
     }
 
     @Override
@@ -182,7 +182,7 @@ public class NotifyEmailResponse {
                 ", content=" + content +
                 ", uri=" + uri +
                 ", template=" + template +
-                ", oneClickUnsubscribeLink=" + oneClickUnsubscribeLink +
+                ", oneClickUnsubscribeURL=" + oneClickUnsubscribeURL +
                 '}';
     }
 }

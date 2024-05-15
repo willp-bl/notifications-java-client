@@ -55,11 +55,11 @@ public interface NotificationClientApi {
      * @param emailReplyToId  An optional identifier for a reply to email address for the notification, rather than use the service default.
      *                        Service emailReplyToIds can be accessed via the service settings / manage email reply to addresses page.
      *                        Omit this argument to use the default service email reply to address.
-     * @param oneClickUnsubscribeLink A link so users can unsubscribe, see https://www.notifications.service.gov.uk/using-notify/unsubscribe-links
+     * @param oneClickUnsubscribeURL A link so users can unsubscribe, see https://www.notifications.service.gov.uk/using-notify/unsubscribe-links
      * @return <code>SendEmailResponse</code>
      * @throws NotificationClientException see https://docs.notifications.service.gov.uk/java.html#send-an-email-error-codes
      */
-    SendEmailResponse sendEmail(String templateId, String emailAddress, Map<String, ?> personalisation, String reference, String emailReplyToId, URI oneClickUnsubscribeLink) throws NotificationClientException;
+    SendEmailResponse sendEmail(String templateId, String emailAddress, Map<String, ?> personalisation, String reference, String emailReplyToId, URI oneClickUnsubscribeURL) throws NotificationClientException;
 
     /**
      * The sendSms method will create an HTTPS POST request. A JWT token will be created and added as an Authorization header to the request.

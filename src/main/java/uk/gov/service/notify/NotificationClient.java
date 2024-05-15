@@ -156,7 +156,7 @@ public class NotificationClient implements NotificationClientApi {
                                        Map<String, ?> personalisation,
                                        String reference,
                                        String emailReplyToId,
-                                       URI oneClickUnsubscribeLink) throws NotificationClientException {
+                                       URI oneClickUnsubscribeURL) throws NotificationClientException {
 
         JSONObject body = createBodyForPostRequest(templateId,
                 null,
@@ -171,9 +171,9 @@ public class NotificationClient implements NotificationClientApi {
             body.put("email_reply_to_id", emailReplyToId);
         }
 
-        if(oneClickUnsubscribeLink != null)
+        if(oneClickUnsubscribeURL != null)
         {
-            body.put("one_click_unsubscribe_url", oneClickUnsubscribeLink);
+            body.put("one_click_unsubscribe_url", oneClickUnsubscribeURL);
         }
 
         HttpURLConnection conn = createConnectionAndSetHeaders(baseUrl + "/v2/notifications/email", "POST");

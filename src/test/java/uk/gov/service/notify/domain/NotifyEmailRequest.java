@@ -13,20 +13,20 @@ public class NotifyEmailRequest {
     private final Map<String, ?> personalisation;
     private final String reference;
     private final String emailReplyToId;
-    private final URI oneClickUnsubscribeLink;
+    private final URI oneClickUnsubscribeURL;
 
     public NotifyEmailRequest(@JsonProperty("email_address") String emailAddress,
                               @JsonProperty("template_id") String templateId,
                               @JsonProperty("personalisation") Map<String, ?> personalisation,
                               @JsonProperty("reference") String reference,
                               @JsonProperty("email_reply_to_id") String emailReplyToId,
-                              @JsonProperty("one_click_unsubscribe_url") URI oneClickUnsubscribeLink) {
+                              @JsonProperty("one_click_unsubscribe_url") URI oneClickUnsubscribeURL) {
         this.emailAddress = emailAddress;
         this.templateId = templateId;
         this.personalisation = personalisation;
         this.reference = reference;
         this.emailReplyToId = emailReplyToId;
-        this.oneClickUnsubscribeLink = oneClickUnsubscribeLink;
+        this.oneClickUnsubscribeURL = oneClickUnsubscribeURL;
     }
 
     @JsonProperty("email_address")
@@ -55,8 +55,8 @@ public class NotifyEmailRequest {
     }
 
     @JsonProperty("one_click_unsubscribe_url")
-    public URI getOneClickUnsubscribeLink() {
-        return oneClickUnsubscribeLink;
+    public URI getOneClickUnsubscribeURL() {
+        return oneClickUnsubscribeURL;
     }
 
     @Override
@@ -64,12 +64,12 @@ public class NotifyEmailRequest {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         NotifyEmailRequest request = (NotifyEmailRequest) o;
-        return Objects.equals(emailAddress, request.emailAddress) && Objects.equals(templateId, request.templateId) && Objects.equals(personalisation, request.personalisation) && Objects.equals(reference, request.reference) && Objects.equals(emailReplyToId, request.emailReplyToId) && Objects.equals(oneClickUnsubscribeLink, request.oneClickUnsubscribeLink);
+        return Objects.equals(emailAddress, request.emailAddress) && Objects.equals(templateId, request.templateId) && Objects.equals(personalisation, request.personalisation) && Objects.equals(reference, request.reference) && Objects.equals(emailReplyToId, request.emailReplyToId) && Objects.equals(oneClickUnsubscribeURL, request.oneClickUnsubscribeURL);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(emailAddress, templateId, personalisation, reference, emailReplyToId, oneClickUnsubscribeLink);
+        return Objects.hash(emailAddress, templateId, personalisation, reference, emailReplyToId, oneClickUnsubscribeURL);
     }
 
     @Override
@@ -80,7 +80,7 @@ public class NotifyEmailRequest {
                 ", personalisation=" + personalisation +
                 ", reference='" + reference + '\'' +
                 ", emailReplyToId='" + emailReplyToId + '\'' +
-                ", oneClickUnsubscribeLink=" + oneClickUnsubscribeLink +
+                ", oneClickUnsubscribeURL=" + oneClickUnsubscribeURL +
                 '}';
     }
 }

@@ -15,7 +15,7 @@ public class SendEmailResponse {
     private final String body;
     private final String subject;
     private final String fromEmail;
-    private final URI oneClickUnsubscribeLink;
+    private final URI oneClickUnsubscribeURL;
 
     public SendEmailResponse(String response) {
         JSONObject data = new JSONObject(response);
@@ -29,7 +29,7 @@ public class SendEmailResponse {
         templateId = UUID.fromString(template.getString("id"));
         templateVersion = template.getInt("version");
         templateUri = template.getString("uri");
-        oneClickUnsubscribeLink = data.isNull("one_click_unsubscribe_url") ? null : URI.create(data.getString("one_click_unsubscribe_url"));
+        oneClickUnsubscribeURL = data.isNull("one_click_unsubscribe_url") ? null : URI.create(data.getString("one_click_unsubscribe_url"));
     }
 
     public UUID getNotificationId() {
@@ -64,8 +64,8 @@ public class SendEmailResponse {
         return Optional.ofNullable(fromEmail);
     }
 
-    public Optional<URI> getOneClickUnsubscribeLink() {
-        return Optional.ofNullable(oneClickUnsubscribeLink);
+    public Optional<URI> getOneClickUnsubscribeURL() {
+        return Optional.ofNullable(oneClickUnsubscribeURL);
     }
 
     @Override
@@ -79,7 +79,7 @@ public class SendEmailResponse {
                 ", body='" + body + '\'' +
                 ", subject='" + subject + '\'' +
                 ", fromEmail='" + fromEmail + '\'' +
-                ", oneClickUnsubscribeLink=" + oneClickUnsubscribeLink +
+                ", oneClickUnsubscribeURL=" + oneClickUnsubscribeURL +
                 '}';
     }
 }
