@@ -1,0 +1,14 @@
+{
+  "id": "ca281672-fb80-4686-a583-80c89a9543d7",
+  "reference": "a reference",
+  "content": {
+    "body": "a content`body",
+    "from_number": "a from number"
+  },
+  "uri": null,
+  "template": {
+    "id": "44219525-adb0-4b26-b51c-cd7b5de5dbf1",
+    "version": -1,
+    "uri": "http://localhost"
+  }
+}
