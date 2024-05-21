@@ -1,3 +1,6 @@
+## Next release
+* Where UUIDs are expected the types in the API have changed from String to UUID.  You can wrap strings in UUID.fromString() if necessary.
+
 ## 5.2.0-RELEASE
 * Added fields related to cost data in response:
   * `is_cost_data_ready`: This field is true if cost data is ready, and false if it isn't (Boolean).
