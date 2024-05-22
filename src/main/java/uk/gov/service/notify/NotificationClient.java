@@ -233,24 +233,28 @@ public class NotificationClient implements NotificationClientApi {
     public NotificationList getNotifications(String status, NotificationType notificationType, String reference, UUID olderThanId) throws NotificationClientException {
         try {
             URIBuilder builder = new URIBuilder(baseUrl + "/v2/notifications");
-            if (status != null && !status.isEmpty()) {
-                builder.addParameter("status", status);
-            }
-            if (notificationType != null) {
-                builder.addParameter("template_type", notificationType.name());
-            }
-            if (reference != null && !reference.isEmpty()) {
-                builder.addParameter("reference", reference);
-            }
-            if (olderThanId != null) {
-                builder.addParameter("older_than", olderThanId.toString());
-            }
+            addQueryParamToURIBuilder("status", status, builder);
+            addQueryParamToURIBuilder("template_type", notificationType, builder);
+            addQueryParamToURIBuilder("reference", reference, builder);
+            addQueryParamToURIBuilder("older_than", olderThanId, builder);
 
             String response = notifyHttpClient.getAsString(builder.build());
             return new NotificationList(response);
         } catch (URISyntaxException e) {
             LOGGER.log(Level.SEVERE, e.toString(), e);
             throw new NotificationClientException(e);
+        }
+    }
+
+    private static void addQueryParamToURIBuilder(String queryParamName, String queryParamValue, URIBuilder builder) {
+        if (queryParamValue != null && !queryParamValue.isEmpty()) {
+            builder.addParameter(queryParamName, queryParamValue);
+        }
+    }
+
+    private static void addQueryParamToURIBuilder(String queryParamName, Object queryParamValue, URIBuilder builder) {
+        if (queryParamValue != null) {
+            builder.addParameter(queryParamName, queryParamValue.toString());
         }
     }
 
@@ -272,9 +276,7 @@ public class NotificationClient implements NotificationClientApi {
     public TemplateList getAllTemplates(NotificationType templateType) throws NotificationClientException{
         try{
             URIBuilder builder = new URIBuilder(baseUrl + "/v2/templates");
-            if (templateType != null) {
-                builder.addParameter("type", templateType.name());
-            }
+            addQueryParamToURIBuilder("type", templateType, builder);
             String response = notifyHttpClient.getAsString(builder.build());
             return new TemplateList(response);
         } catch (URISyntaxException e) {
@@ -297,9 +299,7 @@ public class NotificationClient implements NotificationClientApi {
     public ReceivedTextMessageList getReceivedTextMessages(UUID olderThanId) throws NotificationClientException {
         try {
             URIBuilder builder = new URIBuilder(baseUrl + "/v2/received-text-messages");
-            if (olderThanId != null) {
-                builder.addParameter("older_than", olderThanId.toString());
-            }
+            addQueryParamToURIBuilder("older_than", olderThanId, builder);
             String response = notifyHttpClient.getAsString(builder.build());
             return new ReceivedTextMessageList(response);
         } catch (URISyntaxException e){
