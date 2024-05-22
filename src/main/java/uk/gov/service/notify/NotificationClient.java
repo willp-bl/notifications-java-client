@@ -13,22 +13,18 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.Proxy;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Properties;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static java.nio.charset.StandardCharsets.ISO_8859_1;
-import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class NotificationClient implements NotificationClientApi {
 
@@ -40,6 +36,7 @@ public class NotificationClient implements NotificationClientApi {
     private final String baseUrl;
     private final Proxy proxy;
     private final String version;
+    private final NotifyHttpClient notifyHttpClient;
 
     /**
      * This client constructor given the api key.
@@ -105,36 +102,38 @@ public class NotificationClient implements NotificationClientApi {
                               final Proxy proxy,
                               final SSLContext sslContext){
 
-        this.apiKey = extractApiKey(apiKey);
-        this.serviceId = extractServiceId(apiKey);
+        this.apiKey = NotifyUtils.extractApiKey(apiKey);
+        this.serviceId = NotifyUtils.extractServiceId(apiKey);
         this.baseUrl = baseUrl;
         this.proxy = proxy;
         if (sslContext != null){
             setCustomSSLContext(sslContext);
         }
-        this.version = getVersion();
+        this.version = NotifyUtils.getVersion();
+        this.notifyHttpClient = new NotifyHttpClient(this.serviceId, this.apiKey, getUserAgent(), this.proxy);
     }
 
-    public String getUserAgent() {
+    String getUserAgent() {
         return "NOTIFY-API-JAVA-CLIENT/" + version;
     }
 
-    public String getApiKey() {
+    String getApiKey() {
         return apiKey;
     }
 
-    public String getServiceId() {
+    String getServiceId() {
         return serviceId;
     }
 
-    public String getBaseUrl() {
+    String getBaseUrl() {
         return baseUrl;
     }
 
-    public Proxy getProxy() {
+    Proxy getProxy() {
         return proxy;
     }
 
+    @Override
     public SendEmailResponse sendEmail(UUID templateId,
                                        String emailAddress,
                                        Map<String, ?> personalisation,
@@ -177,15 +176,17 @@ public class NotificationClient implements NotificationClientApi {
             body.put("one_click_unsubscribe_url", oneClickUnsubscribeURL);
         }
 
-        HttpURLConnection conn = createConnectionAndSetHeaders(baseUrl + "/v2/notifications/email", "POST");
-        String response = performPostRequest(conn, body, HttpsURLConnection.HTTP_CREATED);
+        HttpURLConnection conn = notifyHttpClient.createConnectionAndSetHeaders(baseUrl + "/v2/notifications/email", "POST");
+        String response = notifyHttpClient.performPostRequest(conn, body, HttpsURLConnection.HTTP_CREATED);
         return new SendEmailResponse(response);
     }
 
+    @Override
     public SendSmsResponse sendSms(UUID templateId, String phoneNumber, Map<String, ?> personalisation, String reference) throws NotificationClientException {
         return sendSms(templateId, phoneNumber, personalisation, reference, null);
     }
 
+    @Override
     public SendSmsResponse sendSms(UUID templateId,
                                    String phoneNumber,
                                    Map<String, ?> personalisation,
@@ -203,33 +204,37 @@ public class NotificationClient implements NotificationClientApi {
         if( smsSenderId != null){
             body.put("sms_sender_id", smsSenderId);
         }
-        HttpURLConnection conn = createConnectionAndSetHeaders(baseUrl + "/v2/notifications/sms", "POST");
-        String response = performPostRequest(conn, body, HttpsURLConnection.HTTP_CREATED);
+        HttpURLConnection conn = notifyHttpClient.createConnectionAndSetHeaders(baseUrl + "/v2/notifications/sms", "POST");
+        String response = notifyHttpClient.performPostRequest(conn, body, HttpsURLConnection.HTTP_CREATED);
         return new SendSmsResponse(response);
     }
 
+    @Override
     public SendLetterResponse sendLetter(UUID templateId, Map<String, ?> personalisation, String reference) throws NotificationClientException {
         JSONObject body = createBodyForPostRequest(templateId, null, null, personalisation, reference, null, null);
-        HttpURLConnection conn = createConnectionAndSetHeaders(baseUrl + "/v2/notifications/letter", "POST");
-        String response = performPostRequest(conn, body, HttpsURLConnection.HTTP_CREATED);
+        HttpURLConnection conn = notifyHttpClient.createConnectionAndSetHeaders(baseUrl + "/v2/notifications/letter", "POST");
+        String response = notifyHttpClient.performPostRequest(conn, body, HttpsURLConnection.HTTP_CREATED);
         return new SendLetterResponse(response);
     }
 
+    @Override
     public Notification getNotificationById(UUID notificationId) throws NotificationClientException {
         String url = baseUrl + "/v2/notifications/" + notificationId;
-        HttpURLConnection conn = createConnectionAndSetHeaders(url, "GET");
-        String response = performGetRequest(conn);
+        HttpURLConnection conn = notifyHttpClient.createConnectionAndSetHeaders(url, "GET");
+        String response = notifyHttpClient.performGetRequest(conn);
         return new Notification(response);
 
     }
 
+    @Override
     public byte[] getPdfForLetter(UUID notificationId) throws NotificationClientException {
         String url = baseUrl + "/v2/notifications/" + notificationId + "/pdf";
-        HttpURLConnection conn = createConnectionAndSetHeaders(url, "GET");
+        HttpURLConnection conn = notifyHttpClient.createConnectionAndSetHeaders(url, "GET");
 
-        return performRawGetRequest(conn);
+        return notifyHttpClient.performRawGetRequest(conn);
     }
 
+    @Override
     public NotificationList getNotifications(String status, NotificationType notificationType, String reference, UUID olderThanId) throws NotificationClientException {
         try {
             URIBuilder builder = new URIBuilder(baseUrl + "/v2/notifications");
@@ -246,8 +251,8 @@ public class NotificationClient implements NotificationClientApi {
                 builder.addParameter("older_than", olderThanId.toString());
             }
 
-            HttpURLConnection conn = createConnectionAndSetHeaders(builder.toString(), "GET");
-            String response = performGetRequest(conn);
+            HttpURLConnection conn = notifyHttpClient.createConnectionAndSetHeaders(builder.toString(), "GET");
+            String response = notifyHttpClient.performGetRequest(conn);
             return new NotificationList(response);
         } catch (URISyntaxException e) {
             LOGGER.log(Level.SEVERE, e.toString(), e);
@@ -255,17 +260,19 @@ public class NotificationClient implements NotificationClientApi {
         }
     }
 
+    @Override
     public Template getTemplateById(UUID templateId) throws NotificationClientException{
         String url = baseUrl + "/v2/template/" + templateId;
-        HttpURLConnection conn = createConnectionAndSetHeaders(url, "GET");
-        String response = performGetRequest(conn);
+        HttpURLConnection conn = notifyHttpClient.createConnectionAndSetHeaders(url, "GET");
+        String response = notifyHttpClient.performGetRequest(conn);
         return new Template(response);
     }
 
+    @Override
     public Template getTemplateVersion(UUID templateId, int version) throws NotificationClientException{
         String url = baseUrl + "/v2/template/" + templateId + "/version/" + version;
-        HttpURLConnection conn = createConnectionAndSetHeaders(url, "GET");
-        String response = performGetRequest(conn);
+        HttpURLConnection conn = notifyHttpClient.createConnectionAndSetHeaders(url, "GET");
+        String response = notifyHttpClient.performGetRequest(conn);
         return new Template(response);
     }
 
@@ -276,8 +283,8 @@ public class NotificationClient implements NotificationClientApi {
             if (templateType != null) {
                 builder.addParameter("type", templateType.name());
             }
-            HttpURLConnection conn = createConnectionAndSetHeaders(builder.toString(), "GET");
-            String response = performGetRequest(conn);
+            HttpURLConnection conn = notifyHttpClient.createConnectionAndSetHeaders(builder.toString(), "GET");
+            String response = notifyHttpClient.performGetRequest(conn);
             return new TemplateList(response);
         } catch (URISyntaxException e) {
             LOGGER.log(Level.SEVERE, e.toString(), e);
@@ -285,24 +292,26 @@ public class NotificationClient implements NotificationClientApi {
         }
     }
 
+    @Override
     public TemplatePreview generateTemplatePreview(UUID templateId, Map<String, Object> personalisation) throws NotificationClientException {
         JSONObject body = new JSONObject();
         if (personalisation != null && !personalisation.isEmpty()) {
             body.put("personalisation", new JSONObject(personalisation));
         }
-        HttpURLConnection conn = createConnectionAndSetHeaders(baseUrl + "/v2/template/" + templateId + "/preview", "POST");
-        String response = performPostRequest(conn, body, HttpsURLConnection.HTTP_OK);
+        HttpURLConnection conn = notifyHttpClient.createConnectionAndSetHeaders(baseUrl + "/v2/template/" + templateId + "/preview", "POST");
+        String response = notifyHttpClient.performPostRequest(conn, body, HttpsURLConnection.HTTP_OK);
         return new TemplatePreview(response);
     }
 
+    @Override
     public ReceivedTextMessageList getReceivedTextMessages(UUID olderThanId) throws NotificationClientException {
         try {
             URIBuilder builder = new URIBuilder(baseUrl + "/v2/received-text-messages");
             if (olderThanId != null) {
                 builder.addParameter("older_than", olderThanId.toString());
             }
-            HttpURLConnection conn = createConnectionAndSetHeaders(builder.toString(), "GET");
-            String response = performGetRequest(conn);
+            HttpURLConnection conn = notifyHttpClient.createConnectionAndSetHeaders(builder.toString(), "GET");
+            String response = notifyHttpClient.performGetRequest(conn);
             return new ReceivedTextMessageList(response);
         } catch (URISyntaxException e){
             LOGGER.log(Level.SEVERE, e.toString(), e);
@@ -434,102 +443,6 @@ public class NotificationClient implements NotificationClientApi {
         return internalPrepareUpload(documentContents, filename, confirmEmailBeforeDownload, retentionPeriod.toString());
     }
 
-    private String performPostRequest(HttpURLConnection conn, JSONObject body, int expectedStatusCode) throws NotificationClientException {
-        try{
-            OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream(), UTF_8);
-            wr.write(body.toString());
-            wr.flush();
-
-            int httpResult = conn.getResponseCode();
-            if (httpResult == expectedStatusCode) {
-                return readStream(conn.getInputStream());
-            } else {
-                throw new NotificationClientException(httpResult, readStream(conn.getErrorStream()));
-            }
-
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, e.toString(), e);
-            throw new NotificationClientException(e);
-        } finally {
-            if (conn != null) {
-                conn.disconnect();
-            }
-        }
-    }
-
-    private String performGetRequest(HttpURLConnection conn) throws NotificationClientException {
-        try{
-            int httpResult = conn.getResponseCode();
-            if (httpResult == 200) {
-                return readStream(conn.getInputStream());
-            } else {
-                throw new NotificationClientException(httpResult, readStream(conn.getErrorStream()));
-            }
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, e.toString(), e);
-            throw new NotificationClientException(e);
-        } finally {
-            if (conn != null) {
-                conn.disconnect();
-            }
-        }
-    }
-
-    private byte[] performRawGetRequest(HttpURLConnection conn) throws NotificationClientException {
-        byte[] out;
-        try{
-            int httpResult = conn.getResponseCode();
-            if (httpResult == 200) {
-                InputStream is = conn.getInputStream();
-                out = IOUtils.toByteArray(is);
-            } else {
-                throw new NotificationClientException(httpResult, readStream(conn.getErrorStream()));
-            }
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, e.toString(), e);
-            throw new NotificationClientException(e);
-        } finally {
-            if (conn != null) {
-                conn.disconnect();
-            }
-        }
-        return out;
-    }
-
-    private HttpURLConnection createConnectionAndSetHeaders(String urlString, String method) throws NotificationClientException {
-        try
-        {
-            URL url = new URL(urlString);
-            HttpURLConnection conn = getConnection(url);
-            conn.setRequestMethod(method);
-            Authentication authentication = new Authentication();
-            String token = authentication.create(serviceId, apiKey);
-            conn.setRequestProperty("Authorization", "Bearer " + token);
-            conn.setRequestProperty("User-agent", getUserAgent());
-            if (method.equals("POST")) {
-                conn.setDoOutput(true);
-                conn.setRequestProperty("Content-Type", "application/json");
-                conn.setRequestProperty("Accept", "application/json");
-
-            }
-            return conn;
-        }catch (IOException e) {
-            LOGGER.log(Level.SEVERE, e.toString(), e);
-            throw new NotificationClientException(e);
-        }
-    }
-
-    HttpURLConnection getConnection(URL url) throws IOException {
-        HttpURLConnection conn;
-
-        if (null != proxy) {
-            conn = (HttpURLConnection) url.openConnection(proxy);
-        } else {
-            conn = (HttpURLConnection) url.openConnection();
-        }
-        return conn;
-    }
-
     private JSONObject createBodyForPostRequest(final UUID templateId,
                                                 final String phoneNumber,
                                                 final String emailAddress,
@@ -568,13 +481,6 @@ public class NotificationClient implements NotificationClientApi {
         return body;
     }
 
-    private String readStream(InputStream inputStream) throws IOException {
-        if (inputStream == null) {
-            return null;
-        }
-        return IOUtils.toString(inputStream, UTF_8);
-    }
-
     /**
      * Set default SSL context for HTTPS connections.
      * <p/>
@@ -591,60 +497,16 @@ public class NotificationClient implements NotificationClientApi {
         HttpsURLConnection.setDefaultSSLSocketFactory(sslContext.getSocketFactory());
     }
 
-
-    private static String extractServiceId(String apiKey) {
-        return apiKey.substring(Math.max(0, apiKey.length() - 73), Math.max(0, apiKey.length() - 37));
-    }
-
-    private static String extractApiKey(String apiKey) {
-        return apiKey.substring(Math.max(0, apiKey.length() - 36));
-    }
-
-
-    private String getVersion(){
-        InputStream input = null;
-        Properties prop = new Properties();
-        try
-        {
-            input = getClass().getClassLoader().getResourceAsStream("application.properties");
-
-            prop.load(input);
-
-        }
-        catch (IOException ex)
-        {
-            ex.printStackTrace();
-        }
-        finally
-        {
-            if (input != null)
-            {
-                try
-                {
-                    input.close();
-                }
-                catch (IOException e)
-                {
-                    e.printStackTrace();
-                }
-            }
-        }
-        return prop.getProperty("project.version");
-    }
-
     private LetterResponse sendPrecompiledLetter(String reference, String base64EncodedPDFFile, String postage) throws NotificationClientException {
-        if( isBlank(reference) )
-        {
+        if(NotifyUtils.isBlank(reference)) {
             throw new NotificationClientException("reference cannot be null or empty");
         }
 
-        if ( isBlank(base64EncodedPDFFile) )
-        {
+        if(NotifyUtils.isBlank(base64EncodedPDFFile)) {
             throw new NotificationClientException("precompiledPDF cannot be null or empty");
         }
 
-        if(!PdfUtils.isBase64StringPDF(base64EncodedPDFFile))
-        {
+        if(!PdfUtils.isBase64StringPDF(base64EncodedPDFFile)) {
             throw new NotificationClientException("base64EncodedPDFFile is not a PDF");
         }
 
@@ -656,22 +518,14 @@ public class NotificationClient implements NotificationClientApi {
                 base64EncodedPDFFile,
                 postage);
 
-        HttpURLConnection conn = createConnectionAndSetHeaders(
+        HttpURLConnection conn = notifyHttpClient.createConnectionAndSetHeaders(
                 baseUrl + "/v2/notifications/letter",
                 "POST"
         );
 
-        String response = performPostRequest(conn, body, HttpsURLConnection.HTTP_CREATED);
+        String response = notifyHttpClient.performPostRequest(conn, body, HttpsURLConnection.HTTP_CREATED);
         return new LetterResponse(response);
 
-    }
-
-    private boolean isBlank(String string) {
-        if(Objects.isNull(string)
-                || string.trim().length()==0) {
-            return true;
-        }
-        return false;
     }
 
     @Override
@@ -710,7 +564,7 @@ public class NotificationClient implements NotificationClientApi {
         Base64InputStream base64InputStream = new Base64InputStream(stream, true, 0, null);
         String encoded;
         try {
-            encoded = IOUtils.toString(base64InputStream, "ISO-8859-1");
+            encoded = IOUtils.toString(base64InputStream, ISO_8859_1);
         } catch (IOException e) {
             throw new NotificationClientException("Error when turning Base64InputStream into a string");
         }
