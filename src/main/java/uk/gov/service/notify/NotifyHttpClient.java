@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.Proxy;
+import java.net.URI;
 import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -30,8 +31,8 @@ class NotifyHttpClient {
         this.proxy = proxy;
     }
 
-    String performPostRequest(HttpURLConnection conn, JSONObject body, int expectedStatusCode) throws NotificationClientException {
-        try{
+    private String performPostRequest(HttpURLConnection conn, JSONObject body, int expectedStatusCode) throws NotificationClientException {
+        try {
             OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream(), UTF_8);
             wr.write(body.toString());
             wr.flush();
@@ -53,8 +54,8 @@ class NotifyHttpClient {
         }
     }
 
-    String performGetRequest(HttpURLConnection conn) throws NotificationClientException {
-        try{
+    private String performGetRequest(HttpURLConnection conn) throws NotificationClientException {
+        try {
             int httpResult = conn.getResponseCode();
             if (httpResult == 200) {
                 return NotifyUtils.readStream(conn.getInputStream());
@@ -71,9 +72,9 @@ class NotifyHttpClient {
         }
     }
 
-    byte[] performRawGetRequest(HttpURLConnection conn) throws NotificationClientException {
+    private byte[] performRawGetRequest(HttpURLConnection conn) throws NotificationClientException {
         byte[] out;
-        try{
+        try {
             int httpResult = conn.getResponseCode();
             if (httpResult == 200) {
                 InputStream is = conn.getInputStream();
@@ -92,9 +93,8 @@ class NotifyHttpClient {
         return out;
     }
 
-    HttpURLConnection createConnectionAndSetHeaders(String urlString, String method) throws NotificationClientException {
-        try
-        {
+    private HttpURLConnection createConnectionAndSetHeaders(String urlString, String method) throws NotificationClientException {
+        try {
             URL url = new URL(urlString);
             HttpURLConnection conn = getConnection(url);
             conn.setRequestMethod(method);
@@ -109,13 +109,13 @@ class NotifyHttpClient {
 
             }
             return conn;
-        }catch (IOException e) {
+        } catch (IOException e) {
             LOGGER.log(Level.SEVERE, e.toString(), e);
             throw new NotificationClientException(e);
         }
     }
 
-    HttpURLConnection getConnection(URL url) throws IOException {
+    private HttpURLConnection getConnection(URL url) throws IOException {
         HttpURLConnection conn;
 
         if (null != proxy) {
@@ -124,6 +124,21 @@ class NotifyHttpClient {
             conn = (HttpURLConnection) url.openConnection();
         }
         return conn;
+    }
+
+    String post(URI uri, JSONObject requestBody, int expectedResponseCode) throws NotificationClientException {
+        HttpURLConnection conn = createConnectionAndSetHeaders(uri.toString(), "POST");
+        return performPostRequest(conn, requestBody, expectedResponseCode);
+    }
+
+    String getAsString(URI uri) throws NotificationClientException {
+        HttpURLConnection conn = createConnectionAndSetHeaders(uri.toString(), "GET");
+        return performGetRequest(conn);
+    }
+
+    byte[] getAsByteArray(URI uri) throws NotificationClientException {
+        HttpURLConnection conn = createConnectionAndSetHeaders(uri.toString(), "GET");
+        return performRawGetRequest(conn);
     }
 
 }
