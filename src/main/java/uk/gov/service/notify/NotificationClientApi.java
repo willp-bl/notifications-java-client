@@ -194,14 +194,14 @@ public interface NotificationClientApi {
      *
      * @param status If status is not empty or null notifications will only return notifications for the given status.
      *               Possible statuses are created|sending|delivered|permanent-failure|temporary-failure|technical-failure
-     * @param notification_type If notification_type is not empty or null only notifications of the given status will be returned.
+     * @param notificationType If notification_type is not empty or null only notifications of the given status will be returned.
      *                          Possible notificationTypes are sms|email
      * @param reference If reference is not empty or null only the notifications with that reference are returned.
      * @param olderThanId If olderThanId is not empty or null only the notifications older than that notification id are returned.
      * @return <code>NotificationList</code>
      * @throws NotificationClientException see https://docs.notifications.service.gov.uk/java.html#get-the-status-of-multiple-messages-error-codes
      */
-    NotificationList getNotifications(String status, String notification_type, String reference, String olderThanId) throws NotificationClientException;
+    NotificationList getNotifications(String status, NotificationType notificationType, String reference, String olderThanId) throws NotificationClientException;
 
     /**
      * The getTemplateById returns a <code>Template</code> given the template id.
@@ -230,7 +230,7 @@ public interface NotificationClientApi {
      * @return <code>TemplateList</code>
      * @throws NotificationClientException see https://docs.notifications.service.gov.uk/java.html#get-a-template-by-id-error-codes
      */
-    TemplateList getAllTemplates(String templateType) throws NotificationClientException;
+    TemplateList getAllTemplates(NotificationType templateType) throws NotificationClientException;
 
     /**
      * The generateTemplatePreview returns a template with the placeholders replaced with the given personalisation.

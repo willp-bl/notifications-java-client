@@ -7,7 +7,7 @@ import java.util.UUID;
 
 public class TemplatePreview {
         private UUID id;
-        private String templateType;
+        private NotificationType templateType;
         private int version;
         private String body;
         private String subject;
@@ -27,7 +27,7 @@ public class TemplatePreview {
 
         private void build(JSONObject data) {
             id = UUID.fromString(data.getString("id"));
-            templateType = data.getString("type");
+            templateType = NotificationType.valueOf(data.getString("type"));
             version = data.getInt("version");
             body = data.getString("body");
             subject = data.isNull("subject") ? null : data.getString("subject");
@@ -42,11 +42,11 @@ public class TemplatePreview {
             this.id = id;
         }
 
-        public String getTemplateType() {
+        public NotificationType getTemplateType() {
             return templateType;
         }
 
-        public void setTemplateType(String templateType) {
+        public void setTemplateType(NotificationType templateType) {
             this.templateType = templateType;
         }
 

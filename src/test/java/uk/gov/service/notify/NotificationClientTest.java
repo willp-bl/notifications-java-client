@@ -540,7 +540,7 @@ public class NotificationClientTest {
                         .withResponseBody(new Body(objectMapper.writeValueAsString(expected)))));
         NotificationClient client = new NotificationClient(COMBINED_API_KEY, BASE_URL);
 
-        NotificationList actual = client.getNotifications("a stat", "a notification_type", "a ref", "an olderThanId");
+        NotificationList actual = client.getNotifications("a stat", NotificationType.sms, "a ref", "an olderThanId");
 
         assertEquals(expected.getNotifications().size(), actual.getNotifications().size());
         assertEquals(expected.getLinks().getCurrent().toString(), actual.getCurrentPageLink());
@@ -573,7 +573,7 @@ public class NotificationClientTest {
 
         LoggedRequest request = validateRequest();
         assertEquals("a stat", request.queryParameter("status").firstValue());
-        assertEquals("a notification_type", request.queryParameter("template_type").firstValue());
+        assertEquals("sms", request.queryParameter("template_type").firstValue());
         assertEquals("a ref", request.queryParameter("reference").firstValue());
         assertEquals("an olderThanId", request.queryParameter("older_than").firstValue());
     }
@@ -679,7 +679,7 @@ public class NotificationClientTest {
         NotificationClient client = new NotificationClient(COMBINED_API_KEY, BASE_URL);
 
         // we ask for the "foo" templates because as far as the client is concerned the string doesn't matter
-        TemplateList actual = client.getAllTemplates("foo");
+        TemplateList actual = client.getAllTemplates(NotificationType.email);
 
         assertEquals(expected.getTemplates().size(), actual.getTemplates().size());
         assertEquals(expected.getTemplates().get(0).getId(), actual.getTemplates().get(0).getId());
@@ -695,7 +695,7 @@ public class NotificationClientTest {
         assertEquals(expected.getTemplates().get(0).getLetterContactBlock(), actual.getTemplates().get(0).getLetterContactBlock().get());
 
         LoggedRequest request = validateRequest();
-        assertEquals("foo", request.queryParameter("type").firstValue());
+        assertEquals(NotificationType.email.name(), request.queryParameter("type").firstValue());
     }
 
     @Test

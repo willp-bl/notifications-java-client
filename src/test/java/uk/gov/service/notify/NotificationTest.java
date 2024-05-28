@@ -4,7 +4,6 @@ import org.jose4j.json.internal.json_simple.JSONObject;
 import org.junit.Test;
 
 import java.time.ZonedDateTime;
-import java.time.ZonedDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -47,7 +46,7 @@ public class NotificationTest {
         assertEquals(UUID.fromString(id), notification.getId());
         assertEquals(Optional.of("client_reference"), notification.getReference());
         assertEquals(UUID.fromString(templateId), notification.getTemplateId());
-        assertEquals("email", notification.getNotificationType());
+        assertEquals(NotificationType.email, notification.getNotificationType());
         assertEquals(Optional.of("some@address.com"), notification.getEmailAddress());
         assertEquals(Optional.<String>empty(), notification.getPhoneNumber());
         assertEquals(Optional.<String>empty(), notification.getLine1());
@@ -107,7 +106,7 @@ public class NotificationTest {
         assertEquals(UUID.fromString(id), notification.getId());
         assertEquals(Optional.of("client_reference"), notification.getReference());
         assertEquals(UUID.fromString(templateId), notification.getTemplateId());
-        assertEquals("sms", notification.getNotificationType());
+        assertEquals(NotificationType.sms, notification.getNotificationType());
 
         assertEquals(Optional.of("+447111111111"), notification.getPhoneNumber());
         assertEquals(Optional.<String>empty(), notification.getEmailAddress());
@@ -169,7 +168,7 @@ public class NotificationTest {
         assertEquals(UUID.fromString(id), notification.getId());
         assertEquals(Optional.of("client_reference"), notification.getReference());
         assertEquals(UUID.fromString(templateId), notification.getTemplateId());
-        assertEquals("letter", notification.getNotificationType());
+        assertEquals(NotificationType.letter, notification.getNotificationType());
 
         assertEquals(Optional.<String>empty(), notification.getPhoneNumber());
         assertEquals(Optional.<String>empty(), notification.getEmailAddress());

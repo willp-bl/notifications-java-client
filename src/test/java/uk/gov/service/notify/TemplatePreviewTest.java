@@ -22,7 +22,7 @@ public class TemplatePreviewTest {
 
         TemplatePreview template = new TemplatePreview(content.toString());
         assertEquals(UUID.fromString(id), template.getId());
-        assertEquals("email", template.getTemplateType());
+        assertEquals(NotificationType.email, template.getTemplateType());
         assertEquals(3, template.getVersion());
         assertEquals("The body of the template. For ((name)) eyes only.", template.getBody());
         assertEquals(Optional.of("Private email"), template.getSubject());
@@ -42,7 +42,7 @@ public class TemplatePreviewTest {
 
         TemplatePreview template = new TemplatePreview(content.toString());
         assertEquals(UUID.fromString(id), template.getId());
-        assertEquals("email", template.getTemplateType());
+        assertEquals(NotificationType.email, template.getTemplateType());
         assertEquals(3, template.getVersion());
         assertEquals("The body of the template. For ((name)) eyes only.", template.getBody());
         assertEquals(Optional.of("Private email"), template.getSubject());

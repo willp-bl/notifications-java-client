@@ -1,6 +1,7 @@
 package uk.gov.service.notify.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import uk.gov.service.notify.NotificationType;
 
 import java.time.ZonedDateTime;
 import java.util.Objects;
@@ -10,7 +11,7 @@ public class NotifyTemplate {
 
     private final UUID id;
     private final String name;
-    private final String type;
+    private final NotificationType type;
     private final ZonedDateTime createdAt;
     private final ZonedDateTime updatedAt;
     private final int version;
@@ -21,7 +22,7 @@ public class NotifyTemplate {
 
     public NotifyTemplate(@JsonProperty("id") UUID id,
                           @JsonProperty("name") String name,
-                          @JsonProperty("type") String type,
+                          @JsonProperty("type") NotificationType type,
                           @JsonProperty("created_at") ZonedDateTime createdAt,
                           @JsonProperty("updated_at") ZonedDateTime updatedAt,
                           @JsonProperty("version") int version,
@@ -53,7 +54,7 @@ public class NotifyTemplate {
     }
 
     @JsonProperty("type")
-    public String getType() {
+    public NotificationType getType() {
         return type;
     }
 

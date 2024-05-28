@@ -1,6 +1,7 @@
 package uk.gov.service.notify.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import uk.gov.service.notify.NotificationType;
 
 import java.net.URI;
 import java.time.ZonedDateTime;
@@ -140,7 +141,7 @@ public class NotifyNotificationResponse {
     private final String line5;
     private final String line6;
     private final String line7;
-    private final String type;
+    private final NotificationType type;
     private final String status;
     private final Template template;
     private final String body;
@@ -165,7 +166,7 @@ public class NotifyNotificationResponse {
                                       @JsonProperty("line_5") String line5,
                                       @JsonProperty("line_6") String line6,
                                       @JsonProperty("line_7") String line7,
-                                      @JsonProperty("type") String type,
+                                      @JsonProperty("type") NotificationType type,
                                       @JsonProperty("status") String status,
                                       @JsonProperty("template") Template template,
                                       @JsonProperty("body") String body,
@@ -259,7 +260,7 @@ public class NotifyNotificationResponse {
     }
 
     @JsonProperty("type")
-    public String getType() {
+    public NotificationType getType() {
         return type;
     }
 

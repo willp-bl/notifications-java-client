@@ -10,7 +10,7 @@ import java.util.UUID;
 public class Template {
     private UUID id;
     private String name;
-    private String templateType;
+    private NotificationType templateType;
     private ZonedDateTime createdAt;
     private ZonedDateTime updatedAt;
     private String createdBy;
@@ -35,7 +35,7 @@ public class Template {
     private void build(JSONObject data) {
         id = UUID.fromString(data.getString("id"));
         name = data.getString("name");
-        templateType = data.getString("type");
+        templateType = NotificationType.valueOf(data.getString("type"));
         createdAt = ZonedDateTime.parse(data.getString("created_at"));
         updatedAt = data.isNull("updated_at") ? null : ZonedDateTime.parse(data.getString("updated_at"));
         version = data.getInt("version");
@@ -54,11 +54,11 @@ public class Template {
         this.id = id;
     }
 
-    public String getTemplateType() {
+    public NotificationType getTemplateType() {
         return templateType;
     }
 
-    public void setTemplateType(String templateType) {
+    public void setTemplateType(NotificationType templateType) {
         this.templateType = templateType;
     }
 

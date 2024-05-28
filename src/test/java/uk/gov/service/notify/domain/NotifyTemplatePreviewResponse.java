@@ -1,6 +1,7 @@
 package uk.gov.service.notify.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import uk.gov.service.notify.NotificationType;
 
 import java.util.Map;
 import java.util.Objects;
@@ -9,13 +10,13 @@ import java.util.UUID;
 public class NotifyTemplatePreviewResponse {
 
     private final UUID id;
-    private final String type;
+    private final NotificationType type;
     private final int version;
     private final String body;
     private final String subject;
 
     public NotifyTemplatePreviewResponse(@JsonProperty("id") UUID id,
-                                         @JsonProperty("type") String type,
+                                         @JsonProperty("type") NotificationType type,
                                          @JsonProperty("version") int version,
                                          @JsonProperty("body") String body,
                                          @JsonProperty("subject") String subject) {
@@ -32,7 +33,7 @@ public class NotifyTemplatePreviewResponse {
     }
 
     @JsonProperty("type")
-    public String getType() {
+    public NotificationType getType() {
         return type;
     }
 

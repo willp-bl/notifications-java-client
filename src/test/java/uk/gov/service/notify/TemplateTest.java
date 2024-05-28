@@ -38,7 +38,7 @@ public class TemplateTest {
         Template template = new Template(content.toString());
         assertEquals(UUID.fromString(id), template.getId());
         assertEquals("my template", template.getName());
-        assertEquals("email", template.getTemplateType());
+        assertEquals(NotificationType.email, template.getTemplateType());
         assertEquals(ZonedDateTime.parse("2017-05-01T08:30:00.000Z"), template.getCreatedAt());
         assertEquals(Optional.of(ZonedDateTime.parse("2017-05-01T08:34:00.000Z")), template.getUpdatedAt());
         assertEquals(3, template.getVersion());
@@ -73,7 +73,7 @@ public class TemplateTest {
         Template template = new Template(content.toString());
         assertEquals(UUID.fromString(id), template.getId());
         assertEquals("my template", template.getName());
-        assertEquals("email", template.getTemplateType());
+        assertEquals(NotificationType.email, template.getTemplateType());
         assertEquals(ZonedDateTime.parse("2017-05-01T08:30:00.000Z"), template.getCreatedAt());
         assertEquals(Optional.empty(), template.getUpdatedAt());
         assertEquals(3, template.getVersion());

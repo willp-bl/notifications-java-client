@@ -229,14 +229,14 @@ public class NotificationClient implements NotificationClientApi {
         return performRawGetRequest(conn);
     }
 
-    public NotificationList getNotifications(String status, String notification_type, String reference, String olderThanId) throws NotificationClientException {
+    public NotificationList getNotifications(String status, NotificationType notificationType, String reference, String olderThanId) throws NotificationClientException {
         try {
             URIBuilder builder = new URIBuilder(baseUrl + "/v2/notifications");
             if (status != null && !status.isEmpty()) {
                 builder.addParameter("status", status);
             }
-            if (notification_type != null && !notification_type.isEmpty()) {
-                builder.addParameter("template_type", notification_type);
+            if (notificationType != null) {
+                builder.addParameter("template_type", notificationType.name());
             }
             if (reference != null && !reference.isEmpty()) {
                 builder.addParameter("reference", reference);
@@ -268,11 +268,12 @@ public class NotificationClient implements NotificationClientApi {
         return new Template(response);
     }
 
-    public TemplateList getAllTemplates(String templateType) throws NotificationClientException{
+    @Override
+    public TemplateList getAllTemplates(NotificationType templateType) throws NotificationClientException{
         try{
             URIBuilder builder = new URIBuilder(baseUrl + "/v2/templates");
-            if (templateType != null && !templateType.isEmpty()) {
-                builder.addParameter("type", templateType);
+            if (templateType != null) {
+                builder.addParameter("type", templateType.name());
             }
             HttpURLConnection conn = createConnectionAndSetHeaders(builder.toString(), "GET");
             String response = performGetRequest(conn);

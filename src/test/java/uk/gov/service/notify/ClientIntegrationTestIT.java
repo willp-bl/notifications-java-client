@@ -260,7 +260,7 @@ public class ClientIntegrationTestIT {
     @Test
     public void testGetAllTemplates() throws NotificationClientException {
         NotificationClient client = getClient();
-        TemplateList templateList = client.getAllTemplates("");
+        TemplateList templateList = client.getAllTemplates(null);
         assertTrue(2 <= templateList.getTemplates().size());
     }
 
