@@ -1,4 +1,4 @@
-package uk.gov.service.notify;
+package uk.gov.service.notify.domain;
 
 public enum NotificationType {
     sms,

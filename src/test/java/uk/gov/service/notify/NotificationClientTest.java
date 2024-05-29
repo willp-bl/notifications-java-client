@@ -14,11 +14,11 @@ import org.jose4j.jws.AlgorithmIdentifiers;
 import org.jose4j.jwt.consumer.InvalidJwtException;
 import org.jose4j.jwt.consumer.JwtConsumer;
 import org.jose4j.jwt.consumer.JwtConsumerBuilder;
-import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import uk.gov.service.notify.domain.NotificationType;
 import uk.gov.service.notify.domain.NotifyEmailRequest;
 import uk.gov.service.notify.domain.NotifyEmailResponse;
 import uk.gov.service.notify.domain.NotifyLetterRequest;
@@ -49,13 +49,10 @@ import java.net.Proxy;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.created;
@@ -215,89 +212,6 @@ public class NotificationClientTest {
     }
 
     @Test
-    public void testPrepareUpload() throws NotificationClientException {
-        byte[] documentContent = "this is a document to test with".getBytes();
-
-        JSONObject response = NotificationClient.prepareUpload(documentContent);
-
-        assertEquals("dGhpcyBpcyBhIGRvY3VtZW50IHRvIHRlc3Qgd2l0aA==", response.getString("file"));
-        assertNull(response.optJSONObject("filename"));
-        assertNull(response.optJSONObject("confirm_email_before_download"));
-        assertNull(response.optJSONObject("retention_period"));
-    }
-
-    @Test
-    public void testPrepareUploadWithFilename() throws NotificationClientException {
-        byte[] documentContent = "this is a document to test with".getBytes();
-
-        JSONObject response = NotificationClient.prepareUpload(documentContent, "report.csv");
-
-        assertEquals("dGhpcyBpcyBhIGRvY3VtZW50IHRvIHRlc3Qgd2l0aA==", response.getString("file"));
-        assertEquals("report.csv", response.getString("filename"));
-        assertNull(response.optJSONObject("confirm_email_before_download"));
-        assertNull(response.optJSONObject("retention_period"));
-    }
-
-    @Test
-    public void testPrepareUploadWithEmailConfirmationAndRetentionPeriodString() throws NotificationClientException {
-        byte[] documentContent = "this is a document to test with".getBytes();
-
-        JSONObject response = NotificationClient.prepareUpload(
-                documentContent,
-                "report.csv",
-                true,
-                "1 weeks");
-
-        assertEquals("dGhpcyBpcyBhIGRvY3VtZW50IHRvIHRlc3Qgd2l0aA==", response.getString("file"));
-        assertEquals("report.csv", response.getString("filename"));
-        assertTrue(response.getBoolean("confirm_email_before_download"));
-        assertEquals("1 weeks", response.getString("retention_period"));
-    }
-
-    @Test
-    public void testPrepareUploadWithFilenameAndEmailConfirmationAndRetentionPeriodDuration() throws NotificationClientException {
-        byte[] documentContent = "this is a document to test with".getBytes();
-
-        JSONObject response = NotificationClient.prepareUpload(
-                documentContent,
-                "report.csv",
-                true,
-                new RetentionPeriodDuration(1, ChronoUnit.WEEKS));
-
-        assertEquals("dGhpcyBpcyBhIGRvY3VtZW50IHRvIHRlc3Qgd2l0aA==", response.getString("file"));
-        assertEquals("report.csv", response.getString("filename"));
-        assertTrue(response.getBoolean("confirm_email_before_download"));
-        assertEquals("1 weeks", response.getString("retention_period"));
-    }
-
-    @Test
-    public void testPrepareUploadWithEmailConfirmationAndRetentionPeriodDuration() throws NotificationClientException {
-        byte[] documentContent = "this is a document to test with".getBytes();
-
-        JSONObject response = NotificationClient.prepareUpload(
-                documentContent,
-                true,
-                new RetentionPeriodDuration(1, ChronoUnit.WEEKS));
-
-        assertEquals("dGhpcyBpcyBhIGRvY3VtZW50IHRvIHRlc3Qgd2l0aA==", response.getString("file"));
-        assertNull(response.optJSONObject("filename"));
-        assertTrue(response.getBoolean("confirm_email_before_download"));
-        assertEquals("1 weeks", response.getString("retention_period"));
-    }
-
-    @Test
-    public void testPrepareUploadThrowsExceptionWhenExceeds2MB() {
-        char[] data = new char[(2 * 1024 * 1024) + 50];
-        byte[] documentContents = new String(data).getBytes();
-
-        NotificationClientException e = assertThrows(NotificationClientException.class,
-                () -> NotificationClient.prepareUpload(documentContents));
-
-        assertEquals(e.getHttpResult(), 413);
-        assertEquals(e.getMessage(), "Status code: 413 File is larger than 2MB");
-    }
-
-    @Test
     public void testShouldThrowNotificationExceptionOnErrorResponseCodeAndNoErrorStream() {
         wireMockRule.stubFor(post("/v2/notifications/sms")
                 .willReturn(notFound()));
@@ -343,19 +257,18 @@ public class NotificationClientTest {
         UUID templateId = UUID.randomUUID();
         UUID emailReplyToId = UUID.randomUUID();
 
-        SendEmailResponse actual = client.sendEmail(templateId, "anEmailAddress", personalisation, "aReference", emailReplyToId);
+        NotifyEmailResponse actual = client.sendEmail(templateId, "anEmailAddress", personalisation, "aReference", emailReplyToId);
 
         assertEquals(expected.getNotificationId(), actual.getNotificationId());
-        assertEquals(expected.getReference(), actual.getReference().get());
-        assertEquals(expected.getContent().getBody(), actual.getBody());
-        assertEquals(expected.getContent().getSubject(), actual.getSubject());
-        assertEquals(expected.getContent().getFromEmail(), actual.getFromEmail().get());
-        // No notification uri in SendEmailResponse?
-//        assertEquals(expected.getUri(), actual.getUri());
-        assertEquals(expected.getTemplate().getId(), actual.getTemplateId());
-        assertEquals(expected.getTemplate().getVersion(), actual.getTemplateVersion());
-        assertEquals(expected.getTemplate().getUri().toString(), actual.getTemplateUri());
-        assertEquals(Optional.empty(), actual.getOneClickUnsubscribeURL());
+        assertEquals(expected.getReference(), actual.getReference());
+        assertEquals(expected.getContent().getBody(), actual.getContent().getBody());
+        assertEquals(expected.getContent().getSubject(), actual.getContent().getSubject());
+        assertEquals(expected.getContent().getFromEmail(), actual.getContent().getFromEmail());
+        assertEquals(expected.getUri(), actual.getUri());
+        assertEquals(expected.getTemplate().getId(), actual.getTemplate().getId());
+        assertEquals(expected.getTemplate().getVersion(), actual.getTemplate().getVersion());
+        assertEquals(expected.getTemplate().getUri(), actual.getTemplate().getUri());
+        assertNull(actual.getOneClickUnsubscribeURL());
 
         LoggedRequest request = validateRequest();
         NotifyEmailRequest requestReceivedByNotifyApi = objectMapper.readValue(request.getBodyAsString(), NotifyEmailRequest.class);
@@ -381,19 +294,18 @@ public class NotificationClientTest {
         UUID templateId = UUID.randomUUID();
         UUID emailReplyToId = UUID.randomUUID();
 
-        SendEmailResponse actual = client.sendEmail(templateId, "anEmailAddress", personalisation, "aReference", emailReplyToId, oneClickUnsubscribeURL);
+        NotifyEmailResponse actual = client.sendEmail(templateId, "anEmailAddress", personalisation, "aReference", emailReplyToId, oneClickUnsubscribeURL);
 
         assertEquals(expected.getNotificationId(), actual.getNotificationId());
-        assertEquals(expected.getReference(), actual.getReference().get());
-        assertEquals(expected.getContent().getBody(), actual.getBody());
-        assertEquals(expected.getContent().getSubject(), actual.getSubject());
-        assertEquals(expected.getContent().getFromEmail(), actual.getFromEmail().get());
-        // No notification uri in SendEmailResponse?
-//        assertEquals(expected.getUri(), actual.getUri());
-        assertEquals(expected.getTemplate().getId(), actual.getTemplateId());
-        assertEquals(expected.getTemplate().getVersion(), actual.getTemplateVersion());
-        assertEquals(expected.getTemplate().getUri().toString(), actual.getTemplateUri());
-        assertEquals(expected.getOneClickUnsubscribeURL(), actual.getOneClickUnsubscribeURL().get());
+        assertEquals(expected.getReference(), actual.getReference());
+        assertEquals(expected.getContent().getBody(), actual.getContent().getBody());
+        assertEquals(expected.getContent().getSubject(), actual.getContent().getSubject());
+        assertEquals(expected.getContent().getFromEmail(), actual.getContent().getFromEmail());
+        assertEquals(expected.getUri(), actual.getUri());
+        assertEquals(expected.getTemplate().getId(), actual.getTemplate().getId());
+        assertEquals(expected.getTemplate().getVersion(), actual.getTemplate().getVersion());
+        assertEquals(expected.getTemplate().getUri(), actual.getTemplate().getUri());
+        assertEquals(expected.getOneClickUnsubscribeURL(), actual.getOneClickUnsubscribeURL());
 
         LoggedRequest request = validateRequest();
         NotifyEmailRequest requestReceivedByNotifyApi = objectMapper.readValue(request.getBodyAsString(), NotifyEmailRequest.class);
@@ -435,17 +347,16 @@ public class NotificationClientTest {
         UUID templateId = UUID.randomUUID();
         UUID smsSenderId = UUID.randomUUID();
 
-        SendSmsResponse actual = client.sendSms(templateId, "a phone number", personalisation, "aReference", smsSenderId);
+        NotifySmsResponse actual = client.sendSms(templateId, "a phone number", personalisation, "aReference", smsSenderId);
 
         assertEquals(expected.getNotificationId(), actual.getNotificationId());
-        assertEquals(expected.getReference(), actual.getReference().get());
-        assertEquals(expected.getContent().getBody(), actual.getBody());
-        assertEquals(expected.getContent().getFromNumber(), actual.getFromNumber().get());
-        // No notification uri in SendSmsResponse?
-//        assertEquals(expected.getUri(), actual.getUri());
-        assertEquals(expected.getTemplate().getId(), actual.getTemplateId());
-        assertEquals(expected.getTemplate().getVersion(), actual.getTemplateVersion());
-        assertEquals(expected.getTemplate().getUri().toString(), actual.getTemplateUri());
+        assertEquals(expected.getReference(), actual.getReference());
+        assertEquals(expected.getContent().getBody(), actual.getContent().getBody());
+        assertEquals(expected.getContent().getFromNumber(), actual.getContent().getFromNumber());
+        assertEquals(expected.getUri(), actual.getUri());
+        assertEquals(expected.getTemplate().getId(), actual.getTemplate().getId());
+        assertEquals(expected.getTemplate().getVersion(), actual.getTemplate().getVersion());
+        assertEquals(expected.getTemplate().getUri(), actual.getTemplate().getUri());
 
         LoggedRequest request = validateRequest();
         NotifySmsRequest requestReceivedByNotifyApi = objectMapper.readValue(request.getBodyAsString(), NotifySmsRequest.class);
@@ -491,19 +402,17 @@ public class NotificationClientTest {
         personalisation.put("address_line_3", "a3");
         UUID templateId = UUID.randomUUID();
 
-        SendLetterResponse actual = client.sendLetter(templateId, personalisation, "aReference");
+        NotifyLetterResponse actual = client.sendLetter(templateId, personalisation, "aReference");
 
         assertEquals(expected.getNotificationId(), actual.getNotificationId());
-        assertEquals(expected.getReference(), actual.getReference().get());
-        assertEquals(expected.getContent().getBody(), actual.getBody());
-        assertEquals(expected.getContent().getSubject(), actual.getSubject());
-        // No notification uri in SendLetterResponse?
-//        assertEquals(expected.getUri(), actual.getUri());
-        assertEquals(expected.getTemplate().getId(), actual.getTemplateId());
-        assertEquals(expected.getTemplate().getVersion(), actual.getTemplateVersion());
-        assertEquals(expected.getTemplate().getUri().toString(), actual.getTemplateUri());
-        // no scheduled for in SendLetterResponse?
-//        assertEquals(expected.getScheduledFor(), actual.getScheduledFor());
+        assertEquals(expected.getReference(), actual.getReference());
+        assertEquals(expected.getContent().getBody(), actual.getContent().getBody());
+        assertEquals(expected.getContent().getSubject(), actual.getContent().getSubject());
+        assertEquals(expected.getUri(), actual.getUri());
+        assertEquals(expected.getTemplate().getId(), actual.getTemplate().getId());
+        assertEquals(expected.getTemplate().getVersion(), actual.getTemplate().getVersion());
+        assertEquals(expected.getTemplate().getUri(), actual.getTemplate().getUri());
+        assertEquals(expected.getScheduledFor(), actual.getScheduledFor());
 
         LoggedRequest request = validateRequest();
         NotifyLetterRequest requestReceivedByNotifyApi = objectMapper.readValue(request.getBodyAsString(), NotifyLetterRequest.class);
@@ -521,22 +430,22 @@ public class NotificationClientTest {
                         .withResponseBody(new Body(objectMapper.writeValueAsString(expected)))));
         NotificationClient client = new NotificationClient(COMBINED_API_KEY, BASE_URL);
 
-        Notification actual = client.getNotificationById(notificationId);
+        NotifyNotification actual = client.getNotificationById(notificationId);
 
         assertEquals(NotifyNotificationSms.class, expected.getClass());
         assertEquals(expected.getId(), actual.getId());
-        assertEquals(expected.getReference(), actual.getReference().get());
-        assertEquals(((NotifyNotificationSms)expected).getPhoneNumber(), actual.getPhoneNumber().get());
-        assertEquals(expected.getType(), actual.getNotificationType());
-        assertEquals(((NotifyNotificationSms)expected).getStatus().getStatus(), actual.getStatus());
-        assertEquals(expected.getTemplate().getId(), actual.getTemplateId());
-        assertEquals(expected.getTemplate().getVersion(), actual.getTemplateVersion());
-        assertEquals(expected.getTemplate().getUri().toString(), actual.getTemplateUri());
+        assertEquals(expected.getReference(), actual.getReference());
+        assertEquals(((NotifyNotificationSms)expected).getPhoneNumber(), ((NotifyNotificationSms)actual).getPhoneNumber());
+        assertEquals(expected.getType(), actual.getType());
+        assertEquals(((NotifyNotificationSms)expected).getStatus(), ((NotifyNotificationSms)actual).getStatus());
+        assertEquals(expected.getTemplate().getId(), actual.getTemplate().getId());
+        assertEquals(expected.getTemplate().getVersion(), actual.getTemplate().getVersion());
+        assertEquals(expected.getTemplate().getUri(), actual.getTemplate().getUri());
         assertEquals(expected.getBody(), actual.getBody());
         assertTrue(expected.getCreatedAt().isEqual(actual.getCreatedAt()));
-        assertEquals(expected.getCreatedByName(), actual.getCreatedByName().get());
-        assertTrue(expected.getSentAt().isEqual(actual.getSentAt().get()));
-        assertTrue(expected.getCompletedAt().isEqual(actual.getCompletedAt().get()));
+        assertEquals(expected.getCreatedByName(), actual.getCreatedByName());
+        assertEquals(expected.getSentAt(), actual.getSentAt());
+        assertEquals(expected.getCompletedAt(), actual.getCompletedAt());
 
         validateRequest();
     }
@@ -553,15 +462,15 @@ public class NotificationClientTest {
         NotificationClient client = new NotificationClient(COMBINED_API_KEY, BASE_URL);
         UUID olderThanId = UUID.randomUUID();
 
-        NotificationList actual = client.getNotifications("a stat", NotificationType.sms, "a ref", olderThanId);
+        NotifyNotificationListResponse actual = client.getNotifications("a stat", NotificationType.sms, "a ref", olderThanId);
 
         assertEquals(3, actual.getNotifications().size());
-        assertEquals(expected.getLinks().getCurrent().toString(), actual.getCurrentPageLink());
-        assertEquals(expected.getLinks().getNext().toString(), actual.getNextPageLink().get());
+        assertEquals(expected.getLinks().getCurrent(), actual.getLinks().getCurrent());
+        assertEquals(expected.getLinks().getNext(), actual.getLinks().getNext());
 
-        Notification actualNotificationSms = getNotificationOfType(actual, NotificationType.sms);
-        Notification actualNotificationLetter = getNotificationOfType(actual, NotificationType.letter);
-        Notification actualNotificationEmail = getNotificationOfType(actual, NotificationType.email);
+        NotifyNotificationSms actualNotificationSms = (NotifyNotificationSms)getNotificationOfType(actual, NotificationType.sms);
+        NotifyNotificationLetter actualNotificationLetter = (NotifyNotificationLetter)getNotificationOfType(actual, NotificationType.letter);
+        NotifyNotificationEmail actualNotificationEmail = (NotifyNotificationEmail)getNotificationOfType(actual, NotificationType.email);
 
         // check all the base details match
         checkBaseNotificationDetails(expectedNotificationSms, actualNotificationSms);
@@ -569,24 +478,23 @@ public class NotificationClientTest {
         checkBaseNotificationDetails(expectedNotificationEmail, actualNotificationEmail);
 
         // email specific items
-        assertEquals(expectedNotificationEmail.getSubject(), actualNotificationEmail.getSubject().get());
-        assertEquals(expectedNotificationEmail.getEmailAddress(), actualNotificationEmail.getEmailAddress().get());
-        assertEquals(expectedNotificationEmail.getStatus().getStatus(), actualNotificationEmail.getStatus());
+        assertEquals(expectedNotificationEmail.getSubject(), actualNotificationEmail.getSubject());
+        assertEquals(expectedNotificationEmail.getEmailAddress(), actualNotificationEmail.getEmailAddress());
+        assertEquals(expectedNotificationEmail.getStatus(), actualNotificationEmail.getStatus());
 
         // phone specific items
-        assertEquals(expectedNotificationSms.getPhoneNumber(), actualNotificationSms.getPhoneNumber().get());
-        assertEquals(expectedNotificationSms.getStatus().getStatus(), actualNotificationSms.getStatus());
+        assertEquals(expectedNotificationSms.getPhoneNumber(), actualNotificationSms.getPhoneNumber());
+        assertEquals(expectedNotificationSms.getStatus(), actualNotificationSms.getStatus());
 
         // letter specific items
-        assertEquals(expectedNotificationLetter.getLine1(), actualNotificationLetter.getLine1().get());
-        assertEquals(expectedNotificationLetter.getLine2(), actualNotificationLetter.getLine2().get());
-        assertEquals(expectedNotificationLetter.getLine3(), actualNotificationLetter.getLine3().get());
-        assertEquals(expectedNotificationLetter.getLine4(), actualNotificationLetter.getLine4().get());
-        assertEquals(expectedNotificationLetter.getLine5(), actualNotificationLetter.getLine5().get());
-        assertEquals(expectedNotificationLetter.getLine6(), actualNotificationLetter.getLine6().get());
-        // currently this client doesn't handle line 7
-//        assertEquals(expectedNotificationLetter.getLine7(), actualNotificationLetter.getLine7().get());
-        assertEquals(expectedNotificationLetter.getStatus().getStatus(), actualNotificationLetter.getStatus());
+        assertEquals(expectedNotificationLetter.getLine1(), actualNotificationLetter.getLine1());
+        assertEquals(expectedNotificationLetter.getLine2(), actualNotificationLetter.getLine2());
+        assertEquals(expectedNotificationLetter.getLine3(), actualNotificationLetter.getLine3());
+        assertEquals(expectedNotificationLetter.getLine4(), actualNotificationLetter.getLine4());
+        assertEquals(expectedNotificationLetter.getLine5(), actualNotificationLetter.getLine5());
+        assertEquals(expectedNotificationLetter.getLine6(), actualNotificationLetter.getLine6());
+        assertEquals(expectedNotificationLetter.getLine7(), actualNotificationLetter.getLine7());
+        assertEquals(expectedNotificationLetter.getStatus(), actualNotificationLetter.getStatus());
 
         LoggedRequest request = validateRequest();
         assertEquals("a stat", request.queryParameter("status").firstValue());
@@ -603,26 +511,18 @@ public class NotificationClientTest {
                 .get();
     }
 
-    private void checkBaseNotificationDetails(NotifyNotification expected, Notification actual) {
+    private void checkBaseNotificationDetails(NotifyNotification expected, NotifyNotification actual) {
         assertEquals(expected.getId(), actual.getId());
-        assertEquals(expected.getReference(), actual.getReference().get());
-        assertEquals(expected.getType(), actual.getNotificationType());
-        assertEquals(expected.getTemplate().getId(), actual.getTemplateId());
-        assertEquals(expected.getTemplate().getVersion(), actual.getTemplateVersion());
-        assertEquals(expected.getTemplate().getUri().toString(), actual.getTemplateUri());
+        assertEquals(expected.getReference(), actual.getReference());
+        assertEquals(expected.getType(), actual.getType());
+        assertEquals(expected.getTemplate().getId(), actual.getTemplate().getId());
+        assertEquals(expected.getTemplate().getVersion(), actual.getTemplate().getVersion());
+        assertEquals(expected.getTemplate().getUri(), actual.getTemplate().getUri());
         assertEquals(expected.getBody(), actual.getBody());
-        assertTrue(expected.getCreatedAt().isEqual(actual.getCreatedAt()));
-        assertEquals(expected.getCreatedByName(), actual.getCreatedByName().get());
-        assertTrue(expected.getSentAt().isEqual(actual.getSentAt().get()));
-        assertTrue(expected.getCompletedAt().isEqual(actual.getCompletedAt().get()));
-    }
-
-    private static Notification getNotificationOfType(NotificationList actual, NotificationType notificationType) {
-        return actual.getNotifications()
-                .stream()
-                .filter(n -> n.getNotificationType() == notificationType)
-                .findFirst()
-                .get();
+        assertEquals(expected.getCreatedAt(), actual.getCreatedAt());
+        assertEquals(expected.getCreatedByName(), actual.getCreatedByName());
+        assertEquals(expected.getSentAt(), actual.getSentAt());
+        assertEquals(expected.getCompletedAt(), actual.getCompletedAt());
     }
 
     @Test
@@ -650,11 +550,11 @@ public class NotificationClientTest {
         NotificationClient client = new NotificationClient(COMBINED_API_KEY, BASE_URL);
         final File pdfFile = new File(this.getClass().getClassLoader().getResource("small.pdf.txt").getFile());
 
-        LetterResponse actual = client.sendPrecompiledLetter(expected.getReference(), pdfFile, expected.getPostage());
+        NotifyPrecompiledLetterResponse actual = client.sendPrecompiledLetter(expected.getReference(), pdfFile, expected.getPostage());
 
-        assertEquals(expected.getId(), actual.getNotificationId());
-        assertEquals(expected.getReference(), actual.getReference().get());
-        assertEquals(expected.getPostage(), actual.getPostage().get());
+        assertEquals(expected.getId(), actual.getId());
+        assertEquals(expected.getReference(), actual.getReference());
+        assertEquals(expected.getPostage(), actual.getPostage());
 
         LoggedRequest request = validateRequest();
         NotifyPrecompiledLetterRequest requestReceivedByNotifyApi = objectMapper.readValue(request.getBodyAsString(), NotifyPrecompiledLetterRequest.class);
@@ -672,18 +572,17 @@ public class NotificationClientTest {
                         .withResponseBody(new Body(objectMapper.writeValueAsString(expected)))));
         NotificationClient client = new NotificationClient(COMBINED_API_KEY, BASE_URL);
 
-        Template actual = client.getTemplateById(templateId);
+        NotifyTemplateLetter actual = (NotifyTemplateLetter)client.getTemplateById(templateId);
 
         assertEquals(expected.getId(), actual.getId());
         assertEquals(expected.getName(), actual.getName());
-        assertEquals(expected.getType(), actual.getTemplateType());
-        assertTrue(expected.getCreatedAt().isEqual(actual.getCreatedAt()));
-        assertTrue(expected.getUpdatedAt().isEqual(actual.getUpdatedAt().get()));
+        assertEquals(expected.getType(), actual.getType());
+        assertEquals(expected.getCreatedAt(), actual.getCreatedAt());
+        assertEquals(expected.getUpdatedAt(), actual.getUpdatedAt());
         assertEquals(expected.getVersion(), actual.getVersion());
-        // actual created by is null
-//        assertEquals(expected.getCreatedBy(), actual.getCreatedBy());
+        assertEquals(expected.getCreatedBy(), actual.getCreatedBy());
         assertEquals(expected.getBody(), actual.getBody());
-        assertEquals(expected.getLetterContactBlock(), actual.getLetterContactBlock().get());
+        assertEquals(expected.getLetterContactBlock(), actual.getLetterContactBlock());
 
         validateRequest();
     }
@@ -698,18 +597,17 @@ public class NotificationClientTest {
                         .withResponseBody(new Body(objectMapper.writeValueAsString(expected)))));
         NotificationClient client = new NotificationClient(COMBINED_API_KEY, BASE_URL);
 
-        Template actual = client.getTemplateVersion(templateId, 100);
+        NotifyTemplateEmail actual = (NotifyTemplateEmail)client.getTemplateVersion(templateId, 100);
 
         assertEquals(expected.getId(), actual.getId());
         assertEquals(expected.getName(), actual.getName());
-        assertEquals(expected.getType(), actual.getTemplateType());
-        assertTrue(expected.getCreatedAt().isEqual(actual.getCreatedAt()));
-        assertTrue(expected.getUpdatedAt().isEqual(actual.getUpdatedAt().get()));
+        assertEquals(expected.getType(), actual.getType());
+        assertEquals(expected.getCreatedAt(), actual.getCreatedAt());
+        assertEquals(expected.getUpdatedAt(), actual.getUpdatedAt());
         assertEquals(expected.getVersion(), actual.getVersion());
-        // actual created by is null
-//        assertEquals(expected.getCreatedBy(), actual.getCreatedBy());
+        assertEquals(expected.getCreatedBy(), actual.getCreatedBy());
         assertEquals(expected.getBody(), actual.getBody());
-        assertEquals(expected.getSubject(), actual.getSubject().get());
+        assertEquals(expected.getSubject(), actual.getSubject());
 
         validateRequest();
     }
@@ -723,21 +621,19 @@ public class NotificationClientTest {
                         .withResponseBody(new Body(objectMapper.writeValueAsString(expected)))));
         NotificationClient client = new NotificationClient(COMBINED_API_KEY, BASE_URL);
 
-        // we ask for the "foo" templates because as far as the client is concerned the string doesn't matter
-        TemplateList actual = client.getAllTemplates(NotificationType.email);
+        NotifyTemplateListResponse actual = client.getAllTemplates(NotificationType.email);
 
         assertEquals(1, actual.getTemplates().size());
 
         assertEquals(expected.getTemplates().get(0).getId(), actual.getTemplates().get(0).getId());
         assertEquals(expected.getTemplates().get(0).getName(), actual.getTemplates().get(0).getName());
-        assertEquals(expected.getTemplates().get(0).getType(), actual.getTemplates().get(0).getTemplateType());
-        assertTrue(expected.getTemplates().get(0).getCreatedAt().isEqual(actual.getTemplates().get(0).getCreatedAt()));
-        assertTrue(expected.getTemplates().get(0).getUpdatedAt().isEqual(actual.getTemplates().get(0).getUpdatedAt().get()));
+        assertEquals(expected.getTemplates().get(0).getType(), actual.getTemplates().get(0).getType());
+        assertEquals(expected.getTemplates().get(0).getCreatedAt(), actual.getTemplates().get(0).getCreatedAt());
+        assertEquals(expected.getTemplates().get(0).getUpdatedAt(), actual.getTemplates().get(0).getUpdatedAt());
         assertEquals(expected.getTemplates().get(0).getVersion(), actual.getTemplates().get(0).getVersion());
-        // actual created by is null
-//        assertEquals(expected.getTemplates().get(0).getCreatedBy(), actual.getTemplates().get(0).getCreatedBy());
+        assertEquals(expected.getTemplates().get(0).getCreatedBy(), actual.getTemplates().get(0).getCreatedBy());
         assertEquals(expected.getTemplates().get(0).getBody(), actual.getTemplates().get(0).getBody());
-        assertEquals(((NotifyTemplateEmail)expected.getTemplates().get(0)).getSubject(), actual.getTemplates().get(0).getSubject().get());
+        assertEquals(((NotifyTemplateEmail)expected.getTemplates().get(0)).getSubject(), ((NotifyTemplateEmail)actual.getTemplates().get(0)).getSubject());
 
         LoggedRequest request = validateRequest();
         assertEquals(NotificationType.email.name(), request.queryParameter("type").firstValue());
@@ -755,13 +651,13 @@ public class NotificationClientTest {
                         .withResponseBody(new Body(objectMapper.writeValueAsString(expected)))));
         NotificationClient client = new NotificationClient(COMBINED_API_KEY, BASE_URL);
 
-        TemplatePreview actual = client.generateTemplatePreview(templateId, personalisation);
+        NotifyTemplatePreviewResponse actual = client.generateTemplatePreview(templateId, personalisation);
 
         assertEquals(expected.getId(), actual.getId());
-        assertEquals(expected.getType(), actual.getTemplateType());
+        assertEquals(expected.getType(), actual.getType());
         assertEquals(expected.getVersion(), actual.getVersion());
         assertEquals(expected.getBody(), actual.getBody());
-        assertEquals(expected.getSubject(), actual.getSubject().get());
+        assertEquals(expected.getSubject(), actual.getSubject());
 
         LoggedRequest request = validateRequest();
         NotifyTemplatePreviewRequest requestReceivedByNotifyApi = objectMapper.readValue(request.getBodyAsString(), NotifyTemplatePreviewRequest.class);
@@ -777,18 +673,17 @@ public class NotificationClientTest {
         NotificationClient client = new NotificationClient(COMBINED_API_KEY, BASE_URL);
         UUID olderThanId = UUID.randomUUID();
 
-        ReceivedTextMessageList actual = client.getReceivedTextMessages(olderThanId);
+        NotifyReceivedTextMessagesResponse actual = client.getReceivedTextMessages(olderThanId);
 
         assertEquals(expected.getReceivedTextMessages().size(), actual.getReceivedTextMessages().size());
         assertEquals(expected.getReceivedTextMessages().get(0).getId(), actual.getReceivedTextMessages().get(0).getId());
-        assertTrue(expected.getReceivedTextMessages().get(0).getCreatedAt().isEqual(actual.getReceivedTextMessages().get(0).getCreatedAt()));
-        // api docs say service_id is a string and doesn't specify that it's a UUID (however current API here in main specifies that)
+        assertEquals(expected.getReceivedTextMessages().get(0).getCreatedAt(), actual.getReceivedTextMessages().get(0).getCreatedAt());
         assertEquals(expected.getReceivedTextMessages().get(0).getServiceId(), actual.getReceivedTextMessages().get(0).getServiceId());
         assertEquals(expected.getReceivedTextMessages().get(0).getNotifyNumber(), actual.getReceivedTextMessages().get(0).getNotifyNumber());
         assertEquals(expected.getReceivedTextMessages().get(0).getUserNumber(), actual.getReceivedTextMessages().get(0).getUserNumber());
         assertEquals(expected.getReceivedTextMessages().get(0).getContent(), actual.getReceivedTextMessages().get(0).getContent());
-        assertEquals(expected.getLinks().getCurrent().toString(), actual.getCurrentPageLink());
-        assertEquals(expected.getLinks().getNext().toString(), actual.getNextPageLink().get());
+        assertEquals(expected.getLinks().getCurrent(), actual.getLinks().getCurrent());
+        assertEquals(expected.getLinks().getNext(), actual.getLinks().getNext());
 
         LoggedRequest request = validateRequest();
         assertEquals(olderThanId.toString(), request.queryParameter("older_than").firstValue());

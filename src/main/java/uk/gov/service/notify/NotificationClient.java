@@ -1,11 +1,25 @@
 package uk.gov.service.notify;
 
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Base64InputStream;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.client.utils.URIBuilder;
-import org.json.JSONObject;
+import uk.gov.service.notify.domain.NotificationType;
+import uk.gov.service.notify.domain.NotifyEmailRequest;
+import uk.gov.service.notify.domain.NotifyEmailResponse;
+import uk.gov.service.notify.domain.NotifyLetterRequest;
+import uk.gov.service.notify.domain.NotifyLetterResponse;
+import uk.gov.service.notify.domain.NotifyNotification;
+import uk.gov.service.notify.domain.NotifyNotificationListResponse;
+import uk.gov.service.notify.domain.NotifyPrecompiledLetterRequest;
+import uk.gov.service.notify.domain.NotifyPrecompiledLetterResponse;
+import uk.gov.service.notify.domain.NotifyReceivedTextMessagesResponse;
+import uk.gov.service.notify.domain.NotifySmsRequest;
+import uk.gov.service.notify.domain.NotifySmsResponse;
+import uk.gov.service.notify.domain.NotifyTemplate;
+import uk.gov.service.notify.domain.NotifyTemplateListResponse;
+import uk.gov.service.notify.domain.NotifyTemplatePreviewRequest;
+import uk.gov.service.notify.domain.NotifyTemplatePreviewResponse;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
@@ -41,6 +55,7 @@ public class NotificationClient implements NotificationClientApi {
 
     /**
      * This client constructor given the api key.
+     *
      * @param apiKey Generate an API key by signing in to GOV.UK Notify, https://www.notifications.service.gov.uk, and going to the **API integration** page
      */
     public NotificationClient(final String apiKey) {
@@ -53,8 +68,9 @@ public class NotificationClient implements NotificationClientApi {
 
     /**
      * Use this client constructor if you require a proxy for https requests.
+     *
      * @param apiKey Generate an API key by signing in to GOV.UK Notify, https://www.notifications.service.gov.uk, and going to the **API integration** page
-     * @param proxy Proxy used on the http requests
+     * @param proxy  Proxy used on the http requests
      */
     public NotificationClient(final String apiKey, final Proxy proxy) {
         this(
@@ -66,7 +82,8 @@ public class NotificationClient implements NotificationClientApi {
 
     /**
      * This client constructor is used for testing on other environments, used by the GOV.UK Notify team.
-     * @param apiKey Generate an API key by signing in to GOV.UK Notify, https://www.notifications.service.gov.uk, and going to the **API integration** page
+     *
+     * @param apiKey  Generate an API key by signing in to GOV.UK Notify, https://www.notifications.service.gov.uk, and going to the **API integration** page
      * @param baseUrl base URL, defaults to https://api.notifications.service.gov.uk
      */
     public NotificationClient(final String apiKey, final String baseUrl) {
@@ -79,10 +96,9 @@ public class NotificationClient implements NotificationClientApi {
 
 
     /**
-     *
-     * @param apiKey Generate an API key by signing in to GOV.UK Notify, https://www.notifications.service.gov.uk, and going to the **API integration** page
+     * @param apiKey  Generate an API key by signing in to GOV.UK Notify, https://www.notifications.service.gov.uk, and going to the **API integration** page
      * @param baseUrl base URL, defaults to https://api.notifications.service.gov.uk
-     * @param proxy Proxy used on the http requests
+     * @param proxy   Proxy used on the http requests
      */
     public NotificationClient(final String apiKey, final String baseUrl, final Proxy proxy) {
         this(
@@ -101,13 +117,13 @@ public class NotificationClient implements NotificationClientApi {
     public NotificationClient(final String apiKey,
                               final String baseUrl,
                               final Proxy proxy,
-                              final SSLContext sslContext){
+                              final SSLContext sslContext) {
 
         this.apiKey = NotifyUtils.extractApiKey(apiKey);
         this.serviceId = NotifyUtils.extractServiceId(apiKey);
         this.baseUrl = baseUrl;
         this.proxy = proxy;
-        if (sslContext != null){
+        if (sslContext != null) {
             setCustomSSLContext(sslContext);
         }
         this.version = NotifyUtils.getVersion();
@@ -135,102 +151,70 @@ public class NotificationClient implements NotificationClientApi {
     }
 
     @Override
-    public SendEmailResponse sendEmail(UUID templateId,
-                                       String emailAddress,
-                                       Map<String, ?> personalisation,
-                                       String reference) throws NotificationClientException {
+    public NotifyEmailResponse sendEmail(UUID templateId,
+                                         String emailAddress,
+                                         Map<String, ?> personalisation,
+                                         String reference) throws NotificationClientException {
         return sendEmail(templateId, emailAddress, personalisation, reference, null, null);
     }
 
     @Override
-    public SendEmailResponse sendEmail(UUID templateId,
-                                       String emailAddress,
-                                       Map<String, ?> personalisation,
-                                       String reference,
-                                       UUID emailReplyToId) throws NotificationClientException {
+    public NotifyEmailResponse sendEmail(UUID templateId,
+                                         String emailAddress,
+                                         Map<String, ?> personalisation,
+                                         String reference,
+                                         UUID emailReplyToId) throws NotificationClientException {
         return sendEmail(templateId, emailAddress, personalisation, reference, emailReplyToId, null);
     }
 
     @Override
-    public SendEmailResponse sendEmail(UUID templateId,
-                                       String emailAddress,
-                                       Map<String, ?> personalisation,
-                                       String reference,
-                                       UUID emailReplyToId,
-                                       URI oneClickUnsubscribeURL) throws NotificationClientException {
+    public NotifyEmailResponse sendEmail(UUID templateId,
+                                         String emailAddress,
+                                         Map<String, ?> personalisation,
+                                         String reference,
+                                         UUID emailReplyToId,
+                                         URI oneClickUnsubscribeURL) throws NotificationClientException {
 
-        JSONObject body = createBodyForPostRequest(templateId,
-                null,
-                emailAddress,
-                personalisation,
-                reference,
-                null,
-                null);
+        NotifyEmailRequest requestBody = new NotifyEmailRequest(emailAddress, templateId, personalisation, reference, emailReplyToId, oneClickUnsubscribeURL);
 
-        if(emailReplyToId != null)
-        {
-            body.put("email_reply_to_id", emailReplyToId);
-        }
-
-        if(oneClickUnsubscribeURL != null)
-        {
-            body.put("one_click_unsubscribe_url", oneClickUnsubscribeURL);
-        }
-
-        String response = notifyHttpClient.post(URI.create(baseUrl + "/v2/notifications/email"), body, HTTP_CREATED);
-
-        return new SendEmailResponse(response);
+        return notifyHttpClient.post(URI.create(baseUrl + "/v2/notifications/email"), requestBody, NotifyEmailResponse.class, HTTP_CREATED);
     }
 
     @Override
-    public SendSmsResponse sendSms(UUID templateId, String phoneNumber, Map<String, ?> personalisation, String reference) throws NotificationClientException {
+    public NotifySmsResponse sendSms(UUID templateId, String phoneNumber, Map<String, ?> personalisation, String reference) throws NotificationClientException {
         return sendSms(templateId, phoneNumber, personalisation, reference, null);
     }
 
     @Override
-    public SendSmsResponse sendSms(UUID templateId,
-                                   String phoneNumber,
-                                   Map<String, ?> personalisation,
-                                   String reference,
-                                   UUID smsSenderId) throws NotificationClientException {
+    public NotifySmsResponse sendSms(UUID templateId,
+                                     String phoneNumber,
+                                     Map<String, ?> personalisation,
+                                     String reference,
+                                     UUID smsSenderId) throws NotificationClientException {
 
-        JSONObject body = createBodyForPostRequest(templateId,
-                phoneNumber,
-                null,
-                personalisation,
-                reference,
-                null,
-                null);
+        NotifySmsRequest requestBody = new NotifySmsRequest(phoneNumber, templateId, personalisation, reference, smsSenderId);
 
-        if( smsSenderId != null){
-            body.put("sms_sender_id", smsSenderId);
-        }
-
-        String response = notifyHttpClient.post(URI.create(baseUrl + "/v2/notifications/sms"), body, HTTP_CREATED);
-
-        return new SendSmsResponse(response);
+        return notifyHttpClient.post(URI.create(baseUrl + "/v2/notifications/sms"), requestBody, NotifySmsResponse.class, HTTP_CREATED);
     }
 
     @Override
-    public SendLetterResponse sendLetter(UUID templateId, Map<String, ?> personalisation, String reference) throws NotificationClientException {
-        JSONObject body = createBodyForPostRequest(templateId, null, null, personalisation, reference, null, null);
-        String response = notifyHttpClient.post(URI.create(baseUrl + "/v2/notifications/letter"), body, HTTP_CREATED);
-        return new SendLetterResponse(response);
+    public NotifyLetterResponse sendLetter(UUID templateId, Map<String, ?> personalisation, String reference) throws NotificationClientException {
+        NotifyLetterRequest requestBody = new NotifyLetterRequest(templateId, personalisation, reference);
+        return notifyHttpClient.post(URI.create(baseUrl + "/v2/notifications/letter"), requestBody, NotifyLetterResponse.class, HTTP_CREATED);
     }
 
     @Override
-    public Notification getNotificationById(UUID notificationId) throws NotificationClientException {
-        String response = notifyHttpClient.getAsString(URI.create(baseUrl + "/v2/notifications/" + notificationId));
-        return new Notification(response);
+    public NotifyNotification getNotificationById(UUID notificationId) throws NotificationClientException {
+        return notifyHttpClient.get(URI.create(baseUrl + "/v2/notifications/" + notificationId), NotifyNotification.class);
     }
 
     @Override
     public byte[] getPdfForLetter(UUID notificationId) throws NotificationClientException {
-        return notifyHttpClient.getAsByteArray(URI.create(baseUrl + "/v2/notifications/" + notificationId + "/pdf"));
+        return notifyHttpClient.get(URI.create(baseUrl + "/v2/notifications/" + notificationId + "/pdf"));
     }
 
     @Override
-    public NotificationList getNotifications(String status, NotificationType notificationType, String reference, UUID olderThanId) throws NotificationClientException {
+    public NotifyNotificationListResponse getNotifications(String status, NotificationType notificationType, String reference, UUID olderThanId) throws NotificationClientException {
         try {
             URIBuilder builder = new URIBuilder(baseUrl + "/v2/notifications");
             addQueryParamToURIBuilder("status", status, builder);
@@ -238,8 +222,7 @@ public class NotificationClient implements NotificationClientApi {
             addQueryParamToURIBuilder("reference", reference, builder);
             addQueryParamToURIBuilder("older_than", olderThanId, builder);
 
-            String response = notifyHttpClient.getAsString(builder.build());
-            return new NotificationList(response);
+            return notifyHttpClient.get(builder.build(), NotifyNotificationListResponse.class);
         } catch (URISyntaxException e) {
             LOGGER.log(Level.SEVERE, e.toString(), e);
             throw new NotificationClientException(e);
@@ -259,26 +242,23 @@ public class NotificationClient implements NotificationClientApi {
     }
 
     @Override
-    public Template getTemplateById(UUID templateId) throws NotificationClientException{
+    public NotifyTemplate getTemplateById(UUID templateId) throws NotificationClientException {
         URI uri = URI.create(baseUrl + "/v2/template/" + templateId);
-        String response = notifyHttpClient.getAsString(uri);
-        return new Template(response);
+        return notifyHttpClient.get(uri, NotifyTemplate.class);
     }
 
     @Override
-    public Template getTemplateVersion(UUID templateId, int version) throws NotificationClientException{
+    public NotifyTemplate getTemplateVersion(UUID templateId, int version) throws NotificationClientException {
         URI uri = URI.create(baseUrl + "/v2/template/" + templateId + "/version/" + version);
-        String response = notifyHttpClient.getAsString(uri);
-        return new Template(response);
+        return notifyHttpClient.get(uri, NotifyTemplate.class);
     }
 
     @Override
-    public TemplateList getAllTemplates(NotificationType templateType) throws NotificationClientException{
-        try{
+    public NotifyTemplateListResponse getAllTemplates(NotificationType templateType) throws NotificationClientException {
+        try {
             URIBuilder builder = new URIBuilder(baseUrl + "/v2/templates");
             addQueryParamToURIBuilder("type", templateType, builder);
-            String response = notifyHttpClient.getAsString(builder.build());
-            return new TemplateList(response);
+            return notifyHttpClient.get(builder.build(), NotifyTemplateListResponse.class);
         } catch (URISyntaxException e) {
             LOGGER.log(Level.SEVERE, e.toString(), e);
             throw new NotificationClientException(e);
@@ -286,188 +266,21 @@ public class NotificationClient implements NotificationClientApi {
     }
 
     @Override
-    public TemplatePreview generateTemplatePreview(UUID templateId, Map<String, Object> personalisation) throws NotificationClientException {
-        JSONObject body = new JSONObject();
-        if (personalisation != null && !personalisation.isEmpty()) {
-            body.put("personalisation", new JSONObject(personalisation));
-        }
-        String response = notifyHttpClient.post(URI.create(baseUrl + "/v2/template/" + templateId + "/preview"), body, HTTP_OK);
-        return new TemplatePreview(response);
+    public NotifyTemplatePreviewResponse generateTemplatePreview(UUID templateId, Map<String, Object> personalisation) throws NotificationClientException {
+        NotifyTemplatePreviewRequest requestBody = new NotifyTemplatePreviewRequest(personalisation);
+        return notifyHttpClient.post(URI.create(baseUrl + "/v2/template/" + templateId + "/preview"), requestBody, NotifyTemplatePreviewResponse.class, HTTP_OK);
     }
 
     @Override
-    public ReceivedTextMessageList getReceivedTextMessages(UUID olderThanId) throws NotificationClientException {
+    public NotifyReceivedTextMessagesResponse getReceivedTextMessages(UUID olderThanId) throws NotificationClientException {
         try {
             URIBuilder builder = new URIBuilder(baseUrl + "/v2/received-text-messages");
             addQueryParamToURIBuilder("older_than", olderThanId, builder);
-            String response = notifyHttpClient.getAsString(builder.build());
-            return new ReceivedTextMessageList(response);
-        } catch (URISyntaxException e){
+            return notifyHttpClient.get(builder.build(), NotifyReceivedTextMessagesResponse.class);
+        } catch (URISyntaxException e) {
             LOGGER.log(Level.SEVERE, e.toString(), e);
             throw new NotificationClientException(e);
         }
-    }
-
-    /**
-     * Use the prepareUpload method when uploading a document via sendEmail.
-     * The prepareUpload method creates a <code>JSONObject</code> which will need to
-     * be added to the personalisation map.
-     *
-     * @param documentContents           byte[] of the document
-     * @param filename                   a string setting the filename of the
-     *                                   document upon download
-     * @param confirmEmailBeforeDownload boolean True to require the user to enter
-     *                                   their email address before accessing the
-     *                                   file
-     * @param retentionPeriod            a string '[1-78] weeks' to change how long
-     *                                   the document should be available to the
-     *                                   user
-     * @return <code>JSONObject</code> a json object to be added to the
-     *         personalisation is returned
-     */
-    public static JSONObject prepareUpload(final byte[] documentContents,
-                                           String filename,
-                                           boolean confirmEmailBeforeDownload,
-                                           String retentionPeriod) throws NotificationClientException {
-        return internalPrepareUpload(documentContents, filename, confirmEmailBeforeDownload, retentionPeriod);
-    }
-
-    private static JSONObject internalPrepareUpload(final byte[] documentContents,
-                                                    String filename,
-                                                    Boolean confirmEmailBeforeDownload,
-                                                    String retentionPeriod) throws NotificationClientException {
-        if (documentContents.length > 2 * 1024 * 1024) {
-            throw new NotificationClientException(413, "File is larger than 2MB");
-        }
-        byte[] fileContentAsByte = Base64.encodeBase64(documentContents);
-        String fileContent = new String(fileContentAsByte, ISO_8859_1);
-
-        Object filenameValue = Objects.nonNull(filename) ? filename : JSONObject.NULL;
-        Object confirmEmailBeforeDownloadValue = Objects.nonNull(confirmEmailBeforeDownload) ? confirmEmailBeforeDownload : JSONObject.NULL;
-        Object retentionPeriodValue = Objects.nonNull(retentionPeriod) ? retentionPeriod : JSONObject.NULL;
-
-        JSONObject jsonFileObject = new JSONObject();
-        jsonFileObject.put("file", fileContent);
-        jsonFileObject.put("filename", filenameValue);
-        jsonFileObject.put("confirm_email_before_download", confirmEmailBeforeDownloadValue);
-        jsonFileObject.put("retention_period", retentionPeriodValue);
-        return jsonFileObject;
-    }
-
-    /**
-     * Use the prepareUpload method when uploading a document via sendEmail.
-     * The prepareUpload method creates a <code>JSONObject</code> which will need to
-     * be added to the personalisation map.
-     *
-     * @param documentContents           byte[] of the document
-     * @param confirmEmailBeforeDownload boolean True to require the user to enter
-     *                                   their email address before accessing the
-     *                                   file
-     * @param retentionPeriod            a string '[1-78] weeks' to change how long
-     *                                   the document should be available to the
-     *                                   user
-     * @return <code>JSONObject</code> a json object to be added to the
-     *         personalisation is returned
-     */
-    public static JSONObject prepareUpload(final byte[] documentContents,
-                                           boolean confirmEmailBeforeDownload,
-                                           RetentionPeriodDuration retentionPeriod) throws NotificationClientException {
-        return internalPrepareUpload(documentContents, null, confirmEmailBeforeDownload, retentionPeriod.toString());
-    }
-
-    /**
-     * Use the prepareUpload method when uploading a document via sendEmail.
-     * The prepareUpload method creates a <code>JSONObject</code> which will need to
-     * be added to the personalisation map.
-     *
-     * @param documentContents byte[] of the document
-     * @param filename         a string setting the filename of the
-     *                         document upon download
-     * @return <code>JSONObject</code> a json object to be added to the
-     *         personalisation is returned
-     */
-    public static JSONObject prepareUpload(final byte[] documentContents,
-                                           String filename) throws NotificationClientException {
-        return internalPrepareUpload(documentContents, filename, null, null);
-    }
-
-    /**
-     * Use the prepareUpload method when uploading a document via sendEmail.
-     * The prepareUpload method creates a <code>JSONObject</code> which will need to
-     * be added to the personalisation map.
-     *
-     * @param documentContents byte[] of the document
-     * @return <code>JSONObject</code> a json object to be added to the personalisation is returned
-     */
-    public static JSONObject prepareUpload(final byte[] documentContents) throws NotificationClientException {
-        return internalPrepareUpload(documentContents, null, null, null);
-    }
-
-    /**
-     * Use the prepareUpload method when uploading a document via sendEmail.
-     * The prepareUpload method creates a <code>JSONObject</code> which will need to
-     * be added to the personalisation map.
-     *
-     * This version of the class overloads prepareUpload to allow for the use of the
-     * RetentionPeriodDuration class if
-     * desired.
-     *
-     * @see RetentionPeriodDuration
-     *
-     * @param documentContents           byte[] of the document
-     * @param filename                   a string setting the filename of the
-     *                                   document upon download
-     * @param confirmEmailBeforeDownload boolean True to require the user to enter
-     *                                   their email address before accessing the
-     *                                   file
-     * @param retentionPeriod            a RetentionPeriodDuration that defines how
-     *                                   long a file is held for
-     * @return <code>JSONObject</code> a json object to be added to the
-     *         personalisation is returned
-     */
-    public static JSONObject prepareUpload(final byte[] documentContents,
-                                           String filename,
-                                           boolean confirmEmailBeforeDownload,
-                                           RetentionPeriodDuration retentionPeriod) throws NotificationClientException {
-        return internalPrepareUpload(documentContents, filename, confirmEmailBeforeDownload, retentionPeriod.toString());
-    }
-
-    private JSONObject createBodyForPostRequest(final UUID templateId,
-                                                final String phoneNumber,
-                                                final String emailAddress,
-                                                final Map<String, ?> personalisation,
-                                                final String reference,
-                                                final String encodedFileData,
-                                                final String postage) {
-        JSONObject body = new JSONObject();
-
-        if(phoneNumber != null && !phoneNumber.isEmpty()) {
-            body.put("phone_number", phoneNumber);
-        }
-
-        if(emailAddress != null && !emailAddress.isEmpty()) {
-            body.put("email_address", emailAddress);
-        }
-
-        if(templateId != null) {
-            body.put("template_id", templateId);
-        }
-
-        if (personalisation != null && !personalisation.isEmpty()) {
-            body.put("personalisation", personalisation);
-        }
-
-        if(reference != null && !reference.isEmpty()){
-            body.put("reference", reference);
-        }
-
-        if(encodedFileData != null && !encodedFileData.isEmpty()) {
-            body.put("content", encodedFileData);
-        }
-        if(postage != null && !postage.isEmpty()){
-            body.put("postage", postage);
-        }
-        return body;
     }
 
     /**
@@ -486,41 +299,34 @@ public class NotificationClient implements NotificationClientApi {
         HttpsURLConnection.setDefaultSSLSocketFactory(sslContext.getSocketFactory());
     }
 
-    private LetterResponse sendPrecompiledLetter(String reference, String base64EncodedPDFFile, String postage) throws NotificationClientException {
-        if(NotifyUtils.isBlank(reference)) {
+    private NotifyPrecompiledLetterResponse sendPrecompiledLetter(String reference, String base64EncodedPDFFile, String postage) throws NotificationClientException {
+        if (NotifyUtils.isBlank(reference)) {
             throw new NotificationClientException("reference cannot be null or empty");
         }
 
-        if(NotifyUtils.isBlank(base64EncodedPDFFile)) {
+        if (NotifyUtils.isBlank(base64EncodedPDFFile)) {
             throw new NotificationClientException("precompiledPDF cannot be null or empty");
         }
 
-        if(!PdfUtils.isBase64StringPDF(base64EncodedPDFFile)) {
+        if (!PdfUtils.isBase64StringPDF(base64EncodedPDFFile)) {
             throw new NotificationClientException("base64EncodedPDFFile is not a PDF");
         }
 
-        JSONObject body = createBodyForPostRequest(null,
-                null,
-                null,
-                null,
-                reference,
+        final NotifyPrecompiledLetterRequest requestBody = new NotifyPrecompiledLetterRequest(reference,
                 base64EncodedPDFFile,
                 postage);
 
-        String response = notifyHttpClient.post(URI.create(baseUrl + "/v2/notifications/letter"), body, HTTP_CREATED);
-        return new LetterResponse(response);
-
+        return notifyHttpClient.post(URI.create(baseUrl + "/v2/notifications/letter"), requestBody, NotifyPrecompiledLetterResponse.class, HTTP_CREATED);
     }
 
     @Override
-    public LetterResponse sendPrecompiledLetter(String reference, File precompiledPDF) throws NotificationClientException {
+    public NotifyPrecompiledLetterResponse sendPrecompiledLetter(String reference, File precompiledPDF) throws NotificationClientException {
         return sendPrecompiledLetter(reference, precompiledPDF, null);
     }
 
     @Override
-    public LetterResponse sendPrecompiledLetter(String reference, File precompiledPDF, String postage) throws NotificationClientException {
-        if (precompiledPDF == null)
-        {
+    public NotifyPrecompiledLetterResponse sendPrecompiledLetter(String reference, File precompiledPDF, String postage) throws NotificationClientException {
+        if (precompiledPDF == null) {
             throw new NotificationClientException("File cannot be null");
         }
         byte[] buf;
@@ -533,16 +339,13 @@ public class NotificationClient implements NotificationClientApi {
     }
 
     @Override
-    public LetterResponse sendPrecompiledLetterWithInputStream(String reference, InputStream stream) throws NotificationClientException
-    {
-       return sendPrecompiledLetterWithInputStream(reference, stream, null);
+    public NotifyPrecompiledLetterResponse sendPrecompiledLetterWithInputStream(String reference, InputStream stream) throws NotificationClientException {
+        return sendPrecompiledLetterWithInputStream(reference, stream, null);
     }
 
     @Override
-    public LetterResponse sendPrecompiledLetterWithInputStream(String reference, InputStream stream, String postage) throws NotificationClientException
-    {
-        if (stream == null)
-        {
+    public NotifyPrecompiledLetterResponse sendPrecompiledLetterWithInputStream(String reference, InputStream stream, String postage) throws NotificationClientException {
+        if (stream == null) {
             throw new NotificationClientException("Input stream cannot be null");
         }
         Base64InputStream base64InputStream = new Base64InputStream(stream, true, 0, null);

@@ -1,9 +1,7 @@
 package uk.gov.service.notify.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import uk.gov.service.notify.NotificationType;
 
-import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 

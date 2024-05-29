@@ -1,7 +1,10 @@
 package uk.gov.service.notify;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.apache.commons.io.IOUtils;
-import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,6 +22,11 @@ class NotifyHttpClient {
 
     private static final Logger LOGGER = Logger.getLogger(NotifyHttpClient.class.toString());
 
+    private static final ObjectMapper objectMapper = new ObjectMapper()
+            // the following two lines are needed to (de)serialize ZonedDateTime in ISO8601 format
+            .registerModule(new JavaTimeModule())
+            .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+
     private final String serviceId;
     private final String apiKey;
     private final String userAgent;
@@ -31,10 +39,10 @@ class NotifyHttpClient {
         this.proxy = proxy;
     }
 
-    private String performPostRequest(HttpURLConnection conn, JSONObject body, int expectedStatusCode) throws NotificationClientException {
+    private String performPostRequest(HttpURLConnection conn, Object requestBody, int expectedStatusCode) throws NotificationClientException {
         try {
             OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream(), UTF_8);
-            wr.write(body.toString());
+            wr.write(objectMapper.writeValueAsString(requestBody));
             wr.flush();
 
             int httpResult = conn.getResponseCode();
@@ -126,17 +134,27 @@ class NotifyHttpClient {
         return conn;
     }
 
-    String post(URI uri, JSONObject requestBody, int expectedResponseCode) throws NotificationClientException {
+    <T> T post(URI uri, Object requestBody, Class<T> responseClass, int expectedResponseCode) throws NotificationClientException {
         HttpURLConnection conn = createConnectionAndSetHeaders(uri.toString(), "POST");
-        return performPostRequest(conn, requestBody, expectedResponseCode);
+        final String responseBody = performPostRequest(conn, requestBody, expectedResponseCode);
+        try {
+            return objectMapper.readValue(responseBody, responseClass);
+        } catch (JsonProcessingException e) {
+            throw new NotificationClientException(e);
+        }
     }
 
-    String getAsString(URI uri) throws NotificationClientException {
+    <T> T get(URI uri, Class<T> responseClass) throws NotificationClientException {
         HttpURLConnection conn = createConnectionAndSetHeaders(uri.toString(), "GET");
-        return performGetRequest(conn);
+        String responseBody = performGetRequest(conn);
+        try {
+            return objectMapper.readValue(responseBody, responseClass);
+        } catch (JsonProcessingException e) {
+            throw new NotificationClientException(e);
+        }
     }
 
-    byte[] getAsByteArray(URI uri) throws NotificationClientException {
+    byte[] get(URI uri) throws NotificationClientException {
         HttpURLConnection conn = createConnectionAndSetHeaders(uri.toString(), "GET");
         return performRawGetRequest(conn);
     }

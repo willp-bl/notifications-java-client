@@ -1,7 +1,6 @@
 package uk.gov.service.notify.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import uk.gov.service.notify.NotificationType;
 
 import java.time.ZonedDateTime;
 import java.util.Objects;

@@ -1,7 +1,6 @@
 package uk.gov.service.notify.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import uk.gov.service.notify.NotificationType;
 
 import java.time.ZonedDateTime;
 import java.util.Objects;
@@ -17,6 +16,7 @@ public class NotifyNotificationLetter extends NotifyNotification {
     private final String line5;
     private final String line6;
     private final String line7;
+    //"estimated_delivery"?
 
     public NotifyNotificationLetter(@JsonProperty("id") UUID id,
                                     @JsonProperty("reference") String reference,
