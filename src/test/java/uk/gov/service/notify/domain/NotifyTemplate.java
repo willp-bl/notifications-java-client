@@ -1,13 +1,25 @@
 package uk.gov.service.notify.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import uk.gov.service.notify.NotificationType;
 
 import java.time.ZonedDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
-public class NotifyTemplate {
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME,
+        include = JsonTypeInfo.As.EXISTING_PROPERTY,
+        visible = true,
+        property = "type")
+@JsonSubTypes({
+        // unfortunately can't use the enum
+        @JsonSubTypes.Type(name = "email", value = NotifyTemplateEmail.class),
+        @JsonSubTypes.Type(name = "sms", value = NotifyTemplateSms.class),
+        @JsonSubTypes.Type(name = "letter", value = NotifyTemplateLetter.class)
+})
+public abstract class NotifyTemplate {
 
     private final UUID id;
     private final String name;
@@ -17,8 +29,6 @@ public class NotifyTemplate {
     private final int version;
     private final String createdBy;
     private final String body;
-    private final String subject;
-    private final String letterContactBlock;
 
     public NotifyTemplate(@JsonProperty("id") UUID id,
                           @JsonProperty("name") String name,
@@ -27,9 +37,7 @@ public class NotifyTemplate {
                           @JsonProperty("updated_at") ZonedDateTime updatedAt,
                           @JsonProperty("version") int version,
                           @JsonProperty("created_by") String createdBy,
-                          @JsonProperty("body") String body,
-                          @JsonProperty("subject") String subject,
-                          @JsonProperty("letter_contact_block") String letterContactBlock) {
+                          @JsonProperty("body") String body) {
 
         this.id = id;
         this.name = name;
@@ -39,8 +47,6 @@ public class NotifyTemplate {
         this.version = version;
         this.createdBy = createdBy;
         this.body = body;
-        this.subject = subject;
-        this.letterContactBlock = letterContactBlock;
     }
 
     @JsonProperty("id")
@@ -83,27 +89,17 @@ public class NotifyTemplate {
         return body;
     }
 
-    @JsonProperty("subject")
-    public String getSubject() {
-        return subject;
-    }
-
-    @JsonProperty("letter_contact_block")
-    public String getLetterContactBlock() {
-        return letterContactBlock;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         NotifyTemplate that = (NotifyTemplate) o;
-        return version == that.version && Objects.equals(id, that.id) && Objects.equals(name, that.name) && Objects.equals(type, that.type) && Objects.equals(createdAt, that.createdAt) && Objects.equals(updatedAt, that.updatedAt) && Objects.equals(createdBy, that.createdBy) && Objects.equals(body, that.body) && Objects.equals(subject, that.subject) && Objects.equals(letterContactBlock, that.letterContactBlock);
+        return version == that.version && Objects.equals(id, that.id) && Objects.equals(name, that.name) && Objects.equals(type, that.type) && Objects.equals(createdAt, that.createdAt) && Objects.equals(updatedAt, that.updatedAt) && Objects.equals(createdBy, that.createdBy) && Objects.equals(body, that.body);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, type, createdAt, updatedAt, version, createdBy, body, subject, letterContactBlock);
+        return Objects.hash(id, name, type, createdAt, updatedAt, version, createdBy, body);
     }
 
     @Override
@@ -117,8 +113,6 @@ public class NotifyTemplate {
                 ", version=" + version +
                 ", createdBy='" + createdBy + '\'' +
                 ", body='" + body + '\'' +
-                ", subject='" + subject + '\'' +
-                ", letterContactBlock='" + letterContactBlock + '\'' +
                 '}';
     }
 }

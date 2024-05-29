@@ -34,6 +34,8 @@ import uk.gov.service.notify.domain.NotifyReceivedTextMessagesResponse;
 import uk.gov.service.notify.domain.NotifySmsRequest;
 import uk.gov.service.notify.domain.NotifySmsResponse;
 import uk.gov.service.notify.domain.NotifyTemplate;
+import uk.gov.service.notify.domain.NotifyTemplateEmail;
+import uk.gov.service.notify.domain.NotifyTemplateLetter;
 import uk.gov.service.notify.domain.NotifyTemplateListResponse;
 import uk.gov.service.notify.domain.NotifyTemplatePreviewRequest;
 import uk.gov.service.notify.domain.NotifyTemplatePreviewResponse;
@@ -48,6 +50,7 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -662,7 +665,7 @@ public class NotificationClientTest {
 
     @Test
     public void testGetTemplateById() throws IOException, NotificationClientException {
-        NotifyTemplate expected = objectMapper.readValue(this.getClass().getClassLoader().getResourceAsStream("v2_template_byid_response.json"), NotifyTemplate.class);
+        NotifyTemplateLetter expected = (NotifyTemplateLetter)objectMapper.readValue(this.getClass().getClassLoader().getResourceAsStream("v2_template_byid_response_letter.json"), NotifyTemplate.class);
         UUID templateId = expected.getId();
         wireMockRule.stubFor(get(urlPathEqualTo("/v2/template/" + templateId))
                 .willReturn(ok()
@@ -680,7 +683,6 @@ public class NotificationClientTest {
         // actual created by is null
 //        assertEquals(expected.getCreatedBy(), actual.getCreatedBy());
         assertEquals(expected.getBody(), actual.getBody());
-        assertEquals(expected.getSubject(), actual.getSubject().get());
         assertEquals(expected.getLetterContactBlock(), actual.getLetterContactBlock().get());
 
         validateRequest();
@@ -688,7 +690,7 @@ public class NotificationClientTest {
 
     @Test
     public void testGetTemplateVersion() throws IOException, NotificationClientException {
-        NotifyTemplate expected = objectMapper.readValue(this.getClass().getClassLoader().getResourceAsStream("v2_template_byid_response.json"), NotifyTemplate.class);
+        NotifyTemplateEmail expected = (NotifyTemplateEmail)objectMapper.readValue(this.getClass().getClassLoader().getResourceAsStream("v2_template_byid_response_email.json"), NotifyTemplate.class);
         UUID templateId = expected.getId();
         final int version = 100;
         wireMockRule.stubFor(get(urlPathEqualTo("/v2/template/" + templateId + "/version/" + version))
@@ -708,15 +710,14 @@ public class NotificationClientTest {
 //        assertEquals(expected.getCreatedBy(), actual.getCreatedBy());
         assertEquals(expected.getBody(), actual.getBody());
         assertEquals(expected.getSubject(), actual.getSubject().get());
-        assertEquals(expected.getLetterContactBlock(), actual.getLetterContactBlock().get());
 
         validateRequest();
     }
 
     @Test
     public void testGetAllTemplates() throws IOException, NotificationClientException {
-        NotifyTemplate template = objectMapper.readValue(this.getClass().getClassLoader().getResourceAsStream("v2_template_byid_response.json"), NotifyTemplate.class);
-        NotifyTemplateListResponse expected = new NotifyTemplateListResponse(Collections.singletonList(template));
+        NotifyTemplateEmail expectedTemplateEmail = (NotifyTemplateEmail)objectMapper.readValue(this.getClass().getClassLoader().getResourceAsStream("v2_template_byid_response_email.json"), NotifyTemplate.class);
+        NotifyTemplateListResponse expected = new NotifyTemplateListResponse(Collections.singletonList(expectedTemplateEmail));
         wireMockRule.stubFor(get(urlPathEqualTo("/v2/templates"))
                 .willReturn(ok()
                         .withResponseBody(new Body(objectMapper.writeValueAsString(expected)))));
@@ -725,7 +726,8 @@ public class NotificationClientTest {
         // we ask for the "foo" templates because as far as the client is concerned the string doesn't matter
         TemplateList actual = client.getAllTemplates(NotificationType.email);
 
-        assertEquals(expected.getTemplates().size(), actual.getTemplates().size());
+        assertEquals(1, actual.getTemplates().size());
+
         assertEquals(expected.getTemplates().get(0).getId(), actual.getTemplates().get(0).getId());
         assertEquals(expected.getTemplates().get(0).getName(), actual.getTemplates().get(0).getName());
         assertEquals(expected.getTemplates().get(0).getType(), actual.getTemplates().get(0).getTemplateType());
@@ -735,8 +737,7 @@ public class NotificationClientTest {
         // actual created by is null
 //        assertEquals(expected.getTemplates().get(0).getCreatedBy(), actual.getTemplates().get(0).getCreatedBy());
         assertEquals(expected.getTemplates().get(0).getBody(), actual.getTemplates().get(0).getBody());
-        assertEquals(expected.getTemplates().get(0).getSubject(), actual.getTemplates().get(0).getSubject().get());
-        assertEquals(expected.getTemplates().get(0).getLetterContactBlock(), actual.getTemplates().get(0).getLetterContactBlock().get());
+        assertEquals(((NotifyTemplateEmail)expected.getTemplates().get(0)).getSubject(), actual.getTemplates().get(0).getSubject().get());
 
         LoggedRequest request = validateRequest();
         assertEquals(NotificationType.email.name(), request.queryParameter("type").firstValue());
