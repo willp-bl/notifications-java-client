@@ -51,10 +51,10 @@ public class NotifyNotificationListResponse {
         }
     }
 
-    private final List<NotifyNotificationResponse> notifications;
+    private final List<NotifyNotification> notifications;
     private final Links links;
 
-    public NotifyNotificationListResponse(@JsonProperty("notifications") List<NotifyNotificationResponse> notifications,
+    public NotifyNotificationListResponse(@JsonProperty("notifications") List<NotifyNotification> notifications,
                                           @JsonProperty("links") Links links) {
 
         this.notifications = notifications;
@@ -62,7 +62,7 @@ public class NotifyNotificationListResponse {
     }
 
     @JsonProperty("notifications")
-    public List<NotifyNotificationResponse> getNotifications() {
+    public List<NotifyNotification> getNotifications() {
         return notifications;
     }
 

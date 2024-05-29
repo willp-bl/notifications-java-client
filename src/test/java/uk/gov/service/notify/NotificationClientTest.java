@@ -23,8 +23,11 @@ import uk.gov.service.notify.domain.NotifyEmailRequest;
 import uk.gov.service.notify.domain.NotifyEmailResponse;
 import uk.gov.service.notify.domain.NotifyLetterRequest;
 import uk.gov.service.notify.domain.NotifyLetterResponse;
+import uk.gov.service.notify.domain.NotifyNotification;
+import uk.gov.service.notify.domain.NotifyNotificationEmail;
+import uk.gov.service.notify.domain.NotifyNotificationLetter;
 import uk.gov.service.notify.domain.NotifyNotificationListResponse;
-import uk.gov.service.notify.domain.NotifyNotificationResponse;
+import uk.gov.service.notify.domain.NotifyNotificationSms;
 import uk.gov.service.notify.domain.NotifyPrecompiledLetterRequest;
 import uk.gov.service.notify.domain.NotifyPrecompiledLetterResponse;
 import uk.gov.service.notify.domain.NotifyReceivedTextMessagesResponse;
@@ -509,7 +512,7 @@ public class NotificationClientTest {
     @Test
     public void testGetNotificationById() throws IOException, NotificationClientException {
         final UUID notificationId = UUID.randomUUID();
-        NotifyNotificationResponse expected = objectMapper.readValue(this.getClass().getClassLoader().getResourceAsStream("v2_notifications_byid_response.json"), NotifyNotificationResponse.class);
+        NotifyNotification expected = objectMapper.readValue(this.getClass().getClassLoader().getResourceAsStream("v2_notifications_byid_response.json"), NotifyNotification.class);
         wireMockRule.stubFor(get("/v2/notifications/" + notificationId)
                 .willReturn(ok()
                         .withResponseBody(new Body(objectMapper.writeValueAsString(expected)))));
@@ -517,25 +520,16 @@ public class NotificationClientTest {
 
         Notification actual = client.getNotificationById(notificationId);
 
+        assertEquals(NotifyNotificationSms.class, expected.getClass());
         assertEquals(expected.getId(), actual.getId());
         assertEquals(expected.getReference(), actual.getReference().get());
-        assertEquals(expected.getEmailAddress(), actual.getEmailAddress().get());
-        assertEquals(expected.getPhoneNumber(), actual.getPhoneNumber().get());
-        assertEquals(expected.getLine1(), actual.getLine1().get());
-        assertEquals(expected.getLine2(), actual.getLine2().get());
-        assertEquals(expected.getLine3(), actual.getLine3().get());
-        assertEquals(expected.getLine4(), actual.getLine4().get());
-        assertEquals(expected.getLine5(), actual.getLine5().get());
-        assertEquals(expected.getLine6(), actual.getLine6().get());
-        // currently this client doesn't handle line 7
-//        assertEquals(expected.getLine7(), actual.getLine7().get());
+        assertEquals(((NotifyNotificationSms)expected).getPhoneNumber(), actual.getPhoneNumber().get());
         assertEquals(expected.getType(), actual.getNotificationType());
-        assertEquals(expected.getStatus(), actual.getStatus());
+        assertEquals(((NotifyNotificationSms)expected).getStatus().getStatus(), actual.getStatus());
         assertEquals(expected.getTemplate().getId(), actual.getTemplateId());
         assertEquals(expected.getTemplate().getVersion(), actual.getTemplateVersion());
         assertEquals(expected.getTemplate().getUri().toString(), actual.getTemplateUri());
         assertEquals(expected.getBody(), actual.getBody());
-        assertEquals(expected.getSubject(), actual.getSubject().get());
         assertTrue(expected.getCreatedAt().isEqual(actual.getCreatedAt()));
         assertEquals(expected.getCreatedByName(), actual.getCreatedByName().get());
         assertTrue(expected.getSentAt().isEqual(actual.getSentAt().get()));
@@ -547,7 +541,9 @@ public class NotificationClientTest {
     @Test
     public void testGetNotifications() throws IOException, NotificationClientException {
         NotifyNotificationListResponse expected = objectMapper.readValue(this.getClass().getClassLoader().getResourceAsStream("v2_notifications_response.json"), NotifyNotificationListResponse.class);
-        NotifyNotificationResponse expectedNotification = expected.getNotifications().get(0);
+        NotifyNotificationSms expectedNotificationSms = (NotifyNotificationSms)getNotificationOfType(expected, NotificationType.sms);
+        NotifyNotificationLetter expectedNotificationLetter = (NotifyNotificationLetter)getNotificationOfType(expected, NotificationType.letter);
+        NotifyNotificationEmail expectedNotificationEmail = (NotifyNotificationEmail)getNotificationOfType(expected, NotificationType.email);
         wireMockRule.stubFor(get(urlPathEqualTo("/v2/notifications"))
                 .willReturn(ok()
                         .withResponseBody(new Body(objectMapper.writeValueAsString(expected)))));
@@ -556,40 +552,74 @@ public class NotificationClientTest {
 
         NotificationList actual = client.getNotifications("a stat", NotificationType.sms, "a ref", olderThanId);
 
-        assertEquals(expected.getNotifications().size(), actual.getNotifications().size());
+        assertEquals(3, actual.getNotifications().size());
         assertEquals(expected.getLinks().getCurrent().toString(), actual.getCurrentPageLink());
         assertEquals(expected.getLinks().getNext().toString(), actual.getNextPageLink().get());
 
-        Notification actualNotification = actual.getNotifications().get(0);
-        assertEquals(expectedNotification.getId(), actualNotification.getId());
-        assertEquals(expectedNotification.getReference(), actualNotification.getReference().get());
-        assertEquals(expectedNotification.getEmailAddress(), actualNotification.getEmailAddress().get());
-        assertEquals(expectedNotification.getPhoneNumber(), actualNotification.getPhoneNumber().get());
-        assertEquals(expectedNotification.getLine1(), actualNotification.getLine1().get());
-        assertEquals(expectedNotification.getLine2(), actualNotification.getLine2().get());
-        assertEquals(expectedNotification.getLine3(), actualNotification.getLine3().get());
-        assertEquals(expectedNotification.getLine4(), actualNotification.getLine4().get());
-        assertEquals(expectedNotification.getLine5(), actualNotification.getLine5().get());
-        assertEquals(expectedNotification.getLine6(), actualNotification.getLine6().get());
+        Notification actualNotificationSms = getNotificationOfType(actual, NotificationType.sms);
+        Notification actualNotificationLetter = getNotificationOfType(actual, NotificationType.letter);
+        Notification actualNotificationEmail = getNotificationOfType(actual, NotificationType.email);
+
+        // check all the base details match
+        checkBaseNotificationDetails(expectedNotificationSms, actualNotificationSms);
+        checkBaseNotificationDetails(expectedNotificationLetter, actualNotificationLetter);
+        checkBaseNotificationDetails(expectedNotificationEmail, actualNotificationEmail);
+
+        // email specific items
+        assertEquals(expectedNotificationEmail.getSubject(), actualNotificationEmail.getSubject().get());
+        assertEquals(expectedNotificationEmail.getEmailAddress(), actualNotificationEmail.getEmailAddress().get());
+        assertEquals(expectedNotificationEmail.getStatus().getStatus(), actualNotificationEmail.getStatus());
+
+        // phone specific items
+        assertEquals(expectedNotificationSms.getPhoneNumber(), actualNotificationSms.getPhoneNumber().get());
+        assertEquals(expectedNotificationSms.getStatus().getStatus(), actualNotificationSms.getStatus());
+
+        // letter specific items
+        assertEquals(expectedNotificationLetter.getLine1(), actualNotificationLetter.getLine1().get());
+        assertEquals(expectedNotificationLetter.getLine2(), actualNotificationLetter.getLine2().get());
+        assertEquals(expectedNotificationLetter.getLine3(), actualNotificationLetter.getLine3().get());
+        assertEquals(expectedNotificationLetter.getLine4(), actualNotificationLetter.getLine4().get());
+        assertEquals(expectedNotificationLetter.getLine5(), actualNotificationLetter.getLine5().get());
+        assertEquals(expectedNotificationLetter.getLine6(), actualNotificationLetter.getLine6().get());
         // currently this client doesn't handle line 7
-//        assertEquals(expectedNotification.getLine7(), actualNotification.getLine7().get());
-        assertEquals(expectedNotification.getType(), actualNotification.getNotificationType());
-        assertEquals(expectedNotification.getStatus(), actualNotification.getStatus());
-        assertEquals(expectedNotification.getTemplate().getId(), actualNotification.getTemplateId());
-        assertEquals(expectedNotification.getTemplate().getVersion(), actualNotification.getTemplateVersion());
-        assertEquals(expectedNotification.getTemplate().getUri().toString(), actualNotification.getTemplateUri());
-        assertEquals(expectedNotification.getBody(), actualNotification.getBody());
-        assertEquals(expectedNotification.getSubject(), actualNotification.getSubject().get());
-        assertTrue(expectedNotification.getCreatedAt().isEqual(actualNotification.getCreatedAt()));
-        assertEquals(expectedNotification.getCreatedByName(), actualNotification.getCreatedByName().get());
-        assertTrue(expectedNotification.getSentAt().isEqual(actualNotification.getSentAt().get()));
-        assertTrue(expectedNotification.getCompletedAt().isEqual(actualNotification.getCompletedAt().get()));
+//        assertEquals(expectedNotificationLetter.getLine7(), actualNotificationLetter.getLine7().get());
+        assertEquals(expectedNotificationLetter.getStatus().getStatus(), actualNotificationLetter.getStatus());
 
         LoggedRequest request = validateRequest();
         assertEquals("a stat", request.queryParameter("status").firstValue());
         assertEquals("sms", request.queryParameter("template_type").firstValue());
         assertEquals("a ref", request.queryParameter("reference").firstValue());
         assertEquals(olderThanId.toString(), request.queryParameter("older_than").firstValue());
+    }
+
+    private static NotifyNotification getNotificationOfType(NotifyNotificationListResponse expected, NotificationType notificationType) {
+        return expected.getNotifications()
+                .stream()
+                .filter(n -> n.getType() == notificationType)
+                .findFirst()
+                .get();
+    }
+
+    private void checkBaseNotificationDetails(NotifyNotification expected, Notification actual) {
+        assertEquals(expected.getId(), actual.getId());
+        assertEquals(expected.getReference(), actual.getReference().get());
+        assertEquals(expected.getType(), actual.getNotificationType());
+        assertEquals(expected.getTemplate().getId(), actual.getTemplateId());
+        assertEquals(expected.getTemplate().getVersion(), actual.getTemplateVersion());
+        assertEquals(expected.getTemplate().getUri().toString(), actual.getTemplateUri());
+        assertEquals(expected.getBody(), actual.getBody());
+        assertTrue(expected.getCreatedAt().isEqual(actual.getCreatedAt()));
+        assertEquals(expected.getCreatedByName(), actual.getCreatedByName().get());
+        assertTrue(expected.getSentAt().isEqual(actual.getSentAt().get()));
+        assertTrue(expected.getCompletedAt().isEqual(actual.getCompletedAt().get()));
+    }
+
+    private static Notification getNotificationOfType(NotificationList actual, NotificationType notificationType) {
+        return actual.getNotifications()
+                .stream()
+                .filter(n -> n.getNotificationType() == notificationType)
+                .findFirst()
+                .get();
     }
 
     @Test
