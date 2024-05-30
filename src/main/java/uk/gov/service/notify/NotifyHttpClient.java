@@ -106,8 +106,7 @@ class NotifyHttpClient {
             URL url = new URL(urlString);
             HttpURLConnection conn = getConnection(url);
             conn.setRequestMethod(method);
-            Authentication authentication = new Authentication();
-            String token = authentication.create(serviceId, apiKey);
+            String token = Authentication.create(serviceId, apiKey);
             conn.setRequestProperty("Authorization", "Bearer " + token);
             conn.setRequestProperty("User-agent", userAgent);
             if (method.equals("POST")) {

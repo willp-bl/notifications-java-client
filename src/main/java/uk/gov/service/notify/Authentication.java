@@ -1,6 +1,8 @@
 package uk.gov.service.notify;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
+
 import org.jose4j.jws.AlgorithmIdentifiers;
 import org.jose4j.jws.JsonWebSignature;
 import org.jose4j.jwt.JwtClaims;
@@ -10,13 +12,12 @@ import org.jose4j.lang.JoseException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
-public final class Authentication {
+final class Authentication {
 
-    public Authentication() {
+    private Authentication() {
     }
 
-    public String create(String issuer, String secret) {
-
+    static String create(String issuer, String secret) {
         try {
             JsonWebSignature jws = new JsonWebSignature();
             jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.HMAC_SHA256);
@@ -34,11 +35,7 @@ public final class Authentication {
         }
     }
 
-
-    public static final String ENCODING = "UTF-8";
-
-    public static SecretKey keyFromString(String value)
-            throws UnsupportedEncodingException {
-        return new SecretKeySpec(value.getBytes(ENCODING), "RAW");
+    private static SecretKey keyFromString(String value) throws UnsupportedEncodingException {
+        return new SecretKeySpec(value.getBytes(StandardCharsets.UTF_8), "RAW");
     }
 }

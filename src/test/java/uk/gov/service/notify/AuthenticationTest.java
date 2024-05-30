@@ -20,11 +20,10 @@ public class AuthenticationTest {
 
     @Test
     public void testJwtCreation() {
-        Authentication authentication = new Authentication();
         String serviceId = UUID.randomUUID().toString();
         String apiKey = UUID.randomUUID().toString();
 
-        String token = authentication.create(serviceId, apiKey);
+        String token = Authentication.create(serviceId, apiKey);
 
         try {
             validateBearerToken(token, serviceId, apiKey);
@@ -35,12 +34,11 @@ public class AuthenticationTest {
 
     @Test
     public void testJwtIsInvalidIfWrongIssuerUsed() {
-        Authentication authentication = new Authentication();
         String serviceId = UUID.randomUUID().toString();
         String apiKey = UUID.randomUUID().toString();
         String differentServiceId = UUID.randomUUID().toString();
 
-        String jwt = authentication.create(differentServiceId, apiKey);
+        String jwt = Authentication.create(differentServiceId, apiKey);
         InvalidJwtException e = assertThrows(InvalidJwtException.class,
                 () -> validateBearerToken(jwt, serviceId, apiKey));
 
@@ -49,12 +47,11 @@ public class AuthenticationTest {
 
     @Test
     public void testJwtIsInvalidIfWrongKeyUsed() {
-        Authentication authentication = new Authentication();
         String serviceId = UUID.randomUUID().toString();
         String apiKey = UUID.randomUUID().toString();
         String differentApiKey = UUID.randomUUID().toString();
 
-        String jwt = authentication.create(serviceId, differentApiKey);
+        String jwt = Authentication.create(serviceId, differentApiKey);
         InvalidJwtException e = assertThrows(InvalidJwtException.class,
                 () -> validateBearerToken(jwt, serviceId, apiKey));
 
