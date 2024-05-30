@@ -16,7 +16,8 @@ public class NotifyNotificationLetter extends NotifyNotification {
     private final String line5;
     private final String line6;
     private final String line7;
-    //"estimated_delivery"?
+    // FIXME FIXME FIXME
+    //"estimated_delivery"? - not in API docs
 
     public NotifyNotificationLetter(@JsonProperty("id") UUID id,
                                     @JsonProperty("reference") String reference,

@@ -266,7 +266,7 @@ public class ClientIntegrationTestIT {
         assertNotNull(template.getBody());
         assertNotNull(template.getName());
         assertNotNull(template.getVersion());
-        // FIXME FIXME FIXME
+        // FIXME FIXME FIXME - only required for email?
 //        assertNotNull(template.getSubject());
         assertNotNull(template.getLetterContactBlock());
     }
@@ -493,7 +493,7 @@ public class ClientIntegrationTestIT {
     private void assertNotificationWhenLetter(NotifyNotificationLetter notification) {
         // the other address lines are optional. A precompiled letter will only have address_line_1
         assertNotNull(notification.getLine1());
-        // FIXME FIXME FIXME
+        // FIXME FIXME FIXME - only for precompiled letters?
 //        assertNotNull(notification.getPostage());
 
         assertNotNull(notification.getStatus());
