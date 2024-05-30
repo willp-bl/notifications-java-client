@@ -1,9 +1,9 @@
 package uk.gov.service.notify;
 
 import org.apache.commons.codec.binary.Base64;
-import org.json.JSONObject;
 
-import java.util.Objects;
+import java.util.HashMap;
+import java.util.Map;
 
 import static java.nio.charset.StandardCharsets.ISO_8859_1;
 
@@ -28,14 +28,14 @@ public class PrepareUploadHelper {
      * @return <code>JSONObject</code> a json object to be added to the
      *         personalisation is returned
      */
-    public static JSONObject prepareUpload(final byte[] documentContents,
+    public static Map<String, ?> prepareUpload(final byte[] documentContents,
                                            String filename,
                                            boolean confirmEmailBeforeDownload,
                                            String retentionPeriod) throws NotificationClientException {
         return internalPrepareUpload(documentContents, filename, confirmEmailBeforeDownload, retentionPeriod);
     }
 
-    private static JSONObject internalPrepareUpload(final byte[] documentContents,
+    private static Map<String, ?> internalPrepareUpload(final byte[] documentContents,
                                                     String filename,
                                                     Boolean confirmEmailBeforeDownload,
                                                     String retentionPeriod) throws NotificationClientException {
@@ -45,15 +45,11 @@ public class PrepareUploadHelper {
         byte[] fileContentAsByte = Base64.encodeBase64(documentContents);
         String fileContent = new String(fileContentAsByte, ISO_8859_1);
 
-        Object filenameValue = Objects.nonNull(filename) ? filename : JSONObject.NULL;
-        Object confirmEmailBeforeDownloadValue = Objects.nonNull(confirmEmailBeforeDownload) ? confirmEmailBeforeDownload : JSONObject.NULL;
-        Object retentionPeriodValue = Objects.nonNull(retentionPeriod) ? retentionPeriod : JSONObject.NULL;
-
-        JSONObject jsonFileObject = new JSONObject();
+        Map<String, Object> jsonFileObject = new HashMap<>();
         jsonFileObject.put("file", fileContent);
-        jsonFileObject.put("filename", filenameValue);
-        jsonFileObject.put("confirm_email_before_download", confirmEmailBeforeDownloadValue);
-        jsonFileObject.put("retention_period", retentionPeriodValue);
+        jsonFileObject.put("filename", filename);
+        jsonFileObject.put("confirm_email_before_download", confirmEmailBeforeDownload);
+        jsonFileObject.put("retention_period", retentionPeriod);
         return jsonFileObject;
     }
 
@@ -72,7 +68,7 @@ public class PrepareUploadHelper {
      * @return <code>JSONObject</code> a json object to be added to the
      *         personalisation is returned
      */
-    public static JSONObject prepareUpload(final byte[] documentContents,
+    public static Map<String, ?> prepareUpload(final byte[] documentContents,
                                            boolean confirmEmailBeforeDownload,
                                            RetentionPeriodDuration retentionPeriod) throws NotificationClientException {
         return internalPrepareUpload(documentContents, null, confirmEmailBeforeDownload, retentionPeriod.toString());
@@ -89,8 +85,7 @@ public class PrepareUploadHelper {
      * @return <code>JSONObject</code> a json object to be added to the
      *         personalisation is returned
      */
-    public static JSONObject prepareUpload(final byte[] documentContents,
-                                           String filename) throws NotificationClientException {
+    public static Map<String, ?> prepareUpload(final byte[] documentContents, String filename) throws NotificationClientException {
         return internalPrepareUpload(documentContents, filename, null, null);
     }
 
@@ -102,7 +97,7 @@ public class PrepareUploadHelper {
      * @param documentContents byte[] of the document
      * @return <code>JSONObject</code> a json object to be added to the personalisation is returned
      */
-    public static JSONObject prepareUpload(final byte[] documentContents) throws NotificationClientException {
+    public static Map<String, ?> prepareUpload(final byte[] documentContents) throws NotificationClientException {
         return internalPrepareUpload(documentContents, null, null, null);
     }
 
@@ -128,7 +123,7 @@ public class PrepareUploadHelper {
      * @return <code>JSONObject</code> a json object to be added to the
      *         personalisation is returned
      */
-    public static JSONObject prepareUpload(final byte[] documentContents,
+    public static Map<String, ?> prepareUpload(final byte[] documentContents,
                                            String filename,
                                            boolean confirmEmailBeforeDownload,
                                            RetentionPeriodDuration retentionPeriod) throws NotificationClientException {

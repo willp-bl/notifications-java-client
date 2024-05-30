@@ -1,14 +1,13 @@
 package uk.gov.service.notify;
 
-import org.json.JSONObject;
 import org.junit.Test;
 
 import java.time.temporal.ChronoUnit;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
 
 public class PrepareUploadHelperTest {
 
@@ -16,71 +15,71 @@ public class PrepareUploadHelperTest {
     public void testPrepareUpload() throws NotificationClientException {
         byte[] documentContent = "this is a document to test with".getBytes();
 
-        JSONObject response = PrepareUploadHelper.prepareUpload(documentContent);
+        Map<String, ?> response = PrepareUploadHelper.prepareUpload(documentContent);
 
-        assertEquals("dGhpcyBpcyBhIGRvY3VtZW50IHRvIHRlc3Qgd2l0aA==", response.getString("file"));
-        assertNull(response.optJSONObject("filename"));
-        assertNull(response.optJSONObject("confirm_email_before_download"));
-        assertNull(response.optJSONObject("retention_period"));
+        assertEquals("dGhpcyBpcyBhIGRvY3VtZW50IHRvIHRlc3Qgd2l0aA==", response.get("file"));
+        assertNull(response.get("filename"));
+        assertNull(response.get("confirm_email_before_download"));
+        assertNull(response.get("retention_period"));
     }
 
     @Test
     public void testPrepareUploadWithFilename() throws NotificationClientException {
         byte[] documentContent = "this is a document to test with".getBytes();
 
-        JSONObject response = PrepareUploadHelper.prepareUpload(documentContent, "report.csv");
+        Map<String, ?> response = PrepareUploadHelper.prepareUpload(documentContent, "report.csv");
 
-        assertEquals("dGhpcyBpcyBhIGRvY3VtZW50IHRvIHRlc3Qgd2l0aA==", response.getString("file"));
-        assertEquals("report.csv", response.getString("filename"));
-        assertNull(response.optJSONObject("confirm_email_before_download"));
-        assertNull(response.optJSONObject("retention_period"));
+        assertEquals("dGhpcyBpcyBhIGRvY3VtZW50IHRvIHRlc3Qgd2l0aA==", response.get("file"));
+        assertEquals("report.csv", response.get("filename"));
+        assertNull(response.get("confirm_email_before_download"));
+        assertNull(response.get("retention_period"));
     }
 
     @Test
     public void testPrepareUploadWithEmailConfirmationAndRetentionPeriodString() throws NotificationClientException {
         byte[] documentContent = "this is a document to test with".getBytes();
 
-        JSONObject response = PrepareUploadHelper.prepareUpload(
+        Map<String, ?> response = PrepareUploadHelper.prepareUpload(
                 documentContent,
                 "report.csv",
                 true,
                 "1 weeks");
 
-        assertEquals("dGhpcyBpcyBhIGRvY3VtZW50IHRvIHRlc3Qgd2l0aA==", response.getString("file"));
-        assertEquals("report.csv", response.getString("filename"));
-        assertTrue(response.getBoolean("confirm_email_before_download"));
-        assertEquals("1 weeks", response.getString("retention_period"));
+        assertEquals("dGhpcyBpcyBhIGRvY3VtZW50IHRvIHRlc3Qgd2l0aA==", response.get("file"));
+        assertEquals("report.csv", response.get("filename"));
+        assertEquals(true, response.get("confirm_email_before_download"));
+        assertEquals("1 weeks", response.get("retention_period"));
     }
 
     @Test
     public void testPrepareUploadWithFilenameAndEmailConfirmationAndRetentionPeriodDuration() throws NotificationClientException {
         byte[] documentContent = "this is a document to test with".getBytes();
 
-        JSONObject response = PrepareUploadHelper.prepareUpload(
+        Map<String, ?> response = PrepareUploadHelper.prepareUpload(
                 documentContent,
                 "report.csv",
                 true,
                 new RetentionPeriodDuration(1, ChronoUnit.WEEKS));
 
-        assertEquals("dGhpcyBpcyBhIGRvY3VtZW50IHRvIHRlc3Qgd2l0aA==", response.getString("file"));
-        assertEquals("report.csv", response.getString("filename"));
-        assertTrue(response.getBoolean("confirm_email_before_download"));
-        assertEquals("1 weeks", response.getString("retention_period"));
+        assertEquals("dGhpcyBpcyBhIGRvY3VtZW50IHRvIHRlc3Qgd2l0aA==", response.get("file"));
+        assertEquals("report.csv", response.get("filename"));
+        assertEquals(true, response.get("confirm_email_before_download"));
+        assertEquals("1 weeks", response.get("retention_period"));
     }
 
     @Test
     public void testPrepareUploadWithEmailConfirmationAndRetentionPeriodDuration() throws NotificationClientException {
         byte[] documentContent = "this is a document to test with".getBytes();
 
-        JSONObject response = PrepareUploadHelper.prepareUpload(
+        Map<String, ?> response = PrepareUploadHelper.prepareUpload(
                 documentContent,
                 true,
                 new RetentionPeriodDuration(1, ChronoUnit.WEEKS));
 
-        assertEquals("dGhpcyBpcyBhIGRvY3VtZW50IHRvIHRlc3Qgd2l0aA==", response.getString("file"));
-        assertNull(response.optJSONObject("filename"));
-        assertTrue(response.getBoolean("confirm_email_before_download"));
-        assertEquals("1 weeks", response.getString("retention_period"));
+        assertEquals("dGhpcyBpcyBhIGRvY3VtZW50IHRvIHRlc3Qgd2l0aA==", response.get("file"));
+        assertNull(response.get("filename"));
+        assertEquals(true, response.get("confirm_email_before_download"));
+        assertEquals("1 weeks", response.get("retention_period"));
     }
 
     @Test

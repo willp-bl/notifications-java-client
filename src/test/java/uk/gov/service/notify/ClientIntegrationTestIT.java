@@ -1,7 +1,6 @@
 package uk.gov.service.notify;
 
 import org.apache.commons.io.FileUtils;
-import org.json.JSONObject;
 import org.junit.Test;
 import uk.gov.service.notify.domain.NotificationStatus;
 import uk.gov.service.notify.domain.NotificationType;
@@ -16,22 +15,20 @@ import uk.gov.service.notify.domain.NotifyPrecompiledLetterResponse;
 import uk.gov.service.notify.domain.NotifyReceivedTextMessage;
 import uk.gov.service.notify.domain.NotifyReceivedTextMessagesResponse;
 import uk.gov.service.notify.domain.NotifySmsResponse;
-import uk.gov.service.notify.domain.NotifyTemplate;
 import uk.gov.service.notify.domain.NotifyTemplateLetter;
 import uk.gov.service.notify.domain.NotifyTemplateListResponse;
 import uk.gov.service.notify.domain.NotifyTemplatePreviewResponse;
 import uk.gov.service.notify.domain.NotifyTemplateSms;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
@@ -41,9 +38,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static uk.gov.service.notify.domain.NotificationStatus.Email.CREATED;
-import static uk.gov.service.notify.domain.NotificationStatus.Email.DELIVERED;
-import static uk.gov.service.notify.domain.NotificationStatus.Email.SENDING;
 import static uk.gov.service.notify.domain.NotificationStatus.Letter.ACCEPTED;
 import static uk.gov.service.notify.domain.NotificationStatus.Letter.RECEIVED;
 
@@ -174,7 +168,7 @@ public class ClientIntegrationTestIT {
         File file = new File(classLoader.getResource("one_page_pdf.pdf").getFile());
         byte [] fileContents = FileUtils.readFileToByteArray(file);
 
-        JSONObject documentFileObject = PrepareUploadHelper.prepareUpload(fileContents);
+        Map<String, ?> documentFileObject = PrepareUploadHelper.prepareUpload(fileContents);
         personalisation.put("name", documentFileObject);
 
         String reference = UUID.randomUUID().toString();
