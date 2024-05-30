@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.apache.commons.io.IOUtils;
 
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
@@ -13,6 +15,8 @@ import java.net.HttpURLConnection;
 import java.net.Proxy;
 import java.net.URI;
 import java.net.URL;
+import java.security.NoSuchAlgorithmException;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -32,11 +36,20 @@ class NotifyHttpClient {
     private final String userAgent;
     private final Proxy proxy;
 
-    NotifyHttpClient(String serviceId, String apiKey, String userAgent, Proxy proxy) {
+    NotifyHttpClient(String serviceId, String apiKey, String userAgent, Proxy proxy, SSLContext sslContext) {
         this.serviceId = serviceId;
         this.apiKey = apiKey;
         this.userAgent = userAgent;
         this.proxy = proxy;
+        if (Objects.nonNull(sslContext)) {
+            setCustomSSLContext(sslContext);
+        } else {
+            try {
+                setDefaultSSLContext();
+            } catch (NoSuchAlgorithmException e) {
+                LOGGER.log(Level.SEVERE, e.toString(), e);
+            }
+        }
     }
 
     private String performPostRequest(HttpURLConnection conn, Object requestBody, int expectedStatusCode) throws NotificationClientException {
@@ -156,6 +169,22 @@ class NotifyHttpClient {
     byte[] get(URI uri) throws NotificationClientException {
         HttpURLConnection conn = createConnectionAndSetHeaders(uri.toString(), "GET");
         return performRawGetRequest(conn);
+    }
+
+    /**
+     * Set default SSL context for HTTPS connections.
+     * <p/>
+     * This is necessary when client has to use keystore
+     * (eg provide certification for client authentication).
+     * <p/>
+     * Use case: enterprise proxy requiring HTTPS client authentication
+     */
+    private static void setDefaultSSLContext() throws NoSuchAlgorithmException {
+        HttpsURLConnection.setDefaultSSLSocketFactory(SSLContext.getDefault().getSocketFactory());
+    }
+
+    private static void setCustomSSLContext(final SSLContext sslContext) {
+        HttpsURLConnection.setDefaultSSLSocketFactory(sslContext.getSocketFactory());
     }
 
 }

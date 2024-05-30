@@ -21,7 +21,6 @@ import uk.gov.service.notify.domain.NotifyTemplateListResponse;
 import uk.gov.service.notify.domain.NotifyTemplatePreviewRequest;
 import uk.gov.service.notify.domain.NotifyTemplatePreviewResponse;
 
-import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -30,7 +29,6 @@ import java.io.InputStream;
 import java.net.Proxy;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
@@ -100,18 +98,15 @@ public class NotificationClient implements NotificationClientApi {
      * @param baseUrl base URL, defaults to https://api.notifications.service.gov.uk
      * @param proxy   Proxy used on the http requests
      */
-    public NotificationClient(final String apiKey, final String baseUrl, final Proxy proxy) {
+    public NotificationClient(final String apiKey,
+                              final String baseUrl,
+                              final Proxy proxy) {
         this(
                 apiKey,
                 baseUrl,
                 proxy,
                 null
         );
-        try {
-            setDefaultSSLContext();
-        } catch (NoSuchAlgorithmException e) {
-            LOGGER.log(Level.SEVERE, e.toString(), e);
-        }
     }
 
     public NotificationClient(final String apiKey,
@@ -123,11 +118,8 @@ public class NotificationClient implements NotificationClientApi {
         this.serviceId = NotifyUtils.extractServiceId(apiKey);
         this.baseUrl = baseUrl;
         this.proxy = proxy;
-        if (sslContext != null) {
-            setCustomSSLContext(sslContext);
-        }
         this.version = NotifyUtils.getVersion();
-        this.notifyHttpClient = new NotifyHttpClient(this.serviceId, this.apiKey, getUserAgent(), this.proxy);
+        this.notifyHttpClient = new NotifyHttpClient(this.serviceId, this.apiKey, getUserAgent(), this.proxy, sslContext);
     }
 
     String getUserAgent() {
@@ -281,22 +273,6 @@ public class NotificationClient implements NotificationClientApi {
             LOGGER.log(Level.SEVERE, e.toString(), e);
             throw new NotificationClientException(e);
         }
-    }
-
-    /**
-     * Set default SSL context for HTTPS connections.
-     * <p/>
-     * This is necessary when client has to use keystore
-     * (eg provide certification for client authentication).
-     * <p/>
-     * Use case: enterprise proxy requiring HTTPS client authentication
-     */
-    private static void setDefaultSSLContext() throws NoSuchAlgorithmException {
-        HttpsURLConnection.setDefaultSSLSocketFactory(SSLContext.getDefault().getSocketFactory());
-    }
-
-    private static void setCustomSSLContext(final SSLContext sslContext) {
-        HttpsURLConnection.setDefaultSSLSocketFactory(sslContext.getSocketFactory());
     }
 
     private NotifyPrecompiledLetterResponse sendPrecompiledLetter(String reference, String base64EncodedPDFFile, String postage) throws NotificationClientException {
