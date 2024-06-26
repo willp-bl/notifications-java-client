@@ -601,7 +601,7 @@ public class NotificationClientTest {
                 .willReturn(created()
                         .withResponseBody(new Body(objectMapper.writeValueAsString(expected)))));
         NotificationClient client = new NotificationClient(COMBINED_API_KEY, BASE_URL);
-        final File pdfFile = new File(this.getClass().getClassLoader().getResource("one_page_pdf.pdf").getFile());
+        final File pdfFile = new File(this.getClass().getClassLoader().getResource("small.pdf.txt").getFile());
 
         LetterResponse actual = client.sendPrecompiledLetter(expected.getReference(), pdfFile, expected.getPostage());
 
@@ -612,8 +612,7 @@ public class NotificationClientTest {
         LoggedRequest request = validateRequest();
         NotifyPrecompiledLetterRequest requestReceivedByNotifyApi = objectMapper.readValue(request.getBodyAsString(), NotifyPrecompiledLetterRequest.class);
         assertEquals("your-letter-reference", requestReceivedByNotifyApi.getReference());
-        // Is it worth checking that the pdf is sent to Notify correctly?
-//        assertEquals("base 64 pdf", requestReceivedByNotifyApi.getContent());
+        assertEquals("JVBERi1mb28=", requestReceivedByNotifyApi.getContent());
         assertEquals("postage-you-have-set-or-None", requestReceivedByNotifyApi.getPostage());
     }
 
