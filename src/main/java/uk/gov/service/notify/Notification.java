@@ -21,16 +21,29 @@ public class Notification {
     private String postage;
     private String notificationType;
     private String status;
-    private UUID templateId;
-    private int templateVersion;
-    private String templateUri;
     private String body;
     private String subject;
     private ZonedDateTime createdAt;
     private ZonedDateTime sentAt;
     private ZonedDateTime completedAt;
     private ZonedDateTime estimatedDelivery;
+//     private ZonedDateTime scheduledFor;
+//     private String oneClickUnsubscribe;
     private String createdByName;
+    private boolean isCostDataReady;
+    private double costInPounds;
+
+    // Template fields
+    private UUID templateId;
+    private int templateVersion;
+    private String templateUri;
+
+    // CostDetails fields
+    private Integer billableSmsFragments;
+    private Double internationalRateMultiplier;
+    private Double smsRate;
+    private Integer billableSheetsOfPaper;
+    private String costPostage;
 
     public Notification(String content){
         JSONObject responseBodyAsJson = new JSONObject(content);
@@ -67,6 +80,22 @@ public class Notification {
         completedAt = data.isNull("completed_at") ? null : ZonedDateTime.parse(data.getString("completed_at"));
         estimatedDelivery = data.isNull("estimated_delivery") ? null : ZonedDateTime.parse(data.getString("estimated_delivery"));
         createdByName = data.isNull("created_by_name") ? null : data.getString("created_by_name");
+
+        // Deconstructing CostDetails
+        if (!data.isNull("cost_details")) {
+            JSONObject costDetails = data.getJSONObject("cost_details");
+            billableSmsFragments = costDetails.isNull("billable_sms_fragments") ? null : costDetails.getInt("billable_sms_fragments");
+            internationalRateMultiplier = costDetails.isNull("international_rate_multiplier") ? null : costDetails.getDouble("international_rate_multiplier");
+            smsRate = costDetails.isNull("sms_rate") ? null : costDetails.getDouble("sms_rate");
+            billableSheetsOfPaper = costDetails.isNull("billable_sheets_of_paper") ? null : costDetails.getInt("billable_sheets_of_paper");
+            costPostage = costDetails.isNull("postage") ? null : costDetails.getString("postage");
+        } else {
+            billableSmsFragments = null;
+            internationalRateMultiplier = null;
+            smsRate = null;
+            billableSheetsOfPaper = null;
+            costPostage = null;
+        }
     }
 
     public UUID getId() {
@@ -112,6 +141,7 @@ public class Notification {
     public Optional<String> getPostcode() {
         return Optional.ofNullable(postcode);
     }
+
     public Optional<String> getPostage() {
         return Optional.ofNullable(postage);
     }
@@ -167,6 +197,35 @@ public class Notification {
         return Optional.ofNullable(estimatedDelivery);
     }
 
+    public boolean isCostDataReady() {
+            return isCostDataReady;
+        }
+
+    public double getCostInPounds() {
+        return costInPounds;
+    }
+
+    // Getters for CostDetails fields
+    public Optional<Integer> getBillableSmsFragments() {
+        return Optional.ofNullable(billableSmsFragments);
+    }
+
+    public Optional<Double> getInternationalRateMultiplier() {
+        return Optional.ofNullable(internationalRateMultiplier);
+    }
+
+    public Optional<Double> getSmsRate() {
+        return Optional.ofNullable(smsRate);
+    }
+
+    public Optional<Integer> getBillableSheetsOfPaper() {
+        return Optional.ofNullable(billableSheetsOfPaper);
+    }
+
+    public Optional<String> getCostPostage() {
+        return Optional.ofNullable(costPostage);
+    }
+
     @Override
     public String toString() {
         return "Notification{" +
@@ -193,6 +252,13 @@ public class Notification {
                 ", completedAt=" + completedAt +
                 ", estimatedDelivery=" + estimatedDelivery +
                 ", createdByName=" + createdByName +
+                ", isCostDataReady=" + isCostDataReady +
+                ", costInPounds=" + costInPounds +
+                ", billableSmsFragments=" + billableSmsFragments +
+                ", internationalRateMultiplier=" + internationalRateMultiplier +
+                ", smsRate=" + smsRate +
+                ", billableSheetsOfPaper=" + billableSheetsOfPaper +
+                ", costPostage='" + costPostage + '\'' +
                 '}';
     }
 }
