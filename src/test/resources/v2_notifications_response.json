@@ -11,7 +11,6 @@
       "line_4": "a line 4",
       "line_5": "a line 5",
       "line_6": "a line 6",
-      "line_7": "a line 7",
       "type": "a type",
       "status": "a status",
       "template": {
@@ -24,7 +23,16 @@
       "created_at": "2024-05-10T16:40:14Z",
       "created_by_name": "a created_by_name",
       "sent_at": "2024-05-10T16:40:14Z",
-      "completed_at": "2024-05-10T16:40:14Z"
+      "completed_at": "2024-05-10T16:40:14Z",
+      "is_cost_data_ready": true,
+      "cost_in_pounds": 1.23,
+      "cost_details": {
+        "billable_sms_fragments": 5,
+        "international_rate_multiplier": 1.2,
+        "sms_rate": 0.05,
+        "billable_sheets_of_paper": 2,
+        "postage": "first_class"
+      }
     }
   ],
   "links": {

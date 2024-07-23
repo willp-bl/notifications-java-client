@@ -9,7 +9,6 @@ import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
 
-
 public class NotificationListTest {
     @Test
     public void testNotificationList_canCreateObjectFromJson() {
@@ -39,6 +38,16 @@ public class NotificationListTest {
         email.put("created_at", "2016-03-01T08:30:00.000Z");
         email.put("sent_at", "2016-03-01T08:30:03.000Z");
         email.put("completed_at", "2016-03-01T08:30:43.000Z");
+        email.put("is_cost_data_ready", true);
+        email.put("cost_in_pounds", 1.23);
+
+        JSONObject costDetails = new JSONObject();
+        costDetails.put("billable_sms_fragments", 5);
+        costDetails.put("international_rate_multiplier", 1.2);
+        costDetails.put("sms_rate", 0.05);
+        costDetails.put("billable_sheets_of_paper", 2);
+        costDetails.put("postage", "first_class");
+        email.put("cost_details", costDetails);
 
         JSONObject sms = new JSONObject();
         sms.put("id", id);
@@ -52,7 +61,7 @@ public class NotificationListTest {
         sms.put("line_5", null);
         sms.put("line_6", null);
         sms.put("postcode", null);
-        sms.put("type", "email");
+        sms.put("type", "sms");
         sms.put("status", "delivered");
         template.put("id", templateId);
         template.put("version", 1);
@@ -63,6 +72,16 @@ public class NotificationListTest {
         sms.put("created_at", "2016-03-01T08:30:00.000Z");
         sms.put("sent_at", "2016-03-01T08:30:03.000Z");
         sms.put("completed_at", "2016-03-01T08:30:43.000Z");
+        sms.put("is_cost_data_ready", true);
+        sms.put("cost_in_pounds", 0.15);
+
+        JSONObject smsCostDetails = new JSONObject();
+        smsCostDetails.put("billable_sms_fragments", 1);
+        smsCostDetails.put("international_rate_multiplier", null);
+        smsCostDetails.put("sms_rate", 0.15);
+        smsCostDetails.put("billable_sheets_of_paper", null);
+        smsCostDetails.put("postage", null);
+        sms.put("cost_details", smsCostDetails);
 
         JSONObject letter = new JSONObject();
         letter.put("id", id);
@@ -77,7 +96,7 @@ public class NotificationListTest {
         letter.put("line_6", null);
         letter.put("postcode", "SW1 1AA");
         letter.put("postage", "first");
-        letter.put("type", "email");
+        letter.put("type", "letter");
         letter.put("status", "delivered");
         template.put("id", templateId);
         template.put("version", 1);
@@ -88,6 +107,16 @@ public class NotificationListTest {
         letter.put("created_at", "2016-03-01T08:30:00.000Z");
         letter.put("sent_at", "2016-03-01T08:30:03.000Z");
         letter.put("completed_at", "2016-03-01T08:30:43.000Z");
+        letter.put("is_cost_data_ready", true);
+        letter.put("cost_in_pounds", 0.60);
+
+        JSONObject letterCostDetails = new JSONObject();
+        letterCostDetails.put("billable_sms_fragments", null);
+        letterCostDetails.put("international_rate_multiplier", null);
+        letterCostDetails.put("sms_rate", null);
+        letterCostDetails.put("billable_sheets_of_paper", 1);
+        letterCostDetails.put("postage", "first");
+        letter.put("cost_details", letterCostDetails);
 
         JSONArray listNotifications = new JSONArray();
         listNotifications.add(email);
