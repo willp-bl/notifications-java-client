@@ -43,7 +43,7 @@ public class Notification {
     private Double internationalRateMultiplier;
     private Double smsRate;
     private Integer billableSheetsOfPaper;
-    private String costPostage;
+    private String postageType;
 
     public Notification(String content){
         JSONObject responseBodyAsJson = new JSONObject(content);
@@ -88,13 +88,13 @@ public class Notification {
             internationalRateMultiplier = costDetails.isNull("international_rate_multiplier") ? null : costDetails.getDouble("international_rate_multiplier");
             smsRate = costDetails.isNull("sms_rate") ? null : costDetails.getDouble("sms_rate");
             billableSheetsOfPaper = costDetails.isNull("billable_sheets_of_paper") ? null : costDetails.getInt("billable_sheets_of_paper");
-            costPostage = costDetails.isNull("postage") ? null : costDetails.getString("postage");
+            postageType = costDetails.isNull("postage") ? null : costDetails.getString("postage");
         } else {
             billableSmsFragments = null;
             internationalRateMultiplier = null;
             smsRate = null;
             billableSheetsOfPaper = null;
-            costPostage = null;
+            postageType = null;
         }
     }
 
@@ -222,8 +222,8 @@ public class Notification {
         return Optional.ofNullable(billableSheetsOfPaper);
     }
 
-    public Optional<String> getCostPostage() {
-        return Optional.ofNullable(costPostage);
+    public Optional<String> getPostageType() {
+        return Optional.ofNullable(postageType);
     }
 
     @Override
@@ -258,7 +258,7 @@ public class Notification {
                 ", internationalRateMultiplier=" + internationalRateMultiplier +
                 ", smsRate=" + smsRate +
                 ", billableSheetsOfPaper=" + billableSheetsOfPaper +
-                ", costPostage='" + costPostage + '\'' +
+                ", postageType='" + postageType + '\'' +
                 '}';
     }
 }
