@@ -27,8 +27,6 @@ public class Notification {
     private ZonedDateTime sentAt;
     private ZonedDateTime completedAt;
     private ZonedDateTime estimatedDelivery;
-//     private ZonedDateTime scheduledFor;
-//     private String oneClickUnsubscribe;
     private String createdByName;
     private boolean isCostDataReady;
     private double costInPounds;
