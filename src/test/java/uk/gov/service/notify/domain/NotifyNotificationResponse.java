@@ -60,6 +60,75 @@ public class NotifyNotificationResponse {
         }
     }
 
+    public static class CostDetails {
+        private final Integer billableSmsFragments;
+        private final Double internationalRateMultiplier;
+        private final Double smsRate;
+        private final Integer billableSheetsOfPaper;
+        private final String postage;
+
+        public CostDetails(@JsonProperty("billable_sms_fragments") Integer billableSmsFragments,
+                           @JsonProperty("international_rate_multiplier") Double internationalRateMultiplier,
+                           @JsonProperty("sms_rate") Double smsRate,
+                           @JsonProperty("billable_sheets_of_paper") Integer billableSheetsOfPaper,
+                           @JsonProperty("postage") String postage) {
+            this.billableSmsFragments = billableSmsFragments;
+            this.internationalRateMultiplier = internationalRateMultiplier;
+            this.smsRate = smsRate;
+            this.billableSheetsOfPaper = billableSheetsOfPaper;
+            this.postage = postage;
+        }
+
+        @JsonProperty("billable_sms_fragments")
+        public Integer getBillableSmsFragments() {
+            return billableSmsFragments;
+        }
+
+        @JsonProperty("international_rate_multiplier")
+        public Double getInternationalRateMultiplier() {
+            return internationalRateMultiplier;
+        }
+
+        @JsonProperty("sms_rate")
+        public Double getSmsRate() {
+            return smsRate;
+        }
+
+        @JsonProperty("billable_sheets_of_paper")
+        public Integer getBillableSheetsOfPaper() {
+            return billableSheetsOfPaper;
+        }
+
+        @JsonProperty("postage")
+        public String getPostage() {
+            return postage;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            CostDetails that = (CostDetails) o;
+            return Objects.equals(billableSmsFragments, that.billableSmsFragments) && Objects.equals(internationalRateMultiplier, that.internationalRateMultiplier) && Objects.equals(smsRate, that.smsRate) && Objects.equals(billableSheetsOfPaper, that.billableSheetsOfPaper) && Objects.equals(postage, that.postage);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(billableSmsFragments, internationalRateMultiplier, smsRate, billableSheetsOfPaper, postage);
+        }
+
+        @Override
+        public String toString() {
+            return "CostDetails{" +
+                    "billableSmsFragments=" + billableSmsFragments +
+                    ", internationalRateMultiplier=" + internationalRateMultiplier +
+                    ", smsRate=" + smsRate +
+                    ", billableSheetsOfPaper=" + billableSheetsOfPaper +
+                    ", postage='" + postage + '\'' +
+                    '}';
+        }
+    }
+
     private final UUID id;
     private final String reference;
     private final String emailAddress;
@@ -81,6 +150,10 @@ public class NotifyNotificationResponse {
     private final ZonedDateTime sentAt;
     private final ZonedDateTime completedAt;
 
+    private final boolean isCostDataReady;
+    private final double costInPounds;
+    private final CostDetails costDetails;
+
     public NotifyNotificationResponse(@JsonProperty("id") UUID id,
                                       @JsonProperty("reference") String reference,
                                       @JsonProperty("email_address") String emailAddress,
@@ -100,7 +173,10 @@ public class NotifyNotificationResponse {
                                       @JsonProperty("created_at") ZonedDateTime createdAt,
                                       @JsonProperty("created_by_name") String createdByName,
                                       @JsonProperty("sent_at") ZonedDateTime sentAt,
-                                      @JsonProperty("completed_at") ZonedDateTime completedAt) {
+                                      @JsonProperty("completed_at") ZonedDateTime completedAt,
+                                      @JsonProperty("is_cost_data_ready") boolean isCostDataReady,
+                                      @JsonProperty("cost_in_pounds") double costInPounds,
+                                      @JsonProperty("cost_details") CostDetails costDetails) {
 
         this.id = id;
         this.reference = reference;
@@ -122,6 +198,9 @@ public class NotifyNotificationResponse {
         this.createdByName = createdByName;
         this.sentAt = sentAt;
         this.completedAt = completedAt;
+        this.isCostDataReady = isCostDataReady;
+        this.costInPounds = costInPounds;
+        this.costDetails = costDetails;
     }
 
     @JsonProperty("id")
@@ -224,17 +303,54 @@ public class NotifyNotificationResponse {
         return completedAt;
     }
 
+    @JsonProperty("is_cost_data_ready")
+    public boolean isCostDataReady() {
+        return isCostDataReady;
+    }
+
+    @JsonProperty("cost_in_pounds")
+    public double getCostInPounds() {
+        return costInPounds;
+    }
+
+    @JsonProperty("cost_details")
+    public CostDetails getCostDetails() {
+        return costDetails;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         NotifyNotificationResponse that = (NotifyNotificationResponse) o;
-        return Objects.equals(id, that.id) && Objects.equals(reference, that.reference) && Objects.equals(emailAddress, that.emailAddress) && Objects.equals(phoneNumber, that.phoneNumber) && Objects.equals(line1, that.line1) && Objects.equals(line2, that.line2) && Objects.equals(line3, that.line3) && Objects.equals(line4, that.line4) && Objects.equals(line5, that.line5) && Objects.equals(line6, that.line6) && Objects.equals(line7, that.line7) && Objects.equals(type, that.type) && Objects.equals(status, that.status) && Objects.equals(template, that.template) && Objects.equals(body, that.body) && Objects.equals(subject, that.subject) && Objects.equals(createdAt, that.createdAt) && Objects.equals(createdByName, that.createdByName) && Objects.equals(sentAt, that.sentAt) && Objects.equals(completedAt, that.completedAt);
+        return isCostDataReady == that.isCostDataReady &&
+                Double.compare(that.costInPounds, costInPounds) == 0 &&
+                Objects.equals(id, that.id) &&
+                Objects.equals(reference, that.reference) &&
+                Objects.equals(emailAddress, that.emailAddress) &&
+                Objects.equals(phoneNumber, that.phoneNumber) &&
+                Objects.equals(line1, that.line1) &&
+                Objects.equals(line2, that.line2) &&
+                Objects.equals(line3, that.line3) &&
+                Objects.equals(line4, that.line4) &&
+                Objects.equals(line5, that.line5) &&
+                Objects.equals(line6, that.line6) &&
+                Objects.equals(line7, that.line7) &&
+                Objects.equals(type, that.type) &&
+                Objects.equals(status, that.status) &&
+                Objects.equals(template, that.template) &&
+                Objects.equals(body, that.body) &&
+                Objects.equals(subject, that.subject) &&
+                Objects.equals(createdAt, that.createdAt) &&
+                Objects.equals(createdByName, that.createdByName) &&
+                Objects.equals(sentAt, that.sentAt) &&
+                Objects.equals(completedAt, that.completedAt) &&
+                Objects.equals(costDetails, that.costDetails);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, reference, emailAddress, phoneNumber, line1, line2, line3, line4, line5, line6, line7, type, status, template, body, subject, createdAt, createdByName, sentAt, completedAt);
+        return Objects.hash(id, reference, emailAddress, phoneNumber, line1, line2, line3, line4, line5, line6, line7, type, status, template, body, subject, createdAt, createdByName, sentAt, completedAt, isCostDataReady, costInPounds, costDetails);
     }
 
     @Override
@@ -260,6 +376,9 @@ public class NotifyNotificationResponse {
                 ", createdByName='" + createdByName + '\'' +
                 ", sentAt=" + sentAt +
                 ", completedAt=" + completedAt +
+                ", isCostDataReady=" + isCostDataReady +
+                ", costInPounds=" + costInPounds +
+                ", costDetails=" + costDetails +
                 '}';
     }
 }
