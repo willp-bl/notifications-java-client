@@ -1,6 +1,6 @@
 package uk.gov.service.notify;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.time.temporal.ChronoUnit;
 

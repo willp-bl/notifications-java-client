@@ -1,12 +1,12 @@
 package uk.gov.service.notify;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.time.temporal.ChronoUnit;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class PrepareUploadHelperTest {
 

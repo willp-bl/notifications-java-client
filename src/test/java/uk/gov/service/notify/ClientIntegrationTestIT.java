@@ -1,7 +1,7 @@
 package uk.gov.service.notify;
 
 import org.apache.commons.io.FileUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.gov.service.notify.domain.NotificationStatus;
 import uk.gov.service.notify.domain.NotificationType;
 import uk.gov.service.notify.domain.NotifyEmailResponse;
@@ -31,13 +31,13 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static uk.gov.service.notify.domain.NotificationStatus.Letter.ACCEPTED;
 import static uk.gov.service.notify.domain.NotificationStatus.Letter.RECEIVED;
 
@@ -497,7 +497,8 @@ public class ClientIntegrationTestIT {
 //        assertNotNull(notification.getPostage());
 
         assertNotNull(notification.getStatus());
-        assertTrue("expected status to be accepted or received", Arrays.asList(ACCEPTED, RECEIVED).contains(notification.getStatus()));
+        assertTrue(Arrays.asList(ACCEPTED, RECEIVED).contains(notification.getStatus()),
+                "expected status to be accepted or received");
     }
 
     private void assertNotificationWhenEmail(NotifyNotificationEmail notification) {
@@ -505,14 +506,16 @@ public class ClientIntegrationTestIT {
         assertNotNull(notification.getEmailAddress());
 
         assertNotNull(notification.getStatus());
-        assertTrue("expected status to be created, sending or delivered", Arrays.asList(NotificationStatus.Email.CREATED, NotificationStatus.Email.SENDING, NotificationStatus.Email.DELIVERED).contains(notification.getStatus()));
+        assertTrue(Arrays.asList(NotificationStatus.Email.CREATED, NotificationStatus.Email.SENDING, NotificationStatus.Email.DELIVERED).contains(notification.getStatus()),
+                "expected status to be created, sending or delivered");
     }
 
     private void assertNotificationWhenSms(NotifyNotificationSms notification) {
         assertNotNull(notification.getPhoneNumber());
 
         assertNotNull(notification.getStatus());
-        assertTrue("expected status to be created, sending or delivered", Arrays.asList(NotificationStatus.Sms.CREATED, NotificationStatus.Sms.SENDING, NotificationStatus.Sms.DELIVERED).contains(notification.getStatus()));
+        assertTrue(Arrays.asList(NotificationStatus.Sms.CREATED, NotificationStatus.Sms.SENDING, NotificationStatus.Sms.DELIVERED).contains(notification.getStatus()),
+                "expected status to be created, sending or delivered");
     }
 
     private void assertPrecompiledLetterResponse(String reference, String postage, NotifyPrecompiledLetterResponse response) {

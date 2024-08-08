@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.github.tomakehurst.wiremock.http.Body;
-import com.github.tomakehurst.wiremock.junit.WireMockRule;
+import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 import com.github.tomakehurst.wiremock.matching.RequestPattern;
 import com.github.tomakehurst.wiremock.verification.LoggedRequest;
 import org.apache.commons.io.IOUtils;
@@ -14,10 +14,9 @@ import org.jose4j.jws.AlgorithmIdentifiers;
 import org.jose4j.jwt.consumer.InvalidJwtException;
 import org.jose4j.jwt.consumer.JwtConsumer;
 import org.jose4j.jwt.consumer.JwtConsumerBuilder;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import uk.gov.service.notify.domain.NotificationType;
 import uk.gov.service.notify.domain.NotifyEmailRequest;
 import uk.gov.service.notify.domain.NotifyEmailResponse;
@@ -68,7 +67,7 @@ import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMoc
 import static java.util.Collections.emptyMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Fail.fail;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class NotificationClientTest {
 
@@ -85,18 +84,14 @@ public class NotificationClientTest {
     /**
      * A new wireMockRule is created for every test case (as opposed to using @ClassRule) which would use only one
      */
-    @Rule
-    public WireMockRule wireMockRule = new WireMockRule(wireMockConfig().dynamicPort());
+    @RegisterExtension
+    private static final WireMockExtension wireMockRule = WireMockExtension.newInstance()
+            .options(wireMockConfig().dynamicPort())
+            .build();
 
-    @Before
-    public void beforeEachTest() {
-        wireMockRule.start();
-        this.BASE_URL = "http://localhost:" + wireMockRule.port();
-    }
-
-    @After
-    public void afterEachTest() {
-        wireMockRule.shutdown();
+    @BeforeEach
+    public void beforeEach() {
+        this.BASE_URL = "http://localhost:" + wireMockRule.getPort();
     }
 
     @Test
