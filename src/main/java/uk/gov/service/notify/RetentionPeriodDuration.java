@@ -2,6 +2,7 @@ package uk.gov.service.notify;
 
 import java.time.temporal.ChronoUnit;
 import java.util.Locale;
+import java.util.Objects;
 
 /***
  * Represents a retention period duration for files for file upload
@@ -45,5 +46,18 @@ public class RetentionPeriodDuration {
                 "%d %s",
                 getAmount(),
                 getUnit().toString().toLowerCase(Locale.ROOT));
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        RetentionPeriodDuration that = (RetentionPeriodDuration) o;
+        return amount == that.amount && unit == that.unit;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(amount, unit);
     }
 }
