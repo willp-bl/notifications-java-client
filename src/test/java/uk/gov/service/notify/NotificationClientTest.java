@@ -215,7 +215,7 @@ public class NotificationClientTest {
                 () -> client.sendSms(templateId, "aPhoneNumber", emptyMap(), "aReference"));
 
         assertThat(e.getHttpResult()).isEqualTo(404);
-        assertThat(e).hasMessage("Status code: 404 ");
+        assertThat(e).hasMessage("Status code: 404 unexpected response code, expected 201");
 
         validateRequest();
     }
@@ -232,7 +232,7 @@ public class NotificationClientTest {
                 () -> client.sendEmail(templateId, "anEmailAddress", emptyMap(), "aReference", emailReplyToId));
 
         assertThat(e.getHttpResult()).isEqualTo(500);
-        assertThat(e).hasMessage("Status code: 500 ");
+        assertThat(e).hasMessage("Status code: 500 unexpected response code, expected 201");
 
         validateRequest();
     }
@@ -322,7 +322,7 @@ public class NotificationClientTest {
                 () -> client.sendSms(templateId, "a phone number", emptyMap(), "aReference", smsSenderId));
 
         assertThat(e.getHttpResult()).isEqualTo(500);
-        assertThat(e).hasMessage("Status code: 500 ");
+        assertThat(e).hasMessage("Status code: 500 unexpected response code, expected 201");
 
         validateRequest();
     }
@@ -376,7 +376,7 @@ public class NotificationClientTest {
                 () -> client.sendLetter(templateId, personalisation, "aReference"));
 
         assertThat(e.getHttpResult()).isEqualTo(500);
-        assertThat(e).hasMessage("Status code: 500 ");
+        assertThat(e).hasMessage("Status code: 500 unexpected response code, expected 201");
 
         validateRequest();
     }
@@ -705,7 +705,7 @@ public class NotificationClientTest {
                 () -> client.sendSms(templateId, "aPhoneNumber", emptyMap(), "aReference"));
 
         assertThat(e.getHttpResult()).isEqualTo(401);
-        assertThat(e).hasMessage("Status code: 401 ");
+        assertThat(e).hasMessage("Status code: 401 unexpected response code, expected 201");
 
         List<LoggedRequest> requests = wireMockRule.findRequestsMatching(RequestPattern.everything()).getRequests();
         assertThat(requests).hasSize(1);

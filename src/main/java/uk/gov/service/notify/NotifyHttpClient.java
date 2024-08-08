@@ -8,10 +8,16 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import java.io.IOException;
-import java.net.HttpURLConnection;
+import java.io.InputStream;
+import java.net.InetSocketAddress;
 import java.net.Proxy;
+import java.net.ProxySelector;
 import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.security.NoSuchAlgorithmException;
+import java.time.Duration;
 import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -25,16 +31,16 @@ class NotifyHttpClient {
             .registerModule(new JavaTimeModule())
             .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 
-    private final String serviceId;
-    private final String apiKey;
+    private final String bearerToken;
     private final String userAgent;
-    private final Proxy proxy;
+    private final HttpClient httpClient;
 
     NotifyHttpClient(String serviceId, String apiKey, String userAgent, Proxy proxy, SSLContext sslContext) {
-        this.serviceId = serviceId;
-        this.apiKey = apiKey;
+        this.bearerToken = Authentication.create(serviceId, apiKey);
         this.userAgent = userAgent;
-        this.proxy = null == proxy ? Proxy.NO_PROXY : proxy;
+        this.httpClient = HttpClient.newBuilder()
+                .proxy(Objects.nonNull(proxy)?ProxySelector.of((InetSocketAddress)proxy.address()):ProxySelector.getDefault())
+                .build();
         if (Objects.nonNull(sslContext)) {
             setCustomSSLContext(sslContext);
         } else {
@@ -46,107 +52,80 @@ class NotifyHttpClient {
         }
     }
 
-    private String performPostRequest(HttpURLConnection conn, Object requestBody, int expectedStatusCode) throws NotificationClientException {
-        try {
-            objectMapper.writeValue(conn.getOutputStream(), requestBody);
-
-            final int httpResponseCode = conn.getResponseCode();
-            if (httpResponseCode == expectedStatusCode) {
-                return NotifyUtils.readStream(conn.getInputStream());
-            } else {
-                throw new NotificationClientHttpException(httpResponseCode, NotifyUtils.readStream(conn.getErrorStream()));
-            }
-
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, e.toString(), e);
-            throw new NotificationClientException(e);
-        } finally {
-            if (conn != null) {
-                conn.disconnect();
-            }
-        }
-    }
-
-    private String performGetRequest(HttpURLConnection conn) throws NotificationClientException {
-        try {
-            final int httpResponseCode = conn.getResponseCode();
-            if (200 == httpResponseCode) {
-                return NotifyUtils.readStream(conn.getInputStream());
-            } else {
-                throw new NotificationClientHttpException(httpResponseCode, NotifyUtils.readStream(conn.getErrorStream()));
-            }
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, e.toString(), e);
-            throw new NotificationClientException(e);
-        } finally {
-            if (conn != null) {
-                conn.disconnect();
-            }
-        }
-    }
-
-    private byte[] performRawGetRequest(HttpURLConnection conn) throws NotificationClientException {
-        final byte[] out;
-        try {
-            final int httpResponseCode = conn.getResponseCode();
-            if (200 == httpResponseCode) {
-                out = conn.getInputStream().readAllBytes();
-            } else {
-                throw new NotificationClientHttpException(httpResponseCode, NotifyUtils.readStream(conn.getErrorStream()));
-            }
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, e.toString(), e);
-            throw new NotificationClientException(e);
-        } finally {
-            if (conn != null) {
-                conn.disconnect();
-            }
-        }
-        return out;
-    }
-
-    private HttpURLConnection createConnectionAndSetHeaders(URI uri, String method) throws NotificationClientException {
-        try {
-            final HttpURLConnection conn = (HttpURLConnection)uri.toURL().openConnection(proxy);
-            conn.setRequestMethod(method);
-            final String token = Authentication.create(serviceId, apiKey);
-            conn.setRequestProperty("Authorization", "Bearer " + token);
-            conn.setRequestProperty("User-agent", userAgent);
-            if (method.equals("POST")) {
-                conn.setDoOutput(true);
-                conn.setRequestProperty("Content-Type", "application/json");
-                conn.setRequestProperty("Accept", "application/json");
-            }
-            return conn;
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, e.toString(), e);
-            throw new NotificationClientException(e);
-        }
-    }
-
     <T> T post(URI uri, Object requestBody, Class<T> responseClass, int expectedResponseCode) throws NotificationClientException {
-        final HttpURLConnection conn = createConnectionAndSetHeaders(uri, "POST");
-        final String responseBody = performPostRequest(conn, requestBody, expectedResponseCode);
+        final String requestBodyString;
         try {
-            return objectMapper.readValue(responseBody, responseClass);
+            requestBodyString = objectMapper.writeValueAsString(requestBody);
         } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+
+        final HttpRequest httpRequest = HttpRequest.newBuilder()
+                .uri(uri)
+                .timeout(Duration.ofMinutes(1))
+                .setHeader("Authorization", "Bearer " + bearerToken)
+                .setHeader("User-agent", userAgent)
+                .setHeader("Accept", "application/json")
+                .setHeader("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(requestBodyString))
+                .build();
+
+        try(InputStream responseBody = sendHttpRequest(httpRequest, expectedResponseCode);) {
+            return objectMapper.readValue(responseBody, responseClass);
+        } catch (IOException e) {
             throw new NotificationClientException(e);
         }
+    }
+
+    private InputStream sendHttpRequest(HttpRequest httpRequest, int expectedResponseCode) throws NotificationClientException {
+        final HttpResponse<InputStream> httpResponse;
+        try {
+            httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofInputStream());
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, e.toString(), e);
+            throw new NotificationClientException(e);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        if(httpResponse.statusCode() != expectedResponseCode) {
+            throw new NotificationClientHttpException(httpResponse.statusCode(), "unexpected response code, expected "+expectedResponseCode);
+        }
+
+        return httpResponse.body();
     }
 
     <T> T get(URI uri, Class<T> responseClass) throws NotificationClientException {
-        final HttpURLConnection conn = createConnectionAndSetHeaders(uri, "GET");
-        final String responseBody = performGetRequest(conn);
-        try {
+        final HttpRequest httpRequest = HttpRequest.newBuilder()
+                .uri(uri)
+                .timeout(Duration.ofMinutes(1))
+                .setHeader("Authorization", "Bearer " + bearerToken)
+                .setHeader("User-agent", userAgent)
+                .setHeader("Accept", "application/json")
+                .GET()
+                .build();
+
+        try(InputStream responseBody = sendHttpRequest(httpRequest, 200);) {
             return objectMapper.readValue(responseBody, responseClass);
-        } catch (JsonProcessingException e) {
+        } catch (IOException e) {
             throw new NotificationClientException(e);
         }
     }
 
     byte[] get(URI uri) throws NotificationClientException {
-        final HttpURLConnection conn = createConnectionAndSetHeaders(uri, "GET");
-        return performRawGetRequest(conn);
+        final HttpRequest httpRequest = HttpRequest.newBuilder()
+                .uri(uri)
+                .timeout(Duration.ofMinutes(1))
+                .setHeader("Authorization", "Bearer " + bearerToken)
+                .setHeader("User-agent", userAgent)
+                .GET()
+                .build();
+
+        try (InputStream responseBody = sendHttpRequest(httpRequest, 200)) {
+            return responseBody.readAllBytes();
+        } catch (IOException e) {
+            throw new NotificationClientException(e);
+        }
     }
 
     /**
