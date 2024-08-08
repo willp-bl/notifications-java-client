@@ -1,8 +1,5 @@
 package uk.gov.service.notify;
 
-import org.apache.commons.codec.binary.Base64InputStream;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.http.client.utils.URIBuilder;
 import uk.gov.service.notify.domain.NotificationType;
 import uk.gov.service.notify.domain.NotifyEmailRequest;
@@ -29,8 +26,9 @@ import java.io.InputStream;
 import java.net.Proxy;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.util.Base64;
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -307,7 +305,7 @@ public class NotificationClient implements NotificationClientApi {
         }
         byte[] buf;
         try {
-            buf = FileUtils.readFileToByteArray(precompiledPDF);
+            buf = Files.readAllBytes(precompiledPDF.toPath());
         } catch (IOException e) {
             throw new NotificationClientException("Can't read file");
         }
@@ -324,10 +322,9 @@ public class NotificationClient implements NotificationClientApi {
         if (stream == null) {
             throw new NotificationClientException("Input stream cannot be null");
         }
-        Base64InputStream base64InputStream = new Base64InputStream(stream, true, 0, null);
         String encoded;
         try {
-            encoded = IOUtils.toString(base64InputStream, ISO_8859_1);
+            encoded = Base64.getMimeEncoder().encodeToString(stream.readAllBytes());
         } catch (IOException e) {
             throw new NotificationClientException("Error when turning Base64InputStream into a string");
         }

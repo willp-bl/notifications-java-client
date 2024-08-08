@@ -1,11 +1,8 @@
 package uk.gov.service.notify;
 
-import org.apache.commons.codec.binary.Base64;
-
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
-
-import static java.nio.charset.StandardCharsets.ISO_8859_1;
 
 public class PrepareUploadHelper {
 
@@ -42,8 +39,7 @@ public class PrepareUploadHelper {
         if (documentContents.length > 2 * 1024 * 1024) {
             throw new NotificationClientException(413, "File is larger than 2MB");
         }
-        byte[] fileContentAsByte = Base64.encodeBase64(documentContents);
-        String fileContent = new String(fileContentAsByte, ISO_8859_1);
+        final String fileContent = Base64.getMimeEncoder().encodeToString(documentContents);
 
         Map<String, Object> jsonFileObject = new HashMap<>();
         jsonFileObject.put("file", fileContent);

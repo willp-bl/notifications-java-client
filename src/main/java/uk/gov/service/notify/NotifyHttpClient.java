@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import org.apache.commons.io.IOUtils;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
@@ -99,7 +98,7 @@ class NotifyHttpClient {
             int httpResult = conn.getResponseCode();
             if (httpResult == 200) {
                 InputStream is = conn.getInputStream();
-                out = IOUtils.toByteArray(is);
+                out = is.readAllBytes();
             } else {
                 throw new NotificationClientException(httpResult, NotifyUtils.readStream(conn.getErrorStream()));
             }

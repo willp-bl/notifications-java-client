@@ -1,7 +1,5 @@
 package uk.gov.service.notify;
 
-import org.apache.commons.io.IOUtils;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Objects;
@@ -25,7 +23,7 @@ class NotifyUtils {
         if (inputStream == null) {
             return null;
         }
-        return IOUtils.toString(inputStream, UTF_8);
+        return new String(inputStream.readAllBytes(), UTF_8);
     }
 
     static String extractServiceId(String apiKey) {

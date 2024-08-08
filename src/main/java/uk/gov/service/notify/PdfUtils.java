@@ -16,7 +16,7 @@ public class PdfUtils
      */
     public static boolean isBase64StringPDF(String base64String)
     {
-        byte[] decoded = Base64.getDecoder().decode(base64String);
+        byte[] decoded = Base64.getMimeDecoder().decode(base64String);
 
         Scanner input = new Scanner(new ByteArrayInputStream(decoded));
 
