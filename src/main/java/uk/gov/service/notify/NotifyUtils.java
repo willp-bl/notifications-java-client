@@ -2,7 +2,6 @@ package uk.gov.service.notify;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Objects;
 import java.util.Properties;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -27,32 +26,11 @@ class NotifyUtils {
     }
 
     static String getVersion() {
-        InputStream input = null;
-        Properties prop = new Properties();
-        try
-        {
-            input = NotifyUtils.class.getClassLoader().getResourceAsStream("application.properties");
-
+        final Properties prop = new Properties();
+        try(InputStream input = NotifyUtils.class.getClassLoader().getResourceAsStream("application.properties")) {
             prop.load(input);
-
-        }
-        catch (IOException ex)
-        {
-            ex.printStackTrace();
-        }
-        finally
-        {
-            if (input != null)
-            {
-                try
-                {
-                    input.close();
-                }
-                catch (IOException e)
-                {
-                    e.printStackTrace();
-                }
-            }
+        } catch (IOException ex) {
+            throw new RuntimeException(new NotificationClientException(ex));
         }
         return prop.getProperty("project.version");
     }
