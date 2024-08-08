@@ -29,13 +29,13 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.util.Base64;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static java.net.HttpURLConnection.HTTP_CREATED;
 import static java.net.HttpURLConnection.HTTP_OK;
-import static java.nio.charset.StandardCharsets.ISO_8859_1;
 
 public class NotificationClient implements NotificationClientApi {
 
@@ -274,11 +274,11 @@ public class NotificationClient implements NotificationClientApi {
     }
 
     private NotifyPrecompiledLetterResponse sendPrecompiledLetter(String reference, String base64EncodedPDFFile, String postage) throws NotificationClientException {
-        if (NotifyUtils.isBlank(reference)) {
+        if (Objects.isNull(reference) || reference.isBlank()) {
             throw new NotificationClientException("reference cannot be null or empty");
         }
 
-        if (NotifyUtils.isBlank(base64EncodedPDFFile)) {
+        if (Objects.isNull(base64EncodedPDFFile) || base64EncodedPDFFile.isBlank()) {
             throw new NotificationClientException("precompiledPDF cannot be null or empty");
         }
 

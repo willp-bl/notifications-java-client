@@ -11,14 +11,6 @@ class NotifyUtils {
 
     private NotifyUtils() {}
 
-    static boolean isBlank(String string) {
-        if(Objects.isNull(string)
-                || string.trim().length()==0) {
-            return true;
-        }
-        return false;
-    }
-
     static String readStream(InputStream inputStream) throws IOException {
         if (inputStream == null) {
             return null;
