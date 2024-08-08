@@ -11,9 +11,8 @@ import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public class AuthenticationTest {
@@ -42,7 +41,7 @@ public class AuthenticationTest {
         InvalidJwtException e = assertThrows(InvalidJwtException.class,
                 () -> validateBearerToken(jwt, serviceId, apiKey));
 
-        assertTrue(e.getMessage(), e.getMessage().contains("Issuer (iss) claim value ("+differentServiceId+") doesn't match expected value of "+serviceId));
+        assertThat(e.getMessage()).contains("Issuer (iss) claim value ("+differentServiceId+") doesn't match expected value of "+serviceId);
     }
 
     @Test
@@ -55,8 +54,7 @@ public class AuthenticationTest {
         InvalidJwtException e = assertThrows(InvalidJwtException.class,
                 () -> validateBearerToken(jwt, serviceId, apiKey));
 
-        final String expectedMessage = "JWT rejected due to invalid signature";
-        assertEquals(e.getMessage(), expectedMessage, e.getMessage().substring(0, expectedMessage.length()));
+        assertThat(e.getMessage()).startsWith("JWT rejected due to invalid signature");;
     }
 
     private void validateBearerToken(String token, String serviceId, String apiKey) throws InvalidJwtException {

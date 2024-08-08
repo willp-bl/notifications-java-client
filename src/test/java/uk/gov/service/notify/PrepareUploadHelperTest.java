@@ -5,8 +5,7 @@ import org.junit.Test;
 import java.time.temporal.ChronoUnit;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertThrows;
 
 public class PrepareUploadHelperTest {
@@ -17,10 +16,10 @@ public class PrepareUploadHelperTest {
 
         Map<String, ?> response = PrepareUploadHelper.prepareUpload(documentContent);
 
-        assertEquals("dGhpcyBpcyBhIGRvY3VtZW50IHRvIHRlc3Qgd2l0aA==", response.get("file"));
-        assertNull(response.get("filename"));
-        assertNull(response.get("confirm_email_before_download"));
-        assertNull(response.get("retention_period"));
+        assertThat(response.get("file")).isEqualTo("dGhpcyBpcyBhIGRvY3VtZW50IHRvIHRlc3Qgd2l0aA==");
+        assertThat(response.get("filename")).isNull();
+        assertThat(response.get("confirm_email_before_download")).isNull();
+        assertThat(response.get("retention_period")).isNull();
     }
 
     @Test
@@ -29,10 +28,10 @@ public class PrepareUploadHelperTest {
 
         Map<String, ?> response = PrepareUploadHelper.prepareUpload(documentContent, "report.csv");
 
-        assertEquals("dGhpcyBpcyBhIGRvY3VtZW50IHRvIHRlc3Qgd2l0aA==", response.get("file"));
-        assertEquals("report.csv", response.get("filename"));
-        assertNull(response.get("confirm_email_before_download"));
-        assertNull(response.get("retention_period"));
+        assertThat(response.get("file")).isEqualTo("dGhpcyBpcyBhIGRvY3VtZW50IHRvIHRlc3Qgd2l0aA==");
+        assertThat(response.get("filename")).isEqualTo("report.csv");
+        assertThat(response.get("confirm_email_before_download")).isNull();
+        assertThat(response.get("retention_period")).isNull();
     }
 
     @Test
@@ -45,10 +44,10 @@ public class PrepareUploadHelperTest {
                 true,
                 "1 weeks");
 
-        assertEquals("dGhpcyBpcyBhIGRvY3VtZW50IHRvIHRlc3Qgd2l0aA==", response.get("file"));
-        assertEquals("report.csv", response.get("filename"));
-        assertEquals(true, response.get("confirm_email_before_download"));
-        assertEquals("1 weeks", response.get("retention_period"));
+        assertThat(response.get("file")).isEqualTo("dGhpcyBpcyBhIGRvY3VtZW50IHRvIHRlc3Qgd2l0aA==");
+        assertThat(response.get("filename")).isEqualTo("report.csv");
+        assertThat(response.get("confirm_email_before_download")).isEqualTo(true);
+        assertThat(response.get("retention_period")).isEqualTo("1 weeks");
     }
 
     @Test
@@ -61,10 +60,10 @@ public class PrepareUploadHelperTest {
                 true,
                 new RetentionPeriodDuration(1, ChronoUnit.WEEKS));
 
-        assertEquals("dGhpcyBpcyBhIGRvY3VtZW50IHRvIHRlc3Qgd2l0aA==", response.get("file"));
-        assertEquals("report.csv", response.get("filename"));
-        assertEquals(true, response.get("confirm_email_before_download"));
-        assertEquals("1 weeks", response.get("retention_period"));
+        assertThat(response.get("file")).isEqualTo("dGhpcyBpcyBhIGRvY3VtZW50IHRvIHRlc3Qgd2l0aA==");
+        assertThat(response.get("filename")).isEqualTo("report.csv");
+        assertThat(response.get("confirm_email_before_download")).isEqualTo(true);
+        assertThat(response.get("retention_period")).isEqualTo("1 weeks");
     }
 
     @Test
@@ -76,10 +75,10 @@ public class PrepareUploadHelperTest {
                 true,
                 new RetentionPeriodDuration(1, ChronoUnit.WEEKS));
 
-        assertEquals("dGhpcyBpcyBhIGRvY3VtZW50IHRvIHRlc3Qgd2l0aA==", response.get("file"));
-        assertNull(response.get("filename"));
-        assertEquals(true, response.get("confirm_email_before_download"));
-        assertEquals("1 weeks", response.get("retention_period"));
+        assertThat(response.get("file")).isEqualTo("dGhpcyBpcyBhIGRvY3VtZW50IHRvIHRlc3Qgd2l0aA==");
+        assertThat(response.get("filename")).isNull();
+        assertThat(response.get("confirm_email_before_download")).isEqualTo(true);
+        assertThat(response.get("retention_period")).isEqualTo("1 weeks");
     }
 
     @Test
@@ -90,8 +89,8 @@ public class PrepareUploadHelperTest {
         NotificationClientException e = assertThrows(NotificationClientException.class,
                 () -> PrepareUploadHelper.prepareUpload(documentContents));
 
-        assertEquals(e.getHttpResult(), 413);
-        assertEquals(e.getMessage(), "Status code: 413 File is larger than 2MB");
+        assertThat(e.getHttpResult()).isEqualTo(413);
+        assertThat(e).hasMessage("Status code: 413 File is larger than 2MB");
     }
 
 }

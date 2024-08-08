@@ -4,7 +4,7 @@ import org.junit.Test;
 
 import java.time.temporal.ChronoUnit;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class RetentionPeriodDurationTest {
 
@@ -12,13 +12,14 @@ public class RetentionPeriodDurationTest {
     public void testCreatingRetentionPeriodDuration_WithValidData(){
         RetentionPeriodDuration duration = new RetentionPeriodDuration(52, ChronoUnit.WEEKS);
 
-        assertEquals(52, duration.getAmount());
-        assertEquals(ChronoUnit.WEEKS, duration.getUnit());
+        assertThat(duration.getAmount()).isEqualTo(52);
+        assertThat(duration.getUnit()).isEqualTo(ChronoUnit.WEEKS);
     }
 
     @Test
     public void testCreatingStringFromDuration(){
         RetentionPeriodDuration duration = new RetentionPeriodDuration(52, ChronoUnit.WEEKS);
-        assertEquals("52 weeks", duration.toString());
+
+        assertThat(duration).asString().isEqualTo("52 weeks");
     }
 }

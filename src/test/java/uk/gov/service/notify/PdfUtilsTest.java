@@ -7,7 +7,7 @@ import org.junit.Test;
 import java.io.File;
 
 import static java.nio.charset.StandardCharsets.US_ASCII;
-import static org.junit.Assert.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class PdfUtilsTest
 {
@@ -21,7 +21,9 @@ public class PdfUtilsTest
 
         String base64encodedString = new String(encoded, US_ASCII);
 
-        assertFalse(PdfUtils.isBase64StringPDF(base64encodedString));
+        assertThat(PdfUtils.isBase64StringPDF(base64encodedString))
+                .withFailMessage("test file should not have been detected as a pdf")
+                .isFalse();
     }
 
 
@@ -35,6 +37,8 @@ public class PdfUtilsTest
 
         String base64encodedString = new String(encoded, US_ASCII);
 
-        assertTrue(PdfUtils.isBase64StringPDF(base64encodedString));
+        assertThat(PdfUtils.isBase64StringPDF(base64encodedString))
+                .withFailMessage("test file should have been detected as a pdf")
+                .isTrue();
     }
 }

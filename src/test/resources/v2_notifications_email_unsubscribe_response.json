@@ -12,5 +12,5 @@
     "version": -1,
     "uri": "http://localhost"
   },
-  "one_click_unsubscribe_url": "http://localhost"
+  "one_click_unsubscribe_url": "http://localhost/unsubscribe"
 }
