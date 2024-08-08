@@ -37,7 +37,7 @@ public class PrepareUploadHelper {
                                                     Boolean confirmEmailBeforeDownload,
                                                     String retentionPeriod) throws NotificationClientException {
         if (documentContents.length > 2 * 1024 * 1024) {
-            throw new NotificationClientException(413, "File is larger than 2MB");
+            throw new NotificationClientHttpException(413, "File is larger than 2MB");
         }
         final String fileContent = Base64.getMimeEncoder().encodeToString(documentContents);
 

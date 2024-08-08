@@ -97,10 +97,12 @@ public class ClientIntegrationTestIT {
         try {
             client.sendEmail(getUUIDEnvVar("EMAIL_TEMPLATE_ID"), System.getenv("FUNCTIONAL_TEST_EMAIL"), null, null);
             fail("Expected NotificationClientException: Template missing personalisation: name");
-        } catch (NotificationClientException e) {
+        } catch (NotificationClientHttpException e) {
             assert(e.getMessage().contains("Missing personalisation: name"));
             assert e.getHttpResult() == 400;
             assert(e.getMessage().contains("BadRequestError"));
+        } catch (NotificationClientException e) {
+            fail("unexpected exception: "+e);
         }
     }
 

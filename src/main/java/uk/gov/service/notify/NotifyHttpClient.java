@@ -54,7 +54,7 @@ class NotifyHttpClient {
             if (httpResponseCode == expectedStatusCode) {
                 return NotifyUtils.readStream(conn.getInputStream());
             } else {
-                throw new NotificationClientException(httpResponseCode, NotifyUtils.readStream(conn.getErrorStream()));
+                throw new NotificationClientHttpException(httpResponseCode, NotifyUtils.readStream(conn.getErrorStream()));
             }
 
         } catch (IOException e) {
@@ -73,7 +73,7 @@ class NotifyHttpClient {
             if (200 == httpResponseCode) {
                 return NotifyUtils.readStream(conn.getInputStream());
             } else {
-                throw new NotificationClientException(httpResponseCode, NotifyUtils.readStream(conn.getErrorStream()));
+                throw new NotificationClientHttpException(httpResponseCode, NotifyUtils.readStream(conn.getErrorStream()));
             }
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, e.toString(), e);
@@ -92,7 +92,7 @@ class NotifyHttpClient {
             if (200 == httpResponseCode) {
                 out = conn.getInputStream().readAllBytes();
             } else {
-                throw new NotificationClientException(httpResponseCode, NotifyUtils.readStream(conn.getErrorStream()));
+                throw new NotificationClientHttpException(httpResponseCode, NotifyUtils.readStream(conn.getErrorStream()));
             }
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, e.toString(), e);

@@ -86,7 +86,7 @@ public class PrepareUploadHelperTest {
         char[] data = new char[(2 * 1024 * 1024) + 50];
         byte[] documentContents = new String(data).getBytes();
 
-        NotificationClientException e = assertThrows(NotificationClientException.class,
+        NotificationClientHttpException e = assertThrows(NotificationClientHttpException.class,
                 () -> PrepareUploadHelper.prepareUpload(documentContents));
 
         assertThat(e.getHttpResult()).isEqualTo(413);

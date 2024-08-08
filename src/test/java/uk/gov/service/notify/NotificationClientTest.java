@@ -211,7 +211,7 @@ public class NotificationClientTest {
         NotificationClient client = new NotificationClient(COMBINED_API_KEY, BASE_URL);
         UUID templateId = UUID.randomUUID();
 
-        NotificationClientException e = assertThrows(NotificationClientException.class,
+        NotificationClientHttpException e = assertThrows(NotificationClientHttpException.class,
                 () -> client.sendSms(templateId, "aPhoneNumber", emptyMap(), "aReference"));
 
         assertThat(e.getHttpResult()).isEqualTo(404);
@@ -228,7 +228,7 @@ public class NotificationClientTest {
         UUID templateId = UUID.randomUUID();
         UUID emailReplyToId = UUID.randomUUID();
 
-        NotificationClientException e = assertThrows(NotificationClientException.class,
+        NotificationClientHttpException e = assertThrows(NotificationClientHttpException.class,
                 () -> client.sendEmail(templateId, "anEmailAddress", emptyMap(), "aReference", emailReplyToId));
 
         assertThat(e.getHttpResult()).isEqualTo(500);
@@ -318,7 +318,7 @@ public class NotificationClientTest {
         UUID templateId = UUID.randomUUID();
         UUID smsSenderId = UUID.randomUUID();
 
-        NotificationClientException e = assertThrows(NotificationClientException.class,
+        NotificationClientHttpException e = assertThrows(NotificationClientHttpException.class,
                 () -> client.sendSms(templateId, "a phone number", emptyMap(), "aReference", smsSenderId));
 
         assertThat(e.getHttpResult()).isEqualTo(500);
@@ -372,7 +372,7 @@ public class NotificationClientTest {
         personalisation.put("address_line_3", "a3");
         UUID templateId = UUID.randomUUID();
 
-        NotificationClientException e = assertThrows(NotificationClientException.class,
+        NotificationClientHttpException e = assertThrows(NotificationClientHttpException.class,
                 () -> client.sendLetter(templateId, personalisation, "aReference"));
 
         assertThat(e.getHttpResult()).isEqualTo(500);
@@ -701,7 +701,7 @@ public class NotificationClientTest {
         NotificationClient client = new NotificationClient("Api_key_name-" + SERVICE_ID + "-" + badApiKey, BASE_URL);
         UUID templateId = UUID.randomUUID();
 
-        NotificationClientException e = assertThrows(NotificationClientException.class,
+        NotificationClientHttpException e = assertThrows(NotificationClientHttpException.class,
                 () -> client.sendSms(templateId, "aPhoneNumber", emptyMap(), "aReference"));
 
         assertThat(e.getHttpResult()).isEqualTo(401);
