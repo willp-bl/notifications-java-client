@@ -48,6 +48,7 @@ import java.net.Proxy;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
+import java.time.Duration;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -715,6 +716,35 @@ public class NotificationClientTest {
                 () -> validateBearerTokenTest(requests.get(0).header("Authorization").firstValue().substring("Bearer ".length())));
         final String expectedExceptionMessage = "unable to validate jwt: org.jose4j.jwt.consumer.InvalidJwtSignatureException: JWT rejected due to invalid signature";
         assertThat(invalidJwtException).hasMessageStartingWith(expectedExceptionMessage);
+    }
+
+    @Test
+    public void testConnectTimeoutCodeWorks() {
+        wireMockRule.stubFor(post("/v2/notifications/sms")
+                .willReturn(unauthorized().withFixedDelay(100)));
+        NotificationClient client = new NotificationClient(COMBINED_API_KEY, BASE_URL, null, null, Duration.ofNanos(1), Duration.ofMillis(2000));
+        UUID templateId = UUID.randomUUID();
+
+        NotificationClientException e = assertThrows(NotificationClientException.class,
+                () -> client.sendSms(templateId, "aPhoneNumber", emptyMap(), "aReference"));
+
+        assertThat(e).hasMessageContaining("HTTP connect timed out");
+    }
+
+    @Test
+    public void testRequestTimeoutCodeWorks() {
+        final int requestTimeout = 50;
+        wireMockRule.stubFor(post("/v2/notifications/sms")
+                .willReturn(unauthorized().withFixedDelay(requestTimeout*2)));
+        NotificationClient client = new NotificationClient(COMBINED_API_KEY, BASE_URL, null, null, Duration.ofMillis(1000), Duration.ofMillis(requestTimeout));
+        UUID templateId = UUID.randomUUID();
+
+        NotificationClientException e = assertThrows(NotificationClientException.class,
+                () -> client.sendSms(templateId, "aPhoneNumber", emptyMap(), "aReference"));
+
+        assertThat(e).hasMessageContaining("request timed out");
+
+        validateRequest();
     }
 
     private void validateBearerToken(String token) throws InvalidJwtException {

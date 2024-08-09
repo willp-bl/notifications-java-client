@@ -10,4 +10,8 @@ public class NotificationClientException extends Exception {
     NotificationClientException(Exception ex) {
         super(ex);
     }
+
+    NotificationClientException(String message, Exception ex) {
+        super(message, ex);
+    }
 }

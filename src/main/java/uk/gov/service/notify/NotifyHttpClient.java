@@ -34,13 +34,16 @@ class NotifyHttpClient {
     private final String bearerToken;
     private final String userAgent;
     private final HttpClient httpClient;
+    private final Duration requestTimeout;
 
-    NotifyHttpClient(String serviceId, String apiKey, String userAgent, Proxy proxy, SSLContext sslContext) {
+    NotifyHttpClient(String serviceId, String apiKey, String userAgent, Proxy proxy, SSLContext sslContext, Duration connectTimeout, Duration requestTimeout) {
         this.bearerToken = Authentication.create(serviceId, apiKey);
         this.userAgent = userAgent;
         this.httpClient = HttpClient.newBuilder()
+                .connectTimeout(connectTimeout)
                 .proxy(Objects.nonNull(proxy)?ProxySelector.of((InetSocketAddress)proxy.address()):ProxySelector.getDefault())
                 .build();
+        this.requestTimeout = requestTimeout;
         if (Objects.nonNull(sslContext)) {
             setCustomSSLContext(sslContext);
         } else {
@@ -62,7 +65,7 @@ class NotifyHttpClient {
 
         final HttpRequest httpRequest = HttpRequest.newBuilder()
                 .uri(uri)
-                .timeout(Duration.ofMinutes(1))
+                .timeout(requestTimeout)
                 .setHeader("Authorization", "Bearer " + bearerToken)
                 .setHeader("User-agent", userAgent)
                 .setHeader("Accept", "application/json")
@@ -98,7 +101,7 @@ class NotifyHttpClient {
     <T> T get(URI uri, Class<T> responseClass) throws NotificationClientException {
         final HttpRequest httpRequest = HttpRequest.newBuilder()
                 .uri(uri)
-                .timeout(Duration.ofMinutes(1))
+                .timeout(requestTimeout)
                 .setHeader("Authorization", "Bearer " + bearerToken)
                 .setHeader("User-agent", userAgent)
                 .setHeader("Accept", "application/json")
@@ -115,7 +118,7 @@ class NotifyHttpClient {
     byte[] get(URI uri) throws NotificationClientException {
         final HttpRequest httpRequest = HttpRequest.newBuilder()
                 .uri(uri)
-                .timeout(Duration.ofMinutes(1))
+                .timeout(requestTimeout)
                 .setHeader("Authorization", "Bearer " + bearerToken)
                 .setHeader("User-agent", userAgent)
                 .GET()

@@ -27,6 +27,7 @@ import java.net.Proxy;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
+import java.time.Duration;
 import java.util.Base64;
 import java.util.Map;
 import java.util.Objects;
@@ -116,8 +117,32 @@ public class NotificationClient implements NotificationClientApi {
         this.serviceId = NotifyUtils.extractServiceId(apiKey);
         this.baseUrl = baseUrl;
         this.proxy = proxy;
-        this.version = NotifyUtils.getVersion();
-        this.notifyHttpClient = new NotifyHttpClient(this.serviceId, this.apiKey, getUserAgent(), this.proxy, sslContext);
+        this.version = NotifyUtils.getProperty("project.version");
+        this.notifyHttpClient = new NotifyHttpClient(this.serviceId,
+                this.apiKey,
+                getUserAgent(),
+                this.proxy,
+                sslContext,
+                Duration.parse(NotifyUtils.getProperty("http.timeout.connect")),
+                Duration.parse(NotifyUtils.getProperty("http.timeout.request")));
+    }
+
+    /**
+     * For internal use and tests
+     */
+    NotificationClient(final String apiKey,
+                       final String baseUrl,
+                       final Proxy proxy,
+                       final SSLContext sslContext,
+                       final Duration connectTimeout,
+                       final Duration requestTimeout) {
+
+        this.apiKey = NotifyUtils.extractApiKey(apiKey);
+        this.serviceId = NotifyUtils.extractServiceId(apiKey);
+        this.baseUrl = baseUrl;
+        this.proxy = proxy;
+        this.version = NotifyUtils.getProperty("project.version");
+        this.notifyHttpClient = new NotifyHttpClient(this.serviceId, this.apiKey, getUserAgent(), this.proxy, sslContext, connectTimeout, requestTimeout);
     }
 
     String getUserAgent() {
