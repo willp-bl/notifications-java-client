@@ -9,8 +9,6 @@ import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.InetSocketAddress;
-import java.net.Proxy;
 import java.net.ProxySelector;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -36,12 +34,12 @@ class NotifyHttpClient {
     private final HttpClient httpClient;
     private final Duration requestTimeout;
 
-    NotifyHttpClient(String serviceId, String apiKey, String userAgent, Proxy proxy, SSLContext sslContext, Duration connectTimeout, Duration requestTimeout) {
+    NotifyHttpClient(String serviceId, String apiKey, String userAgent, ProxySelector proxySelector, SSLContext sslContext, Duration connectTimeout, Duration requestTimeout) {
         this.bearerToken = Authentication.create(serviceId, apiKey);
         this.userAgent = userAgent;
         this.httpClient = HttpClient.newBuilder()
                 .connectTimeout(connectTimeout)
-                .proxy(Objects.nonNull(proxy)?ProxySelector.of((InetSocketAddress)proxy.address()):ProxySelector.getDefault())
+                .proxy(Objects.nonNull(proxySelector)?proxySelector:ProxySelector.getDefault())
                 .build();
         this.requestTimeout = requestTimeout;
         if (Objects.nonNull(sslContext)) {

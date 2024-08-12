@@ -23,7 +23,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.Proxy;
+import java.net.ProxySelector;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
@@ -46,7 +46,7 @@ public class NotificationClient implements NotificationClientApi {
     private final String apiKey;
     private final String serviceId;
     private final String baseUrl;
-    private final Proxy proxy;
+    private final ProxySelector proxySelector;
     private final String version;
     private final NotifyHttpClient notifyHttpClient;
 
@@ -67,13 +67,13 @@ public class NotificationClient implements NotificationClientApi {
      * Use this client constructor if you require a proxy for https requests.
      *
      * @param apiKey Generate an API key by signing in to GOV.UK Notify, https://www.notifications.service.gov.uk, and going to the **API integration** page
-     * @param proxy  Proxy used on the http requests
+     * @param proxySelector  Proxy used on the http requests
      */
-    public NotificationClient(final String apiKey, final Proxy proxy) {
+    public NotificationClient(final String apiKey, final ProxySelector proxySelector) {
         this(
                 apiKey,
                 LIVE_BASE_URL,
-                proxy
+                proxySelector
         );
     }
 
@@ -95,33 +95,33 @@ public class NotificationClient implements NotificationClientApi {
     /**
      * @param apiKey  Generate an API key by signing in to GOV.UK Notify, https://www.notifications.service.gov.uk, and going to the **API integration** page
      * @param baseUrl base URL, defaults to https://api.notifications.service.gov.uk
-     * @param proxy   Proxy used on the http requests
+     * @param proxySelector   Proxy used on the http requests
      */
     public NotificationClient(final String apiKey,
                               final String baseUrl,
-                              final Proxy proxy) {
+                              final ProxySelector proxySelector) {
         this(
                 apiKey,
                 baseUrl,
-                proxy,
+                proxySelector,
                 null
         );
     }
 
     public NotificationClient(final String apiKey,
                               final String baseUrl,
-                              final Proxy proxy,
+                              final ProxySelector proxySelector,
                               final SSLContext sslContext) {
 
         this.apiKey = NotifyUtils.extractApiKey(apiKey);
         this.serviceId = NotifyUtils.extractServiceId(apiKey);
         this.baseUrl = baseUrl;
-        this.proxy = proxy;
+        this.proxySelector = proxySelector;
         this.version = NotifyUtils.getProperty("project.version");
         this.notifyHttpClient = new NotifyHttpClient(this.serviceId,
                 this.apiKey,
                 getUserAgent(),
-                this.proxy,
+                this.proxySelector,
                 sslContext,
                 Duration.parse(NotifyUtils.getProperty("http.timeout.connect")),
                 Duration.parse(NotifyUtils.getProperty("http.timeout.request")));
@@ -132,7 +132,7 @@ public class NotificationClient implements NotificationClientApi {
      */
     NotificationClient(final String apiKey,
                        final String baseUrl,
-                       final Proxy proxy,
+                       final ProxySelector proxySelector,
                        final SSLContext sslContext,
                        final Duration connectTimeout,
                        final Duration requestTimeout) {
@@ -140,9 +140,9 @@ public class NotificationClient implements NotificationClientApi {
         this.apiKey = NotifyUtils.extractApiKey(apiKey);
         this.serviceId = NotifyUtils.extractServiceId(apiKey);
         this.baseUrl = baseUrl;
-        this.proxy = proxy;
+        this.proxySelector = proxySelector;
         this.version = NotifyUtils.getProperty("project.version");
-        this.notifyHttpClient = new NotifyHttpClient(this.serviceId, this.apiKey, getUserAgent(), this.proxy, sslContext, connectTimeout, requestTimeout);
+        this.notifyHttpClient = new NotifyHttpClient(this.serviceId, this.apiKey, getUserAgent(), this.proxySelector, sslContext, connectTimeout, requestTimeout);
     }
 
     String getUserAgent() {
@@ -161,8 +161,8 @@ public class NotificationClient implements NotificationClientApi {
         return baseUrl;
     }
 
-    Proxy getProxy() {
-        return proxy;
+    ProxySelector getProxySelector() {
+        return proxySelector;
     }
 
     @Override

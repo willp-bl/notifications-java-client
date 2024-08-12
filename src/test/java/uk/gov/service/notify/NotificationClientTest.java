@@ -44,7 +44,7 @@ import javax.net.ssl.SSLContext;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.net.Proxy;
+import java.net.ProxySelector;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
@@ -104,20 +104,20 @@ public class NotificationClientTest {
 
     @Test
     public void testCreateNotificationClient_withSingleApiKeyAndProxy() {
-        Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("10.0.0.1", 8080));
+        ProxySelector proxySelector = ProxySelector.of(new InetSocketAddress("10.0.0.1", 8080));
 
-        NotificationClient client = new NotificationClient(COMBINED_API_KEY, BASE_URL, proxy);
+        NotificationClient client = new NotificationClient(COMBINED_API_KEY, BASE_URL, proxySelector);
 
-        assertNotificationWithProxy(proxy, client);
+        assertNotificationWithProxy(proxySelector, client);
     }
 
     @Test
     public void testCreateNotificationClient_withSingleApiKeyServiceIdAndProxy() {
-        Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("10.0.0.1", 8080));
+        ProxySelector proxySelector = ProxySelector.of(new InetSocketAddress("10.0.0.1", 8080));
 
-        NotificationClient client = new NotificationClient(COMBINED_API_KEY, BASE_URL, proxy);
+        NotificationClient client = new NotificationClient(COMBINED_API_KEY, BASE_URL, proxySelector);
 
-        assertNotificationWithProxy(proxy, client);
+        assertNotificationWithProxy(proxySelector, client);
     }
 
     @Test
@@ -137,18 +137,18 @@ public class NotificationClientTest {
         assertNotificationClient(client);
     }
 
-    private void assertNotificationWithProxy(Proxy proxy, NotificationClient client) {
+    private void assertNotificationWithProxy(ProxySelector proxySelector, NotificationClient client) {
         assertThat(client.getApiKey()).isEqualTo(API_KEY);
         assertThat(client.getServiceId()).isEqualTo(SERVICE_ID);
         assertThat(client.getBaseUrl()).isEqualTo(BASE_URL);
-        assertThat(client.getProxy()).isEqualTo(proxy);
+        assertThat(client.getProxySelector()).isEqualTo(proxySelector);
     }
 
     private void assertNotificationClient(final NotificationClient client) {
         assertThat(client.getApiKey()).isEqualTo(API_KEY);
         assertThat(client.getServiceId()).isEqualTo(SERVICE_ID);
         assertThat(client.getBaseUrl()).isEqualTo(BASE_URL);
-        assertThat(client.getProxy()).isNull();
+        assertThat(client.getProxySelector()).isNull();
     }
 
     @Test
