@@ -2,6 +2,7 @@ package uk.gov.service.notify;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import uk.gov.service.notify.domain.NotificationStatus;
 import uk.gov.service.notify.domain.NotificationType;
 import uk.gov.service.notify.domain.NotifyEmailResponse;
@@ -41,6 +42,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 import static uk.gov.service.notify.domain.NotificationStatus.Letter.ACCEPTED;
 import static uk.gov.service.notify.domain.NotificationStatus.Letter.RECEIVED;
 
+@EnabledIfEnvironmentVariable(named = "CLIENT_INTEGRATION_TEST_ENABLED", matches = "true")
 public class ClientIntegrationTestIT {
 
     @Test
