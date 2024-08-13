@@ -50,7 +50,6 @@ import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -245,9 +244,7 @@ public class NotificationClientTest {
                 .willReturn(created()
                         .withResponseBody(new Body(objectMapper.writeValueAsString(expected)))));
         NotificationClient client = new NotificationClient(COMBINED_API_KEY, BASE_URL);
-        // setting up this map can be replaced with Map.of() in later Java versions
-        Map<String, Object> personalisation = new HashMap<>();
-        personalisation.put("application_date", "2018-01-01");
+        Map<String, Object> personalisation = Map.of("application_date", "2018-01-01");
         UUID templateId = UUID.randomUUID();
         UUID emailReplyToId = UUID.randomUUID();
 
@@ -281,9 +278,7 @@ public class NotificationClientTest {
                 .willReturn(created()
                         .withResponseBody(new Body(objectMapper.writeValueAsString(expected)))));
         NotificationClient client = new NotificationClient(COMBINED_API_KEY, BASE_URL);
-        // setting up this map can be replaced with Map.of() in later Java versions
-        Map<String, Object> personalisation = new HashMap<>();
-        personalisation.put("application_date", "2018-01-01");
+        Map<String, Object> personalisation = Map.of("application_date", "2018-01-01");
         URI oneClickUnsubscribeURL = Objects.requireNonNull(expected.getOneClickUnsubscribeURL());
         UUID templateId = Objects.requireNonNull(expected.getTemplate().getId());
         UUID emailReplyToId = UUID.randomUUID();
@@ -335,9 +330,7 @@ public class NotificationClientTest {
                 .willReturn(created()
                         .withResponseBody(new Body(objectMapper.writeValueAsString(expected)))));
         NotificationClient client = new NotificationClient(COMBINED_API_KEY, BASE_URL);
-        // setting up this map can be replaced with Map.of() in later Java versions
-        Map<String, Object> personalisation = new HashMap<>();
-        personalisation.put("application_date", "2018-01-01");
+        Map<String, Object> personalisation = Map.of("application_date", "2018-01-01");
         UUID templateId = UUID.randomUUID();
         UUID smsSenderId = UUID.randomUUID();
 
@@ -366,11 +359,9 @@ public class NotificationClientTest {
         wireMockRule.stubFor(post("/v2/notifications/letter")
                 .willReturn(serverError()));
         NotificationClient client = new NotificationClient(COMBINED_API_KEY, BASE_URL);
-        // this can all be replaced with Map.of() in later Java versions
-        Map<String, String> personalisation = new HashMap<>();
-        personalisation.put("address_line_1", "a1");
-        personalisation.put("address_line_2", "a2");
-        personalisation.put("address_line_3", "a3");
+        Map<String, String> personalisation = Map.of("address_line_1", "a1",
+                "address_line_2", "a2",
+                "address_line_3", "a3");
         UUID templateId = UUID.randomUUID();
 
         NotificationClientHttpException e = assertThrows(NotificationClientHttpException.class,
@@ -389,11 +380,9 @@ public class NotificationClientTest {
                 .willReturn(created()
                         .withResponseBody(new Body(objectMapper.writeValueAsString(expected)))));
         NotificationClient client = new NotificationClient(COMBINED_API_KEY, BASE_URL);
-        // this can all be replaced with Map.of() in later Java versions
-        Map<String, String> personalisation = new HashMap<>();
-        personalisation.put("address_line_1", "a1");
-        personalisation.put("address_line_2", "a2");
-        personalisation.put("address_line_3", "a3");
+        Map<String, String> personalisation = Map.of("address_line_1", "a1",
+                "address_line_2", "a2",
+                "address_line_3", "a3");
         UUID templateId = UUID.randomUUID();
 
         NotifyLetterResponse actual = client.sendLetter(templateId, personalisation, "aReference");
@@ -637,9 +626,7 @@ public class NotificationClientTest {
     public void testGeneratePreviewTemplate() throws IOException, NotificationClientException {
         NotifyTemplatePreviewResponse expected = objectMapper.readValue(this.getClass().getClassLoader().getResourceAsStream("v2_template_preview_response.json"), NotifyTemplatePreviewResponse.class);
         UUID templateId = expected.getId();
-        // setting up this map can be replaced with Map.of() in later Java versions
-        Map<String, Object> personalisation = new HashMap<>();
-        personalisation.put("application_date", "2018-01-01");
+        Map<String, Object> personalisation = Map.of("application_date", "2018-01-01");
         wireMockRule.stubFor(post(urlPathEqualTo("/v2/template/" + templateId + "/preview"))
                 .willReturn(ok()
                         .withResponseBody(new Body(objectMapper.writeValueAsString(expected)))));

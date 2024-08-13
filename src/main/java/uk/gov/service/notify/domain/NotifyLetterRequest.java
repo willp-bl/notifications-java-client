@@ -3,7 +3,6 @@ package uk.gov.service.notify.domain;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import uk.gov.service.notify.NotificationClientException;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -21,11 +20,7 @@ public class NotifyLetterRequest {
         this.templateId = templateId;
         this.personalisation = personalisation;
         this.reference = reference;
-        // this is easier after java 8 by using List.of() in place
-        final List<String> minimumPersonalisationKeys = new ArrayList<>();
-        minimumPersonalisationKeys.add("address_line_1");
-        minimumPersonalisationKeys.add("address_line_2");
-        minimumPersonalisationKeys.add("address_line_3");
+        final List<String> minimumPersonalisationKeys = List.of("address_line_1", "address_line_2", "address_line_3");
         // the current code in main does not perform this check although it is listed in the api docs
         if(Objects.isNull(personalisation)||!personalisation.keySet().containsAll(minimumPersonalisationKeys)) {
             throw new NotificationClientException("need at least the first three lines of the address");

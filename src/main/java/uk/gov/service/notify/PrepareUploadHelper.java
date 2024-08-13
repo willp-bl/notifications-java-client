@@ -41,6 +41,7 @@ public class PrepareUploadHelper {
         }
         final String fileContent = Base64.getMimeEncoder().encodeToString(documentContents);
 
+        // note: can't use Map.of() or Map.ofEntries() as those disallow null values
         Map<String, Object> jsonFileObject = new HashMap<>();
         jsonFileObject.put("file", fileContent);
         jsonFileObject.put("filename", filename);

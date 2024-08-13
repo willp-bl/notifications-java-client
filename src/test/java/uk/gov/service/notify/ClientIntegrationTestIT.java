@@ -117,9 +117,8 @@ public class ClientIntegrationTestIT {
         NotificationClient client = getClient();
         NotifyEmailResponse emailResponse = sendEmailAndAssertResponse(client);
 
-        HashMap<String, String> personalisation = new HashMap<>();
         String uniqueName = UUID.randomUUID().toString();
-        personalisation.put("name", uniqueName);
+        Map<String, String> personalisation = Map.of("name", uniqueName);
 
         NotifyEmailResponse response = client.sendEmail(
                 getUUIDEnvVar("EMAIL_TEMPLATE_ID"),
@@ -139,9 +138,8 @@ public class ClientIntegrationTestIT {
         NotificationClient client = getClient();
         sendEmailAndAssertResponse(client);
 
-        HashMap<String, String> personalisation = new HashMap<>();
         String uniqueName = UUID.randomUUID().toString();
-        personalisation.put("name", uniqueName);
+        Map<String, String> personalisation = Map.of("name", uniqueName);
 
         UUID fake_uuid = UUID.randomUUID();
 
@@ -166,14 +164,13 @@ public class ClientIntegrationTestIT {
     @Test
     public void testEmailNotificationWithUploadedDocumentInPersonalisation() throws NotificationClientException, IOException {
         NotificationClient client = getClient();
-        HashMap<String, Object> personalisation = new HashMap<>();
 
         ClassLoader classLoader = getClass().getClassLoader();
         File file = new File(classLoader.getResource("one_page_pdf.pdf").getFile());
         byte [] fileContents = FileUtils.readFileToByteArray(file);
 
         Map<String, ?> documentFileObject = PrepareUploadHelper.prepareUpload(fileContents);
-        personalisation.put("name", documentFileObject);
+        Map<String, Object> personalisation = Map.of("name", documentFileObject);
 
         String reference = UUID.randomUUID().toString();
         NotifyEmailResponse emailResponse = client.sendEmail(getUUIDEnvVar("EMAIL_TEMPLATE_ID"),
@@ -202,9 +199,8 @@ public class ClientIntegrationTestIT {
     public void testSmsNotificationWithValidSmsSenderIdIT() throws NotificationClientException {
         NotificationClient client = getClient("API_SENDING_KEY");
 
-        HashMap<String, String> personalisation = new HashMap<>();
         String uniqueName = UUID.randomUUID().toString();
-        personalisation.put("name", uniqueName);
+        Map<String, String> personalisation = Map.of("name", uniqueName);
 
         NotifySmsResponse response = client.sendSms(
                 getUUIDEnvVar("SMS_TEMPLATE_ID"),
@@ -223,9 +219,8 @@ public class ClientIntegrationTestIT {
     public void testSmsNotificationWithInValidSmsSenderIdIT() {
         NotificationClient client = getClient();
 
-        HashMap<String, String> personalisation = new HashMap<>();
         String uniqueName = UUID.randomUUID().toString();
-        personalisation.put("name", uniqueName);
+        Map<String, String> personalisation = Map.of("name", uniqueName);
 
         UUID fake_uuid = UUID.randomUUID();
 
@@ -250,12 +245,12 @@ public class ClientIntegrationTestIT {
     @Test
     public void testSendAndGetNotificationWithReference() throws NotificationClientException {
         NotificationClient client = getClient();
-        HashMap<String, String> personalisation = new HashMap<>();
-        String uniqueString = UUID.randomUUID().toString();
-        personalisation.put("name", uniqueString);
-        NotifyEmailResponse response = client.sendEmail(getUUIDEnvVar("EMAIL_TEMPLATE_ID"), System.getenv("FUNCTIONAL_TEST_EMAIL"), personalisation, uniqueString);
-        assertNotificationEmailResponse(response, uniqueString);
-        NotifyNotificationListResponse notifications = client.getNotifications(null, null, uniqueString, null);
+        String uniqueName = UUID.randomUUID().toString();
+        Map<String, String> personalisation = Map.of("name", uniqueName);
+
+        NotifyEmailResponse response = client.sendEmail(getUUIDEnvVar("EMAIL_TEMPLATE_ID"), System.getenv("FUNCTIONAL_TEST_EMAIL"), personalisation, uniqueName);
+        assertNotificationEmailResponse(response, uniqueName);
+        NotifyNotificationListResponse notifications = client.getNotifications(null, null, uniqueName, null);
         assertEquals(1, notifications.getNotifications().size());
         assertEquals(response.getNotificationId(), notifications.getNotifications().get(0).getId());
     }
@@ -297,9 +292,8 @@ public class ClientIntegrationTestIT {
     @Test
     public void testGenerateTemplatePreview() throws NotificationClientException {
         NotificationClient client = getClient();
-        HashMap<String, Object> personalisation = new HashMap<>();
         String uniqueName = UUID.randomUUID().toString();
-        personalisation.put("name", uniqueName);
+        Map<String, Object> personalisation = Map.of("name", uniqueName);
         NotifyTemplatePreviewResponse template = client.generateTemplatePreview(getUUIDEnvVar("EMAIL_TEMPLATE_ID"), personalisation);
         assertEquals(getUUIDEnvVar("EMAIL_TEMPLATE_ID"), template.getId());
         assertNotNull(template.getType());
@@ -403,9 +397,8 @@ public class ClientIntegrationTestIT {
     }
 
     private NotifyEmailResponse sendEmailAndAssertResponse(final NotificationClient client) throws NotificationClientException {
-        HashMap<String, String> personalisation = new HashMap<>();
         String uniqueName = UUID.randomUUID().toString();
-        personalisation.put("name", uniqueName);
+        Map<String, String> personalisation = Map.of("name", uniqueName);
         NotifyEmailResponse response = client.sendEmail(getUUIDEnvVar("EMAIL_TEMPLATE_ID"),
                 System.getenv("FUNCTIONAL_TEST_EMAIL"), personalisation, uniqueName);
         assertNotificationEmailResponse(response, uniqueName);
@@ -413,22 +406,20 @@ public class ClientIntegrationTestIT {
     }
 
     private NotifySmsResponse sendSmsAndAssertResponse(final NotificationClient client) throws NotificationClientException {
-        HashMap<String, Object> personalisation = new HashMap<>();
         String uniqueName = UUID.randomUUID().toString();
-        personalisation.put("name", uniqueName);
+        Map<String, Object> personalisation = Map.of("name", uniqueName);
         NotifySmsResponse response = client.sendSms(getUUIDEnvVar("SMS_TEMPLATE_ID"), System.getenv("FUNCTIONAL_TEST_NUMBER"), personalisation, uniqueName);
         assertNotificationSmsResponse(response, uniqueName);
         return response;
     }
 
     private NotifyLetterResponse sendLetterAndAssertResponse(final NotificationClient client) throws NotificationClientException {
-        HashMap<String, String> personalisation = new HashMap<>();
         String addressLine1 = UUID.randomUUID().toString();
         String addressLine2 = UUID.randomUUID().toString();
         String postcode = "SW1 1AA";
-        personalisation.put("address_line_1", addressLine1);
-        personalisation.put("address_line_2", addressLine2);
-        personalisation.put("postcode", postcode);
+        Map<String, String> personalisation = Map.of("address_line_1", addressLine1,
+                "address_line_2", addressLine2,
+                "postcode", postcode);
         NotifyLetterResponse response = client.sendLetter(getUUIDEnvVar("LETTER_TEMPLATE_ID"), personalisation, addressLine1);
         assertNotificationLetterResponse(response, addressLine1);
         return response;
@@ -534,7 +525,7 @@ public class ClientIntegrationTestIT {
         int count = 0;
         while (true) {
             try {
-                 pdfData = client.getPdfForLetter(notificationId);
+                pdfData = client.getPdfForLetter(notificationId);
                 break;
             } catch (NotificationClientException e) {
                 if (!e.getMessage().contains("PDFNotReadyError")) {
