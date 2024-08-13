@@ -2,7 +2,6 @@ package uk.gov.service.notify;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.github.tomakehurst.wiremock.http.Body;
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
@@ -671,12 +670,22 @@ public class NotificationClientTest {
     }
 
     @Test
-    public void testJsonParsingFailsWithUnknownValue() {
-        // this is testing that we have the object mapper configured correctly to help during development
-        UnrecognizedPropertyException e = assertThrows(UnrecognizedPropertyException.class,
-                () -> objectMapper.readValue(this.getClass().getClassLoader().getResourceAsStream("v2_notifications_email_unknown_value_response.json"), NotifyEmailResponse.class));
+    public void testJsonParsingDoesNotFailWithUnknownValue() throws IOException {
+        // NOTE: we do not try and deserialise here, we want the client to do that
+        String apiResponse = new String(this.getClass().getClassLoader().getResourceAsStream("v2_notifications_email_unknown_value_response.json").readAllBytes(), StandardCharsets.UTF_8);
+        wireMockRule.stubFor(post("/v2/notifications/email")
+                .willReturn(created()
+                        .withResponseBody(new Body(apiResponse))));
+        NotificationClient client = new NotificationClient(COMBINED_API_KEY, BASE_URL);
+        Map<String, Object> personalisation = Map.of("application_date", "2018-01-01");
+        UUID templateId = UUID.randomUUID();
+        UUID emailReplyToId = UUID.randomUUID();
 
-        assertThat(e).hasMessageContaining("Unrecognized field \"something\"");
+        try {
+            client.sendEmail(templateId, "anEmailAddress", personalisation, "aReference", emailReplyToId);
+        } catch(NotificationClientException e) {
+                fail("should have been able to parse a response with an unknown value", e);
+        }
     }
 
     @Test

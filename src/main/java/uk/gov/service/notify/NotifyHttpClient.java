@@ -1,6 +1,7 @@
 package uk.gov.service.notify;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -27,7 +28,9 @@ class NotifyHttpClient {
     private static final ObjectMapper objectMapper = new ObjectMapper()
             // the following two lines are needed to (de)serialize ZonedDateTime in ISO8601 format
             .registerModule(new JavaTimeModule())
-            .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+            .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
+            // this allows the client to ignore unknown values sent in API responses
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
     private final String bearerToken;
     private final String userAgent;
