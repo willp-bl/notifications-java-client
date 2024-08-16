@@ -43,11 +43,7 @@ public class NotificationClient implements NotificationClientApi {
     private static final Logger LOGGER = Logger.getLogger(NotificationClient.class.toString());
     private static final String LIVE_BASE_URL = "https://api.notifications.service.gov.uk";
 
-    private final String apiKey;
-    private final String serviceId;
     private final String baseUrl;
-    private final ProxySelector proxySelector;
-    private final String version;
     private final NotifyHttpClient notifyHttpClient;
 
     /**
@@ -55,12 +51,8 @@ public class NotificationClient implements NotificationClientApi {
      *
      * @param apiKey Generate an API key by signing in to GOV.UK Notify, https://www.notifications.service.gov.uk, and going to the **API integration** page
      */
-    public NotificationClient(final String apiKey) {
-        this(
-                apiKey,
-                LIVE_BASE_URL,
-                null
-        );
+    public NotificationClient(String apiKey) {
+        this(apiKey, LIVE_BASE_URL, null);
     }
 
     /**
@@ -69,12 +61,8 @@ public class NotificationClient implements NotificationClientApi {
      * @param apiKey Generate an API key by signing in to GOV.UK Notify, https://www.notifications.service.gov.uk, and going to the **API integration** page
      * @param proxySelector  Proxy used on the http requests
      */
-    public NotificationClient(final String apiKey, final ProxySelector proxySelector) {
-        this(
-                apiKey,
-                LIVE_BASE_URL,
-                proxySelector
-        );
+    public NotificationClient(String apiKey, ProxySelector proxySelector) {
+        this(apiKey, LIVE_BASE_URL, proxySelector);
     }
 
     /**
@@ -83,45 +71,28 @@ public class NotificationClient implements NotificationClientApi {
      * @param apiKey  Generate an API key by signing in to GOV.UK Notify, https://www.notifications.service.gov.uk, and going to the **API integration** page
      * @param baseUrl base URL, defaults to https://api.notifications.service.gov.uk
      */
-    public NotificationClient(final String apiKey, final String baseUrl) {
-        this(
-                apiKey,
-                baseUrl,
-                null
-        );
+    public NotificationClient(String apiKey, String baseUrl) {
+        this(apiKey, baseUrl, null);
     }
-
 
     /**
      * @param apiKey  Generate an API key by signing in to GOV.UK Notify, https://www.notifications.service.gov.uk, and going to the **API integration** page
      * @param baseUrl base URL, defaults to https://api.notifications.service.gov.uk
      * @param proxySelector   Proxy used on the http requests
      */
-    public NotificationClient(final String apiKey,
-                              final String baseUrl,
-                              final ProxySelector proxySelector) {
-        this(
-                apiKey,
-                baseUrl,
-                proxySelector,
-                null
-        );
+    public NotificationClient(String apiKey,
+                              String baseUrl,
+                              ProxySelector proxySelector) {
+        this(apiKey, baseUrl, proxySelector, null);
     }
 
-    public NotificationClient(final String apiKey,
-                              final String baseUrl,
-                              final ProxySelector proxySelector,
-                              final SSLContext sslContext) {
-
-        this.apiKey = NotifyUtils.extractApiKey(apiKey);
-        this.serviceId = NotifyUtils.extractServiceId(apiKey);
-        this.baseUrl = baseUrl;
-        this.proxySelector = proxySelector;
-        this.version = NotifyUtils.getProperty("project.version");
-        this.notifyHttpClient = new NotifyHttpClient(this.serviceId,
-                this.apiKey,
-                getUserAgent(),
-                this.proxySelector,
+    public NotificationClient(String apiKey,
+                              String baseUrl,
+                              ProxySelector proxySelector,
+                              SSLContext sslContext) {
+        this(apiKey,
+                baseUrl,
+                proxySelector,
                 sslContext,
                 Duration.parse(NotifyUtils.getProperty("http.timeout.connect")),
                 Duration.parse(NotifyUtils.getProperty("http.timeout.request")));
@@ -130,39 +101,24 @@ public class NotificationClient implements NotificationClientApi {
     /**
      * For internal use and tests
      */
-    NotificationClient(final String apiKey,
-                       final String baseUrl,
-                       final ProxySelector proxySelector,
-                       final SSLContext sslContext,
-                       final Duration connectTimeout,
-                       final Duration requestTimeout) {
+    NotificationClient(String apiKey,
+                       String baseUrl,
+                       ProxySelector proxySelector,
+                       SSLContext sslContext,
+                       Duration connectTimeout,
+                       Duration requestTimeout) {
 
-        this.apiKey = NotifyUtils.extractApiKey(apiKey);
-        this.serviceId = NotifyUtils.extractServiceId(apiKey);
         this.baseUrl = baseUrl;
-        this.proxySelector = proxySelector;
-        this.version = NotifyUtils.getProperty("project.version");
-        this.notifyHttpClient = new NotifyHttpClient(this.serviceId, this.apiKey, getUserAgent(), this.proxySelector, sslContext, connectTimeout, requestTimeout);
-    }
 
-    String getUserAgent() {
-        return "NOTIFY-API-JAVA-CLIENT/" + version;
-    }
+        final String userAgent = "NOTIFY-API-JAVA-CLIENT/" + NotifyUtils.getProperty("project.version");
 
-    String getApiKey() {
-        return apiKey;
-    }
-
-    String getServiceId() {
-        return serviceId;
-    }
-
-    String getBaseUrl() {
-        return baseUrl;
-    }
-
-    ProxySelector getProxySelector() {
-        return proxySelector;
+        this.notifyHttpClient = new NotifyHttpClient(NotifyUtils.extractServiceId(apiKey),
+                NotifyUtils.extractApiKey(apiKey),
+                userAgent,
+                proxySelector,
+                sslContext,
+                connectTimeout,
+                requestTimeout);
     }
 
     @Override
@@ -328,7 +284,7 @@ public class NotificationClient implements NotificationClientApi {
         if (precompiledPDF == null) {
             throw new NotificationClientException("File cannot be null");
         }
-        byte[] buf;
+        final byte[] buf;
         try {
             buf = Files.readAllBytes(precompiledPDF.toPath());
         } catch (IOException e) {
@@ -347,7 +303,7 @@ public class NotificationClient implements NotificationClientApi {
         if (stream == null) {
             throw new NotificationClientException("Input stream cannot be null");
         }
-        String encoded;
+        final String encoded;
         try {
             encoded = Base64.getMimeEncoder().encodeToString(stream.readAllBytes());
         } catch (IOException e) {

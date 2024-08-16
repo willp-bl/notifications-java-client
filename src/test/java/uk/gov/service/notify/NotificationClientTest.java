@@ -39,14 +39,10 @@ import uk.gov.service.notify.domain.NotifyTemplatePreviewRequest;
 import uk.gov.service.notify.domain.NotifyTemplatePreviewResponse;
 
 import javax.crypto.spec.SecretKeySpec;
-import javax.net.ssl.SSLContext;
 import java.io.File;
 import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.ProxySelector;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
@@ -91,62 +87,6 @@ public class NotificationClientTest {
     @BeforeEach
     public void beforeEach() {
         this.BASE_URL = "http://localhost:" + wireMockRule.getPort();
-    }
-
-    @Test
-    public void testCreateNotificationClient_withSingleApiKeyAndBaseUrl() {
-        NotificationClient client = new NotificationClient(COMBINED_API_KEY, BASE_URL);
-
-        assertNotificationClient(client);
-    }
-
-    @Test
-    public void testCreateNotificationClient_withSingleApiKeyAndProxy() {
-        ProxySelector proxySelector = ProxySelector.of(new InetSocketAddress("10.0.0.1", 8080));
-
-        NotificationClient client = new NotificationClient(COMBINED_API_KEY, BASE_URL, proxySelector);
-
-        assertNotificationWithProxy(proxySelector, client);
-    }
-
-    @Test
-    public void testCreateNotificationClient_withSingleApiKeyServiceIdAndProxy() {
-        ProxySelector proxySelector = ProxySelector.of(new InetSocketAddress("10.0.0.1", 8080));
-
-        NotificationClient client = new NotificationClient(COMBINED_API_KEY, BASE_URL, proxySelector);
-
-        assertNotificationWithProxy(proxySelector, client);
-    }
-
-    @Test
-    public void testCreateNotificationClientSetsUserAgent() {
-        NotificationClient client = new NotificationClient(COMBINED_API_KEY, BASE_URL);
-
-        assertThat(client.getUserAgent()).startsWith("NOTIFY-API-JAVA-CLIENT/");
-        assertThat(client.getUserAgent()).endsWith("-RELEASE");
-    }
-
-    @Test
-    public void testCreateNotificationClient_withSSLContext() throws NoSuchAlgorithmException {
-        SSLContext sslContext = SSLContext.getDefault();
-
-        NotificationClient client = new NotificationClient(COMBINED_API_KEY, BASE_URL, null, sslContext);
-
-        assertNotificationClient(client);
-    }
-
-    private void assertNotificationWithProxy(ProxySelector proxySelector, NotificationClient client) {
-        assertThat(client.getApiKey()).isEqualTo(API_KEY);
-        assertThat(client.getServiceId()).isEqualTo(SERVICE_ID);
-        assertThat(client.getBaseUrl()).isEqualTo(BASE_URL);
-        assertThat(client.getProxySelector()).isEqualTo(proxySelector);
-    }
-
-    private void assertNotificationClient(final NotificationClient client) {
-        assertThat(client.getApiKey()).isEqualTo(API_KEY);
-        assertThat(client.getServiceId()).isEqualTo(SERVICE_ID);
-        assertThat(client.getBaseUrl()).isEqualTo(BASE_URL);
-        assertThat(client.getProxySelector()).isNull();
     }
 
     @Test
