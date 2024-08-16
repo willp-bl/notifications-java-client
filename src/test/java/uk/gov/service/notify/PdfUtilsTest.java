@@ -9,11 +9,10 @@ import java.io.File;
 import static java.nio.charset.StandardCharsets.US_ASCII;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class PdfUtilsTest
-{
+public class PdfUtilsTest {
+
     @Test
-    public void testIsBase64StringNotValidPdf() throws Exception
-    {
+    public void testIsBase64StringNotValidPdf() throws Exception {
         ClassLoader classLoader = getClass().getClassLoader();
         File file = new File(classLoader.getResource("not_a_pdf.txt").getFile());
 
@@ -26,10 +25,8 @@ public class PdfUtilsTest
                 .isFalse();
     }
 
-
     @Test
-    public void testIsBase64StringValidPdf() throws Exception
-    {
+    public void testIsBase64StringValidPdf() throws Exception {
         ClassLoader classLoader = getClass().getClassLoader();
         File file = new File(classLoader.getResource("one_page_pdf.pdf").getFile());
 

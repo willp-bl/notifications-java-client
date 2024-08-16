@@ -74,7 +74,7 @@ class NotifyHttpClient {
                 .POST(HttpRequest.BodyPublishers.ofString(requestBodyString))
                 .build();
 
-        try(InputStream responseBody = sendHttpRequest(httpRequest, expectedResponseCode);) {
+        try(InputStream responseBody = sendHttpRequest(httpRequest, expectedResponseCode)) {
             return objectMapper.readValue(responseBody, responseClass);
         } catch (IOException e) {
             throw new NotificationClientException(e);
@@ -109,7 +109,7 @@ class NotifyHttpClient {
                 .GET()
                 .build();
 
-        try(InputStream responseBody = sendHttpRequest(httpRequest, 200);) {
+        try(InputStream responseBody = sendHttpRequest(httpRequest, 200)) {
             return objectMapper.readValue(responseBody, responseClass);
         } catch (IOException e) {
             throw new NotificationClientException(e);

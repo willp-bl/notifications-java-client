@@ -8,6 +8,7 @@ import java.util.Objects;
  * Represents a retention period duration for files for file upload
  */
 public class RetentionPeriodDuration {
+
     private final int amount;
     private final ChronoUnit unit;
 

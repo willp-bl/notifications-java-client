@@ -54,7 +54,7 @@ public class AuthenticationTest {
         InvalidJwtException e = assertThrows(InvalidJwtException.class,
                 () -> validateBearerToken(jwt, serviceId, apiKey));
 
-        assertThat(e.getMessage()).startsWith("JWT rejected due to invalid signature");;
+        assertThat(e.getMessage()).startsWith("JWT rejected due to invalid signature");
     }
 
     private void validateBearerToken(String token, String serviceId, String apiKey) throws InvalidJwtException {

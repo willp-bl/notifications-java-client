@@ -1,8 +1,5 @@
 package uk.gov.service.notify;
 
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.StandardCharsets;
-
 import org.jose4j.jws.AlgorithmIdentifiers;
 import org.jose4j.jws.JsonWebSignature;
 import org.jose4j.jwt.JwtClaims;
@@ -11,11 +8,11 @@ import org.jose4j.lang.JoseException;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
 
 final class Authentication {
 
-    private Authentication() {
-    }
+    private Authentication() {}
 
     static String create(String issuer, String secret) {
         try {
@@ -30,12 +27,12 @@ final class Authentication {
 
             return jws.getCompactSerialization();
 
-        } catch (JoseException | UnsupportedEncodingException ex) {
+        } catch (JoseException ex) {
             throw new RuntimeException(ex);
         }
     }
 
-    private static SecretKey keyFromString(String value) throws UnsupportedEncodingException {
+    private static SecretKey keyFromString(String value) {
         return new SecretKeySpec(value.getBytes(StandardCharsets.UTF_8), "RAW");
     }
 }

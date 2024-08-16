@@ -1,6 +1,5 @@
 package uk.gov.service.notify;
 
-import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import uk.gov.service.notify.domain.NotificationStatus;
@@ -27,7 +26,6 @@ import java.io.InputStream;
 import java.net.URI;
 import java.nio.file.Files;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
@@ -166,8 +164,7 @@ public class ClientIntegrationTestIT {
         NotificationClient client = getClient();
 
         ClassLoader classLoader = getClass().getClassLoader();
-        File file = new File(classLoader.getResource("one_page_pdf.pdf").getFile());
-        byte [] fileContents = FileUtils.readFileToByteArray(file);
+        byte [] fileContents = classLoader.getResourceAsStream("one_page_pdf.pdf").readAllBytes();
 
         Map<String, ?> documentFileObject = PrepareUploadHelper.prepareUpload(fileContents);
         Map<String, Object> personalisation = Map.of("name", documentFileObject);
