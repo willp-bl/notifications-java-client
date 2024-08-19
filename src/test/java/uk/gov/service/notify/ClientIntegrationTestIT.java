@@ -2,8 +2,6 @@ package uk.gov.service.notify;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
-import uk.gov.service.notify.domain.NotificationStatus;
-import uk.gov.service.notify.domain.NotificationType;
 import uk.gov.service.notify.domain.NotifyEmailResponse;
 import uk.gov.service.notify.domain.NotifyLetterResponse;
 import uk.gov.service.notify.domain.NotifyNotification;
@@ -26,19 +24,16 @@ import java.io.InputStream;
 import java.net.URI;
 import java.nio.file.Files;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.fail;
-import static uk.gov.service.notify.domain.NotificationStatus.Letter.ACCEPTED;
-import static uk.gov.service.notify.domain.NotificationStatus.Letter.RECEIVED;
+import static uk.gov.service.notify.domain.NotificationStatus.Email;
+import static uk.gov.service.notify.domain.NotificationStatus.Letter;
+import static uk.gov.service.notify.domain.NotificationStatus.Sms;
 
 @EnabledIfEnvironmentVariable(named = "CLIENT_INTEGRATION_TEST_ENABLED", matches = "true")
 public class ClientIntegrationTestIT {
@@ -74,20 +69,20 @@ public class ClientIntegrationTestIT {
     public void testGetAllNotifications() throws NotificationClientException {
         NotificationClient client = getClient();
         NotifyNotificationListResponse notificationList = client.getNotifications(null, null, null, null);
-        assertNotNull(notificationList);
-        assertNotNull(notificationList.getNotifications());
-        assertFalse(notificationList.getNotifications().isEmpty());
+        assertThat(notificationList).isNotNull();
+        assertThat(notificationList.getNotifications()).isNotNull();
+        assertThat(notificationList.getNotifications()).isNotEmpty();
         // Just check the first notification in the list.
         assertNotification(notificationList.getNotifications().get(0));
         String baseUrl = System.getenv("NOTIFY_API_URL");
-        assertEquals(URI.create(baseUrl + "/v2/notifications"), notificationList.getLinks().getCurrent());
+        assertThat(notificationList.getLinks().getCurrent()).isEqualTo(URI.create(baseUrl + "/v2/notifications"));
         if (Objects.nonNull(notificationList.getLinks().getNext())) {
             URI nextUri = notificationList.getLinks().getNext();
             String olderThanId = nextUri.getQuery().substring(nextUri.getQuery().indexOf("older_than=") + "other_than=".length());
             NotifyNotificationListResponse nextList = client.getNotifications(null, null, null, UUID.fromString(olderThanId));
-            assertNotNull(notificationList.getLinks().getCurrent());
-            assertNotNull(nextList);
-            assertNotNull(nextList.getNotifications());
+            assertThat(notificationList.getLinks().getCurrent()).isNotNull();
+            assertThat(nextList).isNotNull();
+            assertThat(nextList.getNotifications()).isNotNull();
         }
     }
 
@@ -98,9 +93,9 @@ public class ClientIntegrationTestIT {
             client.sendEmail(getUUIDEnvVar("EMAIL_TEMPLATE_ID"), System.getenv("FUNCTIONAL_TEST_EMAIL"), null, null);
             fail("Expected NotificationClientException: Template missing personalisation: name");
         } catch (NotificationClientHttpException e) {
-            assert(e.getMessage().contains("Missing personalisation: name"));
-            assert e.getHttpResult() == 400;
-            assert(e.getMessage().contains("BadRequestError"));
+            assertThat(e).hasMessageContaining("Missing personalisation: name");
+            assertThat(e.getHttpResult()).isEqualTo(400);
+            assertThat(e).hasMessageContaining("BadRequestError");
         } catch (NotificationClientException e) {
             fail("unexpected exception: "+e);
         }
@@ -152,10 +147,10 @@ public class ClientIntegrationTestIT {
                     fake_uuid);
         } catch (final NotificationClientException ex){
             exceptionThrown = true;
-            assertTrue(ex.getMessage().contains("does not exist in database for service id"));
+            assertThat(ex).hasMessageContaining("does not exist in database for service id");
         }
 
-        assertTrue(exceptionThrown);
+        assertThat(exceptionThrown).isTrue();
 
     }
 
@@ -187,8 +182,8 @@ public class ClientIntegrationTestIT {
             client.sendSms(getUUIDEnvVar("SMS_TEMPLATE_ID"), System.getenv("FUNCTIONAL_TEST_NUMBER"), null, null);
             fail("Expected NotificationClientException: Template missing personalisation: name");
         } catch (NotificationClientException e) {
-            assert(e.getMessage().contains("Missing personalisation: name"));
-            assert(e.getMessage().contains("Status code: 400"));
+            assertThat(e).hasMessageContaining("Missing personalisation: name");
+            assertThat(e).hasMessageContaining("Status code: 400");
         }
     }
 
@@ -232,10 +227,10 @@ public class ClientIntegrationTestIT {
                     fake_uuid);
         } catch (final NotificationClientException ex) {
             exceptionThrown = true;
-            assertTrue(ex.getMessage().contains("does not exist in database for service id"));
+            assertThat(ex).hasMessageContaining("does not exist in database for service id");
         }
 
-        assertTrue(exceptionThrown);
+        assertThat(exceptionThrown).isTrue();
 
     }
 
@@ -248,42 +243,42 @@ public class ClientIntegrationTestIT {
         NotifyEmailResponse response = client.sendEmail(getUUIDEnvVar("EMAIL_TEMPLATE_ID"), System.getenv("FUNCTIONAL_TEST_EMAIL"), personalisation, uniqueName);
         assertNotificationEmailResponse(response, uniqueName);
         NotifyNotificationListResponse notifications = client.getNotifications(null, null, uniqueName, null);
-        assertEquals(1, notifications.getNotifications().size());
-        assertEquals(response.getNotificationId(), notifications.getNotifications().get(0).getId());
+        assertThat(notifications.getNotifications()).hasSize(1);
+        assertThat(notifications.getNotifications().get(0).getId()).isEqualTo(response.getNotificationId());
     }
 
     @Test
     public void testGetTemplateById() throws NotificationClientException {
         NotificationClient client = getClient();
         NotifyTemplateLetter template = (NotifyTemplateLetter)client.getTemplateById(getUUIDEnvVar("LETTER_TEMPLATE_ID"));
-        assertEquals(System.getenv("LETTER_TEMPLATE_ID"), template.getId().toString());
-        assertNotNull(template.getCreatedAt());
-        assertNotNull(template.getType());
-        assertNotNull(template.getBody());
-        assertNotNull(template.getName());
-        assertNotNull(template.getVersion());
+        assertThat(template.getId()).isEqualTo(getUUIDEnvVar("LETTER_TEMPLATE_ID"));
+        assertThat(template.getCreatedAt()).isNotNull();
+        assertThat(template.getType()).isNotNull();
+        assertThat(template.getBody()).isNotNull();
+        assertThat(template.getName()).isNotNull();
+        assertThat(template.getVersion()).isNotNull();
         // FIXME FIXME FIXME - only required for email?
 //        assertNotNull(template.getSubject());
-        assertNotNull(template.getLetterContactBlock());
+        assertThat(template.getLetterContactBlock()).isNotNull();
     }
 
     @Test
     public void testGetTemplateVersion() throws NotificationClientException {
         NotificationClient client = getClient();
         NotifyTemplateSms template = (NotifyTemplateSms)client.getTemplateVersion(getUUIDEnvVar("SMS_TEMPLATE_ID"), 1);
-        assertEquals(System.getenv("SMS_TEMPLATE_ID"), template.getId().toString());
-        assertNotNull(template.getCreatedAt());
-        assertNotNull(template.getType());
-        assertNotNull(template.getBody());
-        assertNotNull(template.getName());
-        assertNotNull(template.getVersion());
+        assertThat(template.getId()).isEqualTo(getUUIDEnvVar("SMS_TEMPLATE_ID"));
+        assertThat(template.getCreatedAt()).isNotNull();
+        assertThat(template.getType()).isNotNull();
+        assertThat(template.getBody()).isNotNull();
+        assertThat(template.getName()).isNotNull();
+        assertThat(template.getVersion()).isNotNull();
     }
 
     @Test
     public void testGetAllTemplates() throws NotificationClientException {
         NotificationClient client = getClient();
         NotifyTemplateListResponse templateList = client.getAllTemplates(null);
-        assertTrue(2 <= templateList.getTemplates().size());
+        assertThat(templateList.getTemplates()).hasSizeLessThanOrEqualTo(2);
     }
 
     @Test
@@ -292,11 +287,11 @@ public class ClientIntegrationTestIT {
         String uniqueName = UUID.randomUUID().toString();
         Map<String, Object> personalisation = Map.of("name", uniqueName);
         NotifyTemplatePreviewResponse template = client.generateTemplatePreview(getUUIDEnvVar("EMAIL_TEMPLATE_ID"), personalisation);
-        assertEquals(getUUIDEnvVar("EMAIL_TEMPLATE_ID"), template.getId());
-        assertNotNull(template.getType());
-        assertNotNull(template.getBody());
-        assertNotNull(template.getSubject());
-        assertTrue(template.getBody().contains(uniqueName));
+        assertThat(template.getId()).isEqualTo(getUUIDEnvVar("EMAIL_TEMPLATE_ID"));
+        assertThat(template.getType()).isNotNull();
+        assertThat(template.getBody()).isNotNull();
+        assertThat(template.getSubject()).isNotNull();
+        assertThat(template.getBody()).contains(uniqueName);
     }
 
     @Test
@@ -364,15 +359,15 @@ public class ClientIntegrationTestIT {
     }
 
     private NotifyReceivedTextMessage assertReceivedTextMessageList(NotifyReceivedTextMessagesResponse response) {
-        assertFalse(response.getReceivedTextMessages().isEmpty());
-        assertNotNull(response.getLinks().getCurrent());
+        assertThat(response.getReceivedTextMessages()).isNotEmpty();
+        assertThat(response.getLinks().getCurrent()).isNotNull();
         NotifyReceivedTextMessage receivedTextMessage = response.getReceivedTextMessages().get(0);
-        assertNotNull(receivedTextMessage.getId());
-        assertNotNull(receivedTextMessage.getNotifyNumber());
-        assertNotNull(receivedTextMessage.getUserNumber());
-        assertNotNull(receivedTextMessage.getContent());
-        assertNotNull(receivedTextMessage.getCreatedAt());
-        assertNotNull(receivedTextMessage.getServiceId());
+        assertThat(receivedTextMessage.getId()).isNotNull();
+        assertThat(receivedTextMessage.getNotifyNumber()).isNotNull();
+        assertThat(receivedTextMessage.getUserNumber()).isNotNull();
+        assertThat(receivedTextMessage.getContent()).isNotNull();
+        assertThat(receivedTextMessage.getCreatedAt()).isNotNull();
+        assertThat(receivedTextMessage.getServiceId()).isNotNull();
         return receivedTextMessage;
     }
 
@@ -423,98 +418,106 @@ public class ClientIntegrationTestIT {
     }
 
     private void assertNotificationSmsResponse(final NotifySmsResponse response, final String uniqueName){
-        assertNotNull(response);
-        assertTrue(response.getContent().getBody().contains(uniqueName));
-        assertEquals(uniqueName, response.getReference());
-        assertNotNull(response.getNotificationId());
-        assertNotNull(response.getTemplate().getId());
-        assertNotNull(response.getTemplate().getUri());
+        assertThat(response).isNotNull();
+        assertThat(response.getContent().getBody()).contains(uniqueName);
+        assertThat(response.getReference()).isEqualTo(uniqueName);
+        assertThat(response.getNotificationId()).isNotNull();
+        assertThat(response.getTemplate().getId()).isNotNull();
+        assertThat(response.getTemplate().getUri()).isNotNull();
     }
 
     private void assertNotificationEmailResponse(final NotifyEmailResponse response, final String uniqueName){
-        assertNotNull(response);
-        assertTrue(response.getContent().getBody().contains(uniqueName));
-        assertEquals(uniqueName, response.getReference());
-        assertNotNull(response.getNotificationId());
-        assertNotNull(response.getContent().getSubject());
-        assertNotNull(response.getContent().getFromEmail());
-        assertNotNull(response.getTemplate().getUri());
-        assertNotNull(response.getTemplate().getId());
+        assertThat(response).isNotNull();
+        assertThat(response.getContent().getBody()).contains(uniqueName);
+        assertThat(response.getReference()).isEqualTo(uniqueName);
+        assertThat(response.getNotificationId()).isNotNull();
+        assertThat(response.getContent().getSubject()).isNotNull();
+        assertThat(response.getContent().getFromEmail()).isNotNull();
+        assertThat(response.getTemplate().getUri()).isNotNull();
+        assertThat(response.getTemplate().getId()).isNotNull();
     }
 
     private void assertNotificationEmailResponseWithDocumentInPersonalisation(final NotifyEmailResponse response, final String uniqueName){
-        assertNotNull(response);
-        assertTrue(response.getContent().getBody().contains("https://documents."));
-        assertEquals(uniqueName, response.getReference());
-        assertNotNull(response.getNotificationId());
-        assertNotNull(response.getContent().getSubject());
-        assertNotNull(response.getContent().getFromEmail());
-        assertNotNull(response.getTemplate().getUri());
-        assertNotNull(response.getTemplate().getId());
+        assertThat(response).isNotNull();
+        assertThat(response.getContent().getBody()).contains("https://documents.");
+        assertThat(response.getReference()).isEqualTo(uniqueName);
+        assertThat(response.getNotificationId()).isNotNull();
+        assertThat(response.getContent().getSubject()).isNotNull();
+        assertThat(response.getContent().getFromEmail()).isNotNull();
+        assertThat(response.getTemplate().getUri()).isNotNull();
+        assertThat(response.getTemplate().getId()).isNotNull();
     }
 
     private void assertNotificationLetterResponse(final NotifyLetterResponse response, final String addressLine1){
-        assertNotNull(response);
-        assertTrue(response.getContent().getBody().contains(addressLine1));
-        assertEquals(addressLine1, response.getReference());
-        assertNotNull(response.getNotificationId());
-        assertNotNull(response.getTemplate().getId());
-        assertNotNull(response.getTemplate().getUri());
+        assertThat(response).isNotNull();
+        assertThat(response.getContent().getBody()).contains(addressLine1);
+        assertThat(response.getReference()).isEqualTo(addressLine1);
+        assertThat(response.getNotificationId()).isNotNull();
+        assertThat(response.getTemplate().getId()).isNotNull();
+        assertThat(response.getTemplate().getUri()).isNotNull();
     }
 
     private void assertNotification(NotifyNotification notification) {
-        assertNotNull(notification);
-        assertNotNull(notification.getId());
-        assertNotNull(notification.getTemplate().getId());
-        assertNotNull(notification.getTemplate().getUri());
-        assertNotNull(notification.getCreatedAt());
-        assertNotNull(notification.getType());
-        assertNull(notification.getCreatedByName());
+        assertThat(notification).isNotNull();
+        assertThat(notification.getId()).isNotNull();
+        assertThat(notification.getTemplate().getId()).isNotNull();
+        assertThat(notification.getTemplate().getUri()).isNotNull();
+        assertThat(notification.getCreatedAt()).isNotNull();
+        assertThat(notification.getType()).isNotNull();
+        assertThat(notification.getCreatedByName()).isNull();
 
-        if(notification.getType().equals(NotificationType.sms)) {
-            assertNotificationWhenSms((NotifyNotificationSms)notification);
-        }
-        if(notification.getType().equals(NotificationType.email)){
-            assertNotificationWhenEmail((NotifyNotificationEmail)notification);
-        }
-        if(notification.getType().equals(NotificationType.letter)){
-            assertNotificationWhenLetter((NotifyNotificationLetter)notification);
+        switch(notification.getType()) {
+            case sms: {
+                assertNotificationWhenSms((NotifyNotificationSms)notification);
+                break;
+            }
+            case email: {
+                assertNotificationWhenEmail((NotifyNotificationEmail)notification);
+                break;
+            }
+            case letter: {
+                assertNotificationWhenLetter((NotifyNotificationLetter)notification);
+                break;
+            }
         }
     }
 
     private void assertNotificationWhenLetter(NotifyNotificationLetter notification) {
         // the other address lines are optional. A precompiled letter will only have address_line_1
-        assertNotNull(notification.getLine1());
+        assertThat(notification.getLine1()).isNotNull();
         // FIXME FIXME FIXME - only for precompiled letters?
 //        assertNotNull(notification.getPostage());
 
-        assertNotNull(notification.getStatus());
-        assertTrue(Arrays.asList(ACCEPTED, RECEIVED).contains(notification.getStatus()),
-                "expected status to be accepted or received");
+        assertThat(notification.getStatus()).isNotNull();
+        assertThat(notification.getStatus())
+                .withFailMessage("expected status to be accepted or received")
+                .isIn(List.of(Letter.ACCEPTED, Letter.RECEIVED));
     }
 
     private void assertNotificationWhenEmail(NotifyNotificationEmail notification) {
-        assertNotNull(notification.getSubject());
-        assertNotNull(notification.getEmailAddress());
+        assertThat(notification.getSubject()).isNotNull();
+        assertThat(notification.getEmailAddress()).isNotNull();
 
-        assertNotNull(notification.getStatus());
-        assertTrue(Arrays.asList(NotificationStatus.Email.CREATED, NotificationStatus.Email.SENDING, NotificationStatus.Email.DELIVERED).contains(notification.getStatus()),
-                "expected status to be created, sending or delivered");
+        assertThat(notification.getStatus()).isNotNull();
+        assertThat(notification.getStatus())
+                .withFailMessage("expected status to be created, sending or delivered")
+                .isIn(List.of(Email.CREATED, Email.SENDING, Email.DELIVERED));
     }
 
     private void assertNotificationWhenSms(NotifyNotificationSms notification) {
-        assertNotNull(notification.getPhoneNumber());
+        assertThat(notification.getPhoneNumber()).isNotNull();
 
-        assertNotNull(notification.getStatus());
-        assertTrue(Arrays.asList(NotificationStatus.Sms.CREATED, NotificationStatus.Sms.SENDING, NotificationStatus.Sms.DELIVERED).contains(notification.getStatus()),
-                "expected status to be created, sending or delivered");
+        assertThat(notification.getStatus()).isNotNull();
+        assertThat(notification.getStatus())
+                .withFailMessage("expected status to be created, sending or delivered")
+                .isIn(List.of(Sms.CREATED, Sms.SENDING, Sms.DELIVERED));
     }
 
     private void assertPrecompiledLetterResponse(String reference, String postage, NotifyPrecompiledLetterResponse response) {
-        assertNotNull(response);
-        assertNotNull(response.getId());
-        assertEquals(reference, response.getReference());
-        assertEquals(postage, response.getPostage());
+        assertThat(response).isNotNull();
+        assertThat(response.getId()).isNotNull();
+        assertThat(response.getReference()).isEqualTo(reference);
+        assertThat(response.getPostage()).isEqualTo(postage);
     }
 
     private void assertPdfResponse(NotificationClient client, UUID notificationId) throws NotificationClientException {
@@ -542,12 +545,12 @@ public class ClientIntegrationTestIT {
             }
         }
 
-        assertNotEquals(0, pdfData.length);
+        assertThat(pdfData.length).isGreaterThan(0);
         // check that we've got a pdf by looking for the magic bytes
         byte[] magicBytes = Arrays.copyOfRange(pdfData, 0, 5);
         String magicString = new String(magicBytes);
-        assertEquals("%PDF-", magicString);
-        assertTrue(magicString.startsWith("%PDF-"));
+        assertThat(magicString).isEqualTo("%PDF-");
+        assertThat(magicString).startsWith("%PDF-");
     }
 
 }
