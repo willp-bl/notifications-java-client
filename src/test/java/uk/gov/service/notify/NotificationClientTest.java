@@ -92,7 +92,7 @@ public class NotificationClientTest {
     @Test
     public void sendPrecompiledLetterBlankReferenceErrors() {
         NotificationClient client = new NotificationClient(COMBINED_API_KEY, BASE_URL);
-        final File pdfFile = new File(this.getClass().getClassLoader().getResource("one_page_pdf.pdf").getFile());
+        final File pdfFile = new File(Objects.requireNonNull(this.getClass().getClassLoader().getResource("one_page_pdf.pdf")).getFile());
 
         NotificationClientException e = assertThrows(NotificationClientException.class,
                 () -> client.sendPrecompiledLetter(null, pdfFile));
@@ -103,7 +103,7 @@ public class NotificationClientTest {
     @Test
     public void sendPrecompiledLetterEmptyFileErrors() {
         NotificationClient client = new NotificationClient(COMBINED_API_KEY, BASE_URL);
-        final File pdfFile = new File(this.getClass().getClassLoader().getResource("empty_file.pdf").getFile());
+        final File pdfFile = new File(Objects.requireNonNull(this.getClass().getClassLoader().getResource("empty_file.pdf")).getFile());
 
         NotificationClientException e = assertThrows(NotificationClientException.class,
                 () -> client.sendPrecompiledLetter("a reference", pdfFile));
@@ -134,7 +134,7 @@ public class NotificationClientTest {
     @Test
     public void testSendPrecompiledLetterNotPDF() {
         ClassLoader classLoader = getClass().getClassLoader();
-        File file = new File(classLoader.getResource("not_a_pdf.txt").getFile());
+        File file = new File(Objects.requireNonNull(classLoader.getResource("not_a_pdf.txt")).getFile());
         NotificationClient client = new NotificationClient(COMBINED_API_KEY, BASE_URL);
 
         NotificationClientException e = assertThrows(NotificationClientException.class,
@@ -403,10 +403,12 @@ public class NotificationClientTest {
         assertThat(actualNotificationEmail.getSubject()).isEqualTo(expectedNotificationEmail.getSubject());
         assertThat(actualNotificationEmail.getEmailAddress()).isEqualTo(expectedNotificationEmail.getEmailAddress());
         assertThat(actualNotificationEmail.getStatus()).isEqualTo(expectedNotificationEmail.getStatus());
+        assertThat(actualNotificationEmail.getCostDetails()).isNull();
 
         // phone specific items
         assertThat(actualNotificationSms.getPhoneNumber()).isEqualTo(expectedNotificationSms.getPhoneNumber());
         assertThat(actualNotificationSms.getStatus()).isEqualTo(expectedNotificationSms.getStatus());
+        assertThat(actualNotificationSms.getCostDetails()).isNull();
 
         // letter specific items
         assertThat(actualNotificationLetter.getLine1()).isEqualTo(expectedNotificationLetter.getLine1());
@@ -417,6 +419,16 @@ public class NotificationClientTest {
         assertThat(actualNotificationLetter.getLine6()).isEqualTo(expectedNotificationLetter.getLine6());
         assertThat(actualNotificationLetter.getLine7()).isEqualTo(expectedNotificationLetter.getLine7());
         assertThat(actualNotificationLetter.getStatus()).isEqualTo(expectedNotificationLetter.getStatus());
+
+        // cost details are all in the letter response from the api and not separate for notification type
+        assertThat(actualNotificationLetter.getCostInPounds()).isEqualTo(expectedNotificationLetter.getCostInPounds());
+        assertThat(actualNotificationLetter.isCostDataReady()).isEqualTo(expectedNotificationLetter.isCostDataReady());
+        assertThat(actualNotificationLetter.getCostDetails()).isNotNull();
+        assertThat(actualNotificationLetter.getCostDetails().getBillableSmsFragments()).isEqualTo(expectedNotificationLetter.getCostDetails().getBillableSmsFragments());
+        assertThat(actualNotificationLetter.getCostDetails().getInternationalRateMultiplier()).isEqualTo(expectedNotificationLetter.getCostDetails().getInternationalRateMultiplier());
+        assertThat(actualNotificationLetter.getCostDetails().getSmsRate()).isEqualTo(expectedNotificationLetter.getCostDetails().getSmsRate());
+        assertThat(actualNotificationLetter.getCostDetails().getBillableSheetsOfPaper()).isEqualTo(expectedNotificationLetter.getCostDetails().getBillableSheetsOfPaper());
+        assertThat(actualNotificationLetter.getCostDetails().getPostage()).isEqualTo(expectedNotificationLetter.getCostDetails().getPostage());
 
         LoggedRequest request = validateRequest();
         assertThat(request.queryParameter("status").firstValue()).isEqualTo("a stat");
@@ -430,7 +442,7 @@ public class NotificationClientTest {
                 .stream()
                 .filter(n -> n.getType() == notificationType)
                 .findFirst()
-                .get();
+                .orElseThrow();
     }
 
     private void checkBaseNotificationDetails(NotifyNotification expected, NotifyNotification actual) {
@@ -450,7 +462,7 @@ public class NotificationClientTest {
     @Test
     public void testGetPdfForLetter() throws NotificationClientException, IOException {
         final UUID notificationId = UUID.randomUUID();
-        byte[] pdfFile = IOUtils.toByteArray(this.getClass().getClassLoader().getResourceAsStream("one_page_pdf.pdf"));
+        byte[] pdfFile = IOUtils.toByteArray(Objects.requireNonNull(this.getClass().getClassLoader().getResourceAsStream("one_page_pdf.pdf")));
         wireMockRule.stubFor(get("/v2/notifications/" + notificationId + "/pdf")
                 .willReturn(ok()
                         .withResponseBody(new Body(pdfFile))));
@@ -470,7 +482,7 @@ public class NotificationClientTest {
                 .willReturn(created()
                         .withResponseBody(new Body(objectMapper.writeValueAsString(expected)))));
         NotificationClient client = new NotificationClient(COMBINED_API_KEY, BASE_URL);
-        final File pdfFile = new File(this.getClass().getClassLoader().getResource("small.pdf.txt").getFile());
+        final File pdfFile = new File(Objects.requireNonNull(this.getClass().getClassLoader().getResource("small.pdf.txt")).getFile());
 
         NotifyPrecompiledLetterResponse actual = client.sendPrecompiledLetter(expected.getReference(), pdfFile, expected.getPostage());
 
@@ -612,7 +624,7 @@ public class NotificationClientTest {
     @Test
     public void testJsonParsingDoesNotFailWithUnknownValue() throws IOException {
         // NOTE: we do not try and deserialise here, we want the client to do that
-        String apiResponse = new String(this.getClass().getClassLoader().getResourceAsStream("v2_notifications_email_unknown_value_response.json").readAllBytes(), StandardCharsets.UTF_8);
+        String apiResponse = new String(Objects.requireNonNull(this.getClass().getClassLoader().getResourceAsStream("v2_notifications_email_unknown_value_response.json")).readAllBytes(), StandardCharsets.UTF_8);
         wireMockRule.stubFor(post("/v2/notifications/email")
                 .willReturn(created()
                         .withResponseBody(new Body(apiResponse))));
