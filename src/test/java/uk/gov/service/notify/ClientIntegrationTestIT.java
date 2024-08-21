@@ -74,7 +74,7 @@ public class ClientIntegrationTestIT {
         assertThat(notificationList.getNotifications()).isNotEmpty();
         // Just check the first notification in the list.
         assertNotification(notificationList.getNotifications().get(0));
-        String baseUrl = System.getenv("NOTIFY_API_URL");
+        String baseUrl = getEnvVar("NOTIFY_API_URL");
         assertThat(notificationList.getLinks().getCurrent()).isEqualTo(URI.create(baseUrl + "/v2/notifications"));
         if (Objects.nonNull(notificationList.getLinks().getNext())) {
             URI nextUri = notificationList.getLinks().getNext();
@@ -90,7 +90,7 @@ public class ClientIntegrationTestIT {
     public void testEmailNotificationWithoutPersonalisationReturnsErrorMessageIT() {
         NotificationClient client = getClient();
         try {
-            client.sendEmail(getUUIDEnvVar("EMAIL_TEMPLATE_ID"), System.getenv("FUNCTIONAL_TEST_EMAIL"), null, null);
+            client.sendEmail(getUUIDEnvVar("EMAIL_TEMPLATE_ID"), getEnvVar("FUNCTIONAL_TEST_EMAIL"), null, null);
             fail("Expected NotificationClientException: Template missing personalisation: name");
         } catch (NotificationClientHttpException e) {
             assertThat(e).hasMessageContaining("Missing personalisation: name");
@@ -102,7 +102,11 @@ public class ClientIntegrationTestIT {
     }
 
     private static UUID getUUIDEnvVar(String envVar) {
-        return UUID.fromString(System.getenv(envVar));
+        return UUID.fromString(getEnvVar(envVar));
+    }
+
+    private static String getEnvVar(String envVar) {
+        return Objects.requireNonNull(System.getenv(envVar));
     }
 
     @Test
@@ -115,7 +119,7 @@ public class ClientIntegrationTestIT {
 
         NotifyEmailResponse response = client.sendEmail(
                 getUUIDEnvVar("EMAIL_TEMPLATE_ID"),
-                System.getenv("FUNCTIONAL_TEST_EMAIL"),
+                getEnvVar("FUNCTIONAL_TEST_EMAIL"),
                 personalisation,
                 uniqueName,
                 getUUIDEnvVar("EMAIL_REPLY_TO_ID"));
@@ -141,7 +145,7 @@ public class ClientIntegrationTestIT {
         try {
             client.sendEmail(
                     getUUIDEnvVar("EMAIL_TEMPLATE_ID"),
-                    System.getenv("FUNCTIONAL_TEST_EMAIL"),
+                    getEnvVar("FUNCTIONAL_TEST_EMAIL"),
                     personalisation,
                     uniqueName,
                     fake_uuid);
@@ -159,14 +163,14 @@ public class ClientIntegrationTestIT {
         NotificationClient client = getClient();
 
         ClassLoader classLoader = getClass().getClassLoader();
-        byte [] fileContents = classLoader.getResourceAsStream("one_page_pdf.pdf").readAllBytes();
+        byte [] fileContents = Objects.requireNonNull(classLoader.getResourceAsStream("one_page_pdf.pdf")).readAllBytes();
 
         Map<String, ?> documentFileObject = PrepareUploadHelper.prepareUpload(fileContents);
         Map<String, Object> personalisation = Map.of("name", documentFileObject);
 
         String reference = UUID.randomUUID().toString();
         NotifyEmailResponse emailResponse = client.sendEmail(getUUIDEnvVar("EMAIL_TEMPLATE_ID"),
-                System.getenv("FUNCTIONAL_TEST_EMAIL"),
+                getEnvVar("FUNCTIONAL_TEST_EMAIL"),
                 personalisation,
                 reference
         );
@@ -179,7 +183,7 @@ public class ClientIntegrationTestIT {
     public void testSmsNotificationWithoutPersonalisationReturnsErrorMessageIT() {
         NotificationClient client = getClient();
         try {
-            client.sendSms(getUUIDEnvVar("SMS_TEMPLATE_ID"), System.getenv("FUNCTIONAL_TEST_NUMBER"), null, null);
+            client.sendSms(getUUIDEnvVar("SMS_TEMPLATE_ID"), getEnvVar("FUNCTIONAL_TEST_NUMBER"), null, null);
             fail("Expected NotificationClientException: Template missing personalisation: name");
         } catch (NotificationClientException e) {
             assertThat(e).hasMessageContaining("Missing personalisation: name");
@@ -196,7 +200,7 @@ public class ClientIntegrationTestIT {
 
         NotifySmsResponse response = client.sendSms(
                 getUUIDEnvVar("SMS_TEMPLATE_ID"),
-                System.getenv("FUNCTIONAL_TEST_NUMBER"),
+                getEnvVar("FUNCTIONAL_TEST_NUMBER"),
                 personalisation,
                 uniqueName,
                 getUUIDEnvVar("SMS_SENDER_ID"));
@@ -221,7 +225,7 @@ public class ClientIntegrationTestIT {
         try {
             client.sendSms(
                     getUUIDEnvVar("SMS_TEMPLATE_ID"),
-                    System.getenv("FUNCTIONAL_TEST_NUMBER"),
+                    getEnvVar("FUNCTIONAL_TEST_NUMBER"),
                     personalisation,
                     uniqueName,
                     fake_uuid);
@@ -240,7 +244,7 @@ public class ClientIntegrationTestIT {
         String uniqueName = UUID.randomUUID().toString();
         Map<String, String> personalisation = Map.of("name", uniqueName);
 
-        NotifyEmailResponse response = client.sendEmail(getUUIDEnvVar("EMAIL_TEMPLATE_ID"), System.getenv("FUNCTIONAL_TEST_EMAIL"), personalisation, uniqueName);
+        NotifyEmailResponse response = client.sendEmail(getUUIDEnvVar("EMAIL_TEMPLATE_ID"), getEnvVar("FUNCTIONAL_TEST_EMAIL"), personalisation, uniqueName);
         assertNotificationEmailResponse(response, uniqueName);
         NotifyNotificationListResponse notifications = client.getNotifications(null, null, uniqueName, null);
         assertThat(notifications.getNotifications()).hasSize(1);
@@ -309,7 +313,7 @@ public class ClientIntegrationTestIT {
         String reference = UUID.randomUUID().toString();
 
         ClassLoader classLoader = getClass().getClassLoader();
-        File file = new File(classLoader.getResource("one_page_pdf.pdf").getFile());
+        File file = new File(Objects.requireNonNull(classLoader.getResource("one_page_pdf.pdf")).getFile());
         NotificationClient client = getClient();
         NotifyPrecompiledLetterResponse response =  client.sendPrecompiledLetter(reference, file);
 
@@ -322,7 +326,7 @@ public class ClientIntegrationTestIT {
         String reference = UUID.randomUUID().toString();
 
         ClassLoader classLoader = getClass().getClassLoader();
-        File file = new File(classLoader.getResource("one_page_pdf.pdf").getFile());
+        File file = new File(Objects.requireNonNull(classLoader.getResource("one_page_pdf.pdf")).getFile());
         NotificationClient client = getClient();
         NotifyPrecompiledLetterResponse response =  client.sendPrecompiledLetter(reference, file, "first");
 
@@ -335,7 +339,7 @@ public class ClientIntegrationTestIT {
         String reference = UUID.randomUUID().toString();
 
         ClassLoader classLoader = getClass().getClassLoader();
-        File file = new File(classLoader.getResource("one_page_pdf.pdf").getFile());
+        File file = new File(Objects.requireNonNull(classLoader.getResource("one_page_pdf.pdf")).getFile());
         InputStream stream = Files.newInputStream(file.toPath());
         NotificationClient client = getClient();
         NotifyPrecompiledLetterResponse response =  client.sendPrecompiledLetterWithInputStream(reference, stream);
@@ -349,7 +353,7 @@ public class ClientIntegrationTestIT {
         String reference = UUID.randomUUID().toString();
 
         ClassLoader classLoader = getClass().getClassLoader();
-        File file = new File(classLoader.getResource("one_page_pdf.pdf").getFile());
+        File file = new File(Objects.requireNonNull(classLoader.getResource("one_page_pdf.pdf")).getFile());
         InputStream stream = Files.newInputStream(file.toPath());
         NotificationClient client = getClient();
         NotifyPrecompiledLetterResponse response =  client.sendPrecompiledLetterWithInputStream(reference, stream, "first");
@@ -377,14 +381,14 @@ public class ClientIntegrationTestIT {
     }
 
     private NotificationClient getClient(){
-        String apiKey = System.getenv("API_KEY");
-        String baseUrl = System.getenv("NOTIFY_API_URL");
+        String apiKey = getEnvVar("API_KEY");
+        String baseUrl = getEnvVar("NOTIFY_API_URL");
         return new NotificationClient(apiKey, baseUrl);
     }
 
     private NotificationClient getClient(String api_key){
-        String apiKey = System.getenv(api_key);
-        String baseUrl = System.getenv("NOTIFY_API_URL");
+        String apiKey = getEnvVar(api_key);
+        String baseUrl = getEnvVar("NOTIFY_API_URL");
         return new NotificationClient(apiKey, baseUrl);
     }
 
@@ -392,7 +396,7 @@ public class ClientIntegrationTestIT {
         String uniqueName = UUID.randomUUID().toString();
         Map<String, String> personalisation = Map.of("name", uniqueName);
         NotifyEmailResponse response = client.sendEmail(getUUIDEnvVar("EMAIL_TEMPLATE_ID"),
-                System.getenv("FUNCTIONAL_TEST_EMAIL"), personalisation, uniqueName);
+                getEnvVar("FUNCTIONAL_TEST_EMAIL"), personalisation, uniqueName);
         assertNotificationEmailResponse(response, uniqueName);
         return response;
     }
@@ -400,7 +404,7 @@ public class ClientIntegrationTestIT {
     private NotifySmsResponse sendSmsAndAssertResponse(final NotificationClient client) throws NotificationClientException {
         String uniqueName = UUID.randomUUID().toString();
         Map<String, Object> personalisation = Map.of("name", uniqueName);
-        NotifySmsResponse response = client.sendSms(getUUIDEnvVar("SMS_TEMPLATE_ID"), System.getenv("FUNCTIONAL_TEST_NUMBER"), personalisation, uniqueName);
+        NotifySmsResponse response = client.sendSms(getUUIDEnvVar("SMS_TEMPLATE_ID"), getEnvVar("FUNCTIONAL_TEST_NUMBER"), personalisation, uniqueName);
         assertNotificationSmsResponse(response, uniqueName);
         return response;
     }
@@ -537,7 +541,7 @@ public class ClientIntegrationTestIT {
                     throw e;
                 } else {
                     try {
-                        Thread.sleep(count * 1000);
+                        Thread.sleep(count * 1_000L);
                     } catch (InterruptedException e1) {
                         Thread.currentThread().interrupt();
                     }
@@ -550,7 +554,6 @@ public class ClientIntegrationTestIT {
         byte[] magicBytes = Arrays.copyOfRange(pdfData, 0, 5);
         String magicString = new String(magicBytes);
         assertThat(magicString).isEqualTo("%PDF-");
-        assertThat(magicString).startsWith("%PDF-");
     }
 
 }
