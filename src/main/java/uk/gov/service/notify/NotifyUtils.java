@@ -7,6 +7,9 @@ import java.util.Properties;
 
 class NotifyUtils {
 
+    private static final int LENGTH_UUID = 36;
+    private static final int LENGTH_DASH = 1;// "-"
+
     private static final Properties prop = new Properties();
 
     static {
@@ -20,11 +23,12 @@ class NotifyUtils {
     private NotifyUtils() {}
 
     static String extractServiceId(String apiKey) {
-        return apiKey.substring(Math.max(0, apiKey.length() - 73), Math.max(0, apiKey.length() - 37));
+        return apiKey.substring(Math.max(0, apiKey.length() - LENGTH_UUID - LENGTH_DASH - LENGTH_UUID),
+                Math.max(0, apiKey.length() - LENGTH_UUID - LENGTH_DASH));
     }
 
     static String extractApiKey(String apiKey) {
-        return apiKey.substring(Math.max(0, apiKey.length() - 36));
+        return apiKey.substring(Math.max(0, apiKey.length() - LENGTH_UUID));
     }
 
     static String getProperty(String propertyName) {
