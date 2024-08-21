@@ -1,14 +1,8 @@
 package uk.gov.service.notify;
 
-import org.jose4j.jwa.AlgorithmConstraints;
-import org.jose4j.jws.AlgorithmIdentifiers;
 import org.jose4j.jwt.consumer.InvalidJwtException;
-import org.jose4j.jwt.consumer.JwtConsumer;
-import org.jose4j.jwt.consumer.JwtConsumerBuilder;
 import org.junit.jupiter.api.Test;
 
-import javax.crypto.spec.SecretKeySpec;
-import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -16,6 +10,43 @@ import static org.assertj.core.api.Assertions.fail;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class AuthenticationTest {
+
+    // this tests that the validateBearerToken() method in this class is working
+    // so we can be confident that it is checking the output of the main code
+    @Test
+    public void testFixedJwtString() {
+        final String serviceId = UUID.randomUUID().toString();
+        final String apiKey = UUID.randomUUID().toString();
+
+        final long msInPastToIssueToken = 120 * 1_000L; // 120 seconds
+        final String token = Authentication.create(serviceId, apiKey, System.currentTimeMillis()- msInPastToIssueToken);
+
+        final int allowedSecondsInThePast = 60*3; // 180 seconds
+        assertThat(allowedSecondsInThePast*1_000L).isGreaterThan(msInPastToIssueToken);
+
+        try {
+            Authentication.validateBearerToken(token, serviceId, apiKey, 60, allowedSecondsInThePast);
+        } catch (InvalidJwtException e) {
+            fail("unable to validate token: "+e);
+        }
+    }
+
+    // this tests that the validateBearerToken() method in this class is working
+    // so we can be confident that it is checking the output of the main code
+    @Test
+    public void testFixedJwtStringIsExpired() {
+        final String serviceId = UUID.randomUUID().toString();
+        final String apiKey = UUID.randomUUID().toString();
+
+        final long msInPastToIssueToken = 120 * 1_000L; // 120 seconds
+        final String token = Authentication.create(serviceId, apiKey, System.currentTimeMillis()-msInPastToIssueToken);
+
+        InvalidJwtException e = assertThrows(InvalidJwtException.class,
+                () -> Authentication.validateBearerToken(token, serviceId, apiKey));
+
+        assertThat(e).hasMessageContaining("rejected due to invalid claims or other invalid content");
+        assertThat(e).hasMessageContaining("is more than 60 second(s) in the past");
+    }
 
     @Test
     public void testJwtCreation() {
@@ -25,7 +56,7 @@ public class AuthenticationTest {
         String token = Authentication.create(serviceId, apiKey);
 
         try {
-            validateBearerToken(token, serviceId, apiKey);
+            Authentication.validateBearerToken(token, serviceId, apiKey);
         } catch (InvalidJwtException e) {
             fail("unable to validate token: "+e);
         }
@@ -39,9 +70,9 @@ public class AuthenticationTest {
 
         String jwt = Authentication.create(differentServiceId, apiKey);
         InvalidJwtException e = assertThrows(InvalidJwtException.class,
-                () -> validateBearerToken(jwt, serviceId, apiKey));
+                () -> Authentication.validateBearerToken(jwt, serviceId, apiKey));
 
-        assertThat(e.getMessage()).contains("Issuer (iss) claim value ("+differentServiceId+") doesn't match expected value of "+serviceId);
+        assertThat(e).hasMessageContaining("Issuer (iss) claim value ("+differentServiceId+") doesn't match expected value of "+serviceId);
     }
 
     @Test
@@ -52,20 +83,9 @@ public class AuthenticationTest {
 
         String jwt = Authentication.create(serviceId, differentApiKey);
         InvalidJwtException e = assertThrows(InvalidJwtException.class,
-                () -> validateBearerToken(jwt, serviceId, apiKey));
+                () -> Authentication.validateBearerToken(jwt, serviceId, apiKey));
 
-        assertThat(e.getMessage()).startsWith("JWT rejected due to invalid signature");
+        assertThat(e).hasMessageStartingWith("JWT rejected due to invalid signature");
     }
 
-    private void validateBearerToken(String token, String serviceId, String apiKey) throws InvalidJwtException {
-        final int allowedSecondsInTheFuture = 60;
-        final int allowedSecondsInThePast = 60;
-        final JwtConsumer jwtConsumer = new JwtConsumerBuilder()
-                .setExpectedIssuer(serviceId)
-                .setIssuedAtRestrictions(allowedSecondsInTheFuture, allowedSecondsInThePast)
-                .setVerificationKey(new SecretKeySpec(apiKey.getBytes(StandardCharsets.UTF_8), "RAW"))
-                .setJwsAlgorithmConstraints(AlgorithmConstraints.ConstraintType.PERMIT, AlgorithmIdentifiers.HMAC_SHA256)
-                .build();
-        jwtConsumer.process(token);
-    }
 }
