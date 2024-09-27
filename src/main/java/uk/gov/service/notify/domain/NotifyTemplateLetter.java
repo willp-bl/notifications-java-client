@@ -8,6 +8,7 @@ import java.util.UUID;
 
 public class NotifyTemplateLetter extends NotifyTemplate {
 
+    // @NotEmpty?
     private final String letterContactBlock;
 
     public NotifyTemplateLetter(@JsonProperty("id") UUID id,

@@ -5,11 +5,11 @@
     "body": "a content`body",
     "subject": "a subject"
   },
-  "uri": null,
+  "uri": "http://localhost/letter",
   "template": {
     "id": "c8347a63-edfc-4777-8809-8ab3d1372557",
     "version": -1,
-    "uri": "http://localhost"
+    "uri": "http://localhost/template"
   },
   "scheduled_for": "tomorrow"
 }

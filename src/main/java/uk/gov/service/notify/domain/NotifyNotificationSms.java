@@ -1,6 +1,9 @@
 package uk.gov.service.notify.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.PositiveOrZero;
 
 import java.time.ZonedDateTime;
 import java.util.Objects;
@@ -9,6 +12,8 @@ import java.util.UUID;
 public class NotifyNotificationSms extends NotifyNotification {
 
     public static class CostDetails {
+        @NotNull
+        @PositiveOrZero
         private final Integer billableSmsFragments;
         private final Double internationalRateMultiplier;
         private final Double smsRate;
@@ -59,7 +64,10 @@ public class NotifyNotificationSms extends NotifyNotification {
         }
     }
 
+    @NotNull
     private final NotificationStatus.Sms status;
+    @NotNull
+    @Pattern(regexp = "^[0-9\\+\\(\\)]*$")
     private final String phoneNumber;
     private final CostDetails costDetails;
 

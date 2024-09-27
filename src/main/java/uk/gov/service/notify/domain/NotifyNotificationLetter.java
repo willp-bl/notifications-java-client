@@ -1,6 +1,10 @@
 package uk.gov.service.notify.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 
 import java.time.ZonedDateTime;
 import java.util.Objects;
@@ -9,7 +13,10 @@ import java.util.UUID;
 public class NotifyNotificationLetter extends NotifyNotification {
 
     public static class CostDetails {
+        @NotNull
+        @PositiveOrZero
         private final Integer billableSheetsOfPaper;
+        @NotNull
         private final Postage postage;
 
         public CostDetails(@JsonProperty("billable_sheets_of_paper") Integer billableSheetsOfPaper,
@@ -50,7 +57,10 @@ public class NotifyNotificationLetter extends NotifyNotification {
         }
     }
 
+    @NotNull
     private final NotificationStatus.Letter status;
+    // the other address lines are optional. A precompiled letter will only have address_line_1
+    @NotEmpty
     private final String line1;
     private final String line2;
     private final String line3;

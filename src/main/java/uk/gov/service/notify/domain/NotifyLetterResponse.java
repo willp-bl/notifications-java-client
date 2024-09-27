@@ -1,6 +1,9 @@
 package uk.gov.service.notify.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 
 import java.net.URI;
 import java.util.Objects;
@@ -9,7 +12,9 @@ import java.util.UUID;
 public class NotifyLetterResponse {
 
     public static class Content {
+        @NotEmpty
         private final String body;
+        @NotEmpty
         private final String subject;
 
         public Content(@JsonProperty("body") String body,
@@ -51,8 +56,11 @@ public class NotifyLetterResponse {
     }
 
     public static class Template {
+        @NotNull
         private final UUID id;
+        @Positive
         private final int version;
+        @NotNull
         private final URI uri;
 
         public Template(@JsonProperty("id") UUID id,
@@ -101,10 +109,15 @@ public class NotifyLetterResponse {
         }
     }
 
+    @NotNull
     private final UUID notificationId;
+    @NotEmpty
     private final String reference;
+    @NotNull
     private final Content content;
+    @NotNull
     private final URI uri;
+    @NotNull
     private final Template template;
     private final String scheduledFor;
 

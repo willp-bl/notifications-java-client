@@ -1,12 +1,14 @@
 package uk.gov.service.notify.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotNull;
 
 import java.util.Map;
 import java.util.Objects;
 
 public class NotifyTemplatePreviewRequest {
 
+    @NotNull
     private final Map<String, ?> personalisation;
 
     public NotifyTemplatePreviewRequest(@JsonProperty("personalisation") Map<String, ?> personalisation) {

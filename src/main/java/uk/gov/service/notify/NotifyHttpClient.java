@@ -1,10 +1,6 @@
 package uk.gov.service.notify;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
@@ -25,13 +21,7 @@ class NotifyHttpClient {
 
     private static final Logger LOGGER = Logger.getLogger(NotifyHttpClient.class.toString());
 
-    private static final ObjectMapper objectMapper = new ObjectMapper()
-            // the following two lines are needed to (de)serialize ZonedDateTime in ISO8601 format
-            .registerModule(new JavaTimeModule())
-            .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
-            // this allows the client to ignore unknown values sent in API responses
-            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-
+    private final ValidatingJsonMapper validatingJsonMapper;
     private final String bearerToken;
     private final String userAgent;
     private final HttpClient httpClient;
@@ -45,6 +35,7 @@ class NotifyHttpClient {
                      NotificationClientOptions clientOptions) {
         this.bearerToken = Authentication.create(serviceId, apiKey);
         this.userAgent = userAgent;
+        this.validatingJsonMapper = new ValidatingJsonMapper(clientOptions);
         this.httpClient = HttpClient.newBuilder()
                 .connectTimeout(Duration.parse(NotifyUtils.getProperty(clientOptions, NotificationClientOptions.Options.HTTP_TIMEOUT_CONNECT.getPropertyKey())))
                 .proxy(Objects.nonNull(proxySelector)?proxySelector:ProxySelector.getDefault())
@@ -64,7 +55,7 @@ class NotifyHttpClient {
     <T> T post(URI uri, Object requestBody, Class<T> responseClass, int expectedResponseCode) throws NotificationClientException {
         final String requestBodyString;
         try {
-            requestBodyString = objectMapper.writeValueAsString(requestBody);
+            requestBodyString = validatingJsonMapper.writeValueAsString(requestBody);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
@@ -80,7 +71,7 @@ class NotifyHttpClient {
                 .build();
 
         try(InputStream responseBody = sendHttpRequest(httpRequest, expectedResponseCode)) {
-            return objectMapper.readValue(responseBody, responseClass);
+            return validatingJsonMapper.readValue(responseBody, responseClass);
         } catch (IOException e) {
             throw new NotificationClientException(e);
         }
@@ -115,7 +106,7 @@ class NotifyHttpClient {
                 .build();
 
         try(InputStream responseBody = sendHttpRequest(httpRequest, 200)) {
-            return objectMapper.readValue(responseBody, responseClass);
+            return validatingJsonMapper.readValue(responseBody, responseClass);
         } catch (IOException e) {
             throw new NotificationClientException(e);
         }

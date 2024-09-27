@@ -5,10 +5,10 @@
     "body": "a content`body",
     "from_number": "a from number"
   },
-  "uri": null,
+  "uri": "http://localhost/sms",
   "template": {
     "id": "44219525-adb0-4b26-b51c-cd7b5de5dbf1",
     "version": -1,
-    "uri": "http://localhost"
+    "uri": "http://localhost/template"
   }
 }

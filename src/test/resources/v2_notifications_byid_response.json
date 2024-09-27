@@ -1,7 +1,7 @@
 {
   "id": "051ffca0-2560-4de7-9015-ce69e77998d2",
   "reference": "a reference",
-  "phone_number": "a phone_number",
+  "phone_number": "+44(0)12345",
   "type": "sms",
   "status": "pending",
   "template": {

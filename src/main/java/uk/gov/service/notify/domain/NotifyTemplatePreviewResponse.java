@@ -1,16 +1,22 @@
 package uk.gov.service.notify.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 
 import java.util.Objects;
 import java.util.UUID;
 
 public class NotifyTemplatePreviewResponse {
 
+    @NotNull
     private final UUID id;
+    @NotNull
     private final NotificationType type;
     private final int version;
+    @NotEmpty
     private final String body;
+    @NotEmpty
     private final String subject;
 
     public NotifyTemplatePreviewResponse(@JsonProperty("id") UUID id,

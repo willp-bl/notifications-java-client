@@ -1,6 +1,8 @@
 package uk.gov.service.notify.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 
 import java.time.ZonedDateTime;
 import java.util.Objects;
@@ -8,8 +10,11 @@ import java.util.UUID;
 
 public class NotifyNotificationEmail extends NotifyNotification {
 
+    @NotNull
     private final NotificationStatus.Email status;
+    @NotEmpty
     private final String emailAddress;
+    @NotEmpty
     private final String subject;
 
     public NotifyNotificationEmail(@JsonProperty("id") UUID id,
@@ -27,7 +32,7 @@ public class NotifyNotificationEmail extends NotifyNotification {
                                    @JsonProperty("is_cost_data_ready") boolean isCostDataReady,
                                    @JsonProperty("cost_in_pounds") double costInPounds) {
     super(id, reference, type, template, body, createdAt, createdByName, sentAt, completedAt, isCostDataReady, costInPounds);
-    this.status = status;
+        this.status = status;
         this.emailAddress = emailAddress;
         this.subject = subject;
     }

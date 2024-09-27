@@ -13,7 +13,15 @@ public class NotificationClientOptions {
         /**
          * Value is in the ISO-8601 duration format
          */
-        HTTP_TIMEOUT_REQUEST("http.timeout.request");
+        HTTP_TIMEOUT_REQUEST("http.timeout.request"),
+        /**
+         * Value is a boolean
+         */
+        VALIDATION_SKIP("validation.skip"),
+        /**
+         * Value is a boolean
+         */
+        FAIL_ON_UNKNOWN_VALUES("parse.fail_on_unknown_value");
 
         private final String propertyKey;
 

@@ -3,6 +3,9 @@ package uk.gov.service.notify.domain;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Null;
 
 import java.net.URI;
 import java.time.ZonedDateTime;
@@ -72,10 +75,15 @@ public abstract class NotifyNotification {
         }
     }
 
+    @NotNull
     private final UUID id;
+    @NotEmpty
     private final String reference;
+    @NotNull
     private final NotificationType type;
+    @NotNull
     private final Template template;
+    @NotEmpty
     private final String body;
     private final ZonedDateTime createdAt;
     private final String createdByName;

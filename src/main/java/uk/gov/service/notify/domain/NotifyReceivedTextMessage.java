@@ -1,6 +1,10 @@
 package uk.gov.service.notify.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PastOrPresent;
+import jakarta.validation.constraints.Pattern;
 
 import java.time.ZonedDateTime;
 import java.util.Objects;
@@ -8,11 +12,20 @@ import java.util.UUID;
 
 public class NotifyReceivedTextMessage {
 
+    @NotNull
     private final UUID id;
+    @NotNull
+    @PastOrPresent
     private final ZonedDateTime createdAt;
+    @NotNull
     private final UUID serviceId;
+    @NotNull
+    @Pattern(regexp = "^[0-9\\+\\(\\)]*$")
     private final String notifyNumber;
+    @NotNull
+    @Pattern(regexp = "^[0-9\\+\\(\\)]*$")
     private final String userNumber;
+    @NotEmpty
     private final String content;
 
     public NotifyReceivedTextMessage(@JsonProperty("id") UUID id,

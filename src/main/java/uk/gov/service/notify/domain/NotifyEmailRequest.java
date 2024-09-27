@@ -1,6 +1,9 @@
 package uk.gov.service.notify.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 
 import java.net.URI;
 import java.util.Map;
@@ -9,11 +12,16 @@ import java.util.UUID;
 
 public class NotifyEmailRequest {
 
+    @NotEmpty
     private final String emailAddress;
+    @NotNull
     private final UUID templateId;
     private final Map<String, ?> personalisation;
+    @NotEmpty
     private final String reference;
+    @NotNull
     private final UUID emailReplyToId;
+    // @NotNull?
     private final URI oneClickUnsubscribeURL;
 
     public NotifyEmailRequest(@JsonProperty("email_address") String emailAddress,

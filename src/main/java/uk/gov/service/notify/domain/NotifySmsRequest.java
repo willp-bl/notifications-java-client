@@ -1,16 +1,24 @@
 package uk.gov.service.notify.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
 public class NotifySmsRequest {
+    @NotNull
+    @Pattern(regexp = "^[0-9\\+\\(\\)]*$")
     private final String phoneNumber;
+    @NotNull
     private final UUID templateId;
     private final Map<String, ?> personalisation;
+    @NotEmpty
     private final String reference;
+    // Not @NotNull because the client allows null values to be used
     private final UUID smsSenderId;
 
     public NotifySmsRequest(@JsonProperty("phone_number") String phoneNumber,

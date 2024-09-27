@@ -1,6 +1,7 @@
 package uk.gov.service.notify.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotNull;
 
 import java.net.URI;
 import java.util.List;
@@ -9,6 +10,7 @@ import java.util.Objects;
 public class NotifyReceivedTextMessagesResponse {
 
     public static class Links {
+        @NotNull
         private final URI current;
         private final URI next;
 
@@ -52,6 +54,7 @@ public class NotifyReceivedTextMessagesResponse {
     }
 
     private final List<NotifyReceivedTextMessage> receivedTextMessages;
+    @NotNull
     private final Links links;
 
     public NotifyReceivedTextMessagesResponse(@JsonProperty("received_text_messages") List<NotifyReceivedTextMessage> receivedTextMessages,

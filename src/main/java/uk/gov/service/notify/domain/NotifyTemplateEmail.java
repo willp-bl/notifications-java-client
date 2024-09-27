@@ -1,6 +1,7 @@
 package uk.gov.service.notify.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotEmpty;
 
 import java.time.ZonedDateTime;
 import java.util.Objects;
@@ -8,6 +9,7 @@ import java.util.UUID;
 
 public class NotifyTemplateEmail extends NotifyTemplate {
 
+    @NotEmpty
     private final String subject;
 
     public NotifyTemplateEmail(@JsonProperty("id") UUID id,

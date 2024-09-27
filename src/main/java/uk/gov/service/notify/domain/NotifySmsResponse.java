@@ -1,6 +1,10 @@
 package uk.gov.service.notify.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.PositiveOrZero;
 
 import java.net.URI;
 import java.util.Objects;
@@ -9,7 +13,10 @@ import java.util.UUID;
 public class NotifySmsResponse {
 
     public static class Content {
+        @NotEmpty
         private final String body;
+        @NotNull
+        @Pattern(regexp = "^[0-9\\+\\(\\)]*$")
         private final String fromNumber;
 
         public Content(@JsonProperty("body") String body,
@@ -51,8 +58,11 @@ public class NotifySmsResponse {
     }
 
     public static class Template {
+        @NotNull
         private final UUID id;
+        @PositiveOrZero
         private final int version;
+        @NotNull
         private final URI uri;
 
         public Template(@JsonProperty("id") UUID id,
@@ -101,10 +111,15 @@ public class NotifySmsResponse {
         }
     }
 
+    @NotNull
     private final UUID notificationId;
+    @NotEmpty
     private final String reference;
+    @NotNull
     private final Content content;
+    @NotNull
     private final URI uri;
+    @NotNull
     private final Template template;
 
     public NotifySmsResponse(@JsonProperty("id") UUID notificationId,

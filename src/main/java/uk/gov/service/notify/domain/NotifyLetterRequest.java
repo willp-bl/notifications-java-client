@@ -1,6 +1,8 @@
 package uk.gov.service.notify.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import uk.gov.service.notify.NotificationClientException;
 
 import java.util.List;
@@ -10,8 +12,10 @@ import java.util.UUID;
 
 public class NotifyLetterRequest {
 
+    @NotNull
     private final UUID templateId;
     private final Map<String, ?> personalisation;
+    @NotEmpty
     private final String reference;
 
     public NotifyLetterRequest(@JsonProperty("template_id") UUID templateId,

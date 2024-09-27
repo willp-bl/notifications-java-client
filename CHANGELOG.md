@@ -1,5 +1,6 @@
 ## Next release
 * Where UUIDs are expected the types in the API have changed from String to UUID.  You can wrap strings in UUID.fromString() if necessary.
+* There is now some validation on request and response data.  That validation can be disabled by passing in a Map<String, String> to the client that sets `validation.skip` to `true`
 
 ## 5.2.0-RELEASE
 * Added fields related to cost data in response:

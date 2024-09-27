@@ -3,6 +3,9 @@ package uk.gov.service.notify.domain;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PastOrPresent;
 
 import java.time.ZonedDateTime;
 import java.util.Objects;
@@ -20,13 +23,20 @@ import java.util.UUID;
 })
 public abstract class NotifyTemplate {
 
+    @NotNull
     private final UUID id;
+    @NotEmpty
     private final String name;
+    @NotNull
     private final NotificationType type;
+    @PastOrPresent
     private final ZonedDateTime createdAt;
+    @PastOrPresent
     private final ZonedDateTime updatedAt;
     private final int version;
+    @NotEmpty
     private final String createdBy;
+    @NotEmpty
     private final String body;
 
     public NotifyTemplate(@JsonProperty("id") UUID id,

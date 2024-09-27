@@ -151,7 +151,7 @@ public class NotificationClientTest {
         UUID templateId = UUID.randomUUID();
 
         NotificationClientHttpException e = assertThrows(NotificationClientHttpException.class,
-                () -> client.sendSms(templateId, "aPhoneNumber", emptyMap(), "aReference"));
+                () -> client.sendSms(templateId, "+44(0)12345", emptyMap(), "aReference"));
 
         assertThat(e.getHttpResult()).isEqualTo(404);
         assertThat(e).hasMessage("Status code: 404 unexpected response code, expected 201");
@@ -254,7 +254,7 @@ public class NotificationClientTest {
         UUID smsSenderId = UUID.randomUUID();
 
         NotificationClientHttpException e = assertThrows(NotificationClientHttpException.class,
-                () -> client.sendSms(templateId, "a phone number", emptyMap(), "aReference", smsSenderId));
+                () -> client.sendSms(templateId, "+44(0)12345", emptyMap(), "aReference", smsSenderId));
 
         assertThat(e.getHttpResult()).isEqualTo(500);
         assertThat(e).hasMessage("Status code: 500 unexpected response code, expected 201");
@@ -273,7 +273,7 @@ public class NotificationClientTest {
         UUID templateId = UUID.randomUUID();
         UUID smsSenderId = UUID.randomUUID();
 
-        NotifySmsResponse actual = client.sendSms(templateId, "a phone number", personalisation, "aReference", smsSenderId);
+        NotifySmsResponse actual = client.sendSms(templateId, "+44(0)12345", personalisation, "aReference", smsSenderId);
 
         assertThat(actual.getNotificationId()).isEqualTo(expected.getNotificationId());
         assertThat(actual.getReference()).isEqualTo(expected.getReference());
@@ -286,7 +286,7 @@ public class NotificationClientTest {
 
         LoggedRequest request = validateRequest();
         NotifySmsRequest requestReceivedByNotifyApi = objectMapper.readValue(request.getBodyAsString(), NotifySmsRequest.class);
-        assertThat(requestReceivedByNotifyApi.getPhoneNumber()).isEqualTo("a phone number");
+        assertThat(requestReceivedByNotifyApi.getPhoneNumber()).isEqualTo("+44(0)12345");
         assertThat(requestReceivedByNotifyApi.getTemplateId()).isEqualTo(templateId);
         assertThat(requestReceivedByNotifyApi.getPersonalisation()).isEqualTo(personalisation);
         assertThat(requestReceivedByNotifyApi.getReference()).isEqualTo("aReference");
@@ -650,7 +650,7 @@ public class NotificationClientTest {
         UUID templateId = UUID.randomUUID();
 
         NotificationClientHttpException e = assertThrows(NotificationClientHttpException.class,
-                () -> client.sendSms(templateId, "aPhoneNumber", emptyMap(), "aReference"));
+                () -> client.sendSms(templateId, "+44(0)12345", emptyMap(), "aReference"));
 
         assertThat(e.getHttpResult()).isEqualTo(401);
         assertThat(e).hasMessage("Status code: 401 unexpected response code, expected 201");
@@ -676,7 +676,7 @@ public class NotificationClientTest {
         UUID templateId = UUID.randomUUID();
 
         NotificationClientException e = assertThrows(NotificationClientException.class,
-                () -> client.sendSms(templateId, "aPhoneNumber", emptyMap(), "aReference"));
+                () -> client.sendSms(templateId, "+44(0)12345", emptyMap(), "aReference"));
 
         assertThat(e).hasMessageContaining("HTTP connect timed out");
     }
@@ -693,7 +693,7 @@ public class NotificationClientTest {
         UUID templateId = UUID.randomUUID();
 
         NotificationClientException e = assertThrows(NotificationClientException.class,
-                () -> client.sendSms(templateId, "aPhoneNumber", emptyMap(), "aReference"));
+                () -> client.sendSms(templateId, "+44(0)12345", emptyMap(), "aReference"));
 
         assertThat(e).hasMessageContaining("request timed out");
 

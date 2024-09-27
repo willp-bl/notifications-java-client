@@ -45,6 +45,12 @@
             <artifactId>jose4j</artifactId>
             <version>0.9.6</version>
         </dependency>
+        <dependency>
+            <groupId>org.hibernate.validator</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <version>8.0.1.Final</version>
+            <scope>compile</scope>
+        </dependency>
         <!-- only used for URIBuilder -->
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>

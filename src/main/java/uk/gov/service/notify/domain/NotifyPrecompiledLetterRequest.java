@@ -1,13 +1,18 @@
 package uk.gov.service.notify.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 
 import java.util.Objects;
 
 public class NotifyPrecompiledLetterRequest {
 
+    @NotEmpty
     private final String reference;
+    @NotEmpty
     private final String content;
+    @NotNull
     private final Postage postage;
 
     public NotifyPrecompiledLetterRequest(@JsonProperty("reference") String reference,

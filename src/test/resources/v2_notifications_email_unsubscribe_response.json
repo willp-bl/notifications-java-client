@@ -6,11 +6,11 @@
     "subject": "a subject",
     "from_email": "a from email"
   },
-  "uri": null,
+  "uri": "http://localhost/email",
   "template": {
     "id": "cc378915-2e6c-4e04-86a7-5f71949582b7",
     "version": -1,
-    "uri": "http://localhost"
+    "uri": "http://localhost/template"
   },
   "one_click_unsubscribe_url": "http://localhost/unsubscribe"
 }
