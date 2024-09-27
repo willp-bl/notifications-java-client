@@ -25,9 +25,8 @@ public class NotifyNotificationEmail extends NotifyNotification {
                                    @JsonProperty("sent_at") ZonedDateTime sentAt,
                                    @JsonProperty("completed_at") ZonedDateTime completedAt,
                                    @JsonProperty("is_cost_data_ready") boolean isCostDataReady,
-                                   @JsonProperty("cost_in_pounds") double costInPounds,
-                                   @JsonProperty("cost_details") CostDetails costDetails) {
-    super(id, reference, type, template, body, createdAt, createdByName, sentAt, completedAt, isCostDataReady, costInPounds, costDetails);
+                                   @JsonProperty("cost_in_pounds") double costInPounds) {
+    super(id, reference, type, template, body, createdAt, createdByName, sentAt, completedAt, isCostDataReady, costInPounds);
     this.status = status;
         this.emailAddress = emailAddress;
         this.subject = subject;

@@ -403,12 +403,14 @@ public class NotificationClientTest {
         assertThat(actualNotificationEmail.getSubject()).isEqualTo(expectedNotificationEmail.getSubject());
         assertThat(actualNotificationEmail.getEmailAddress()).isEqualTo(expectedNotificationEmail.getEmailAddress());
         assertThat(actualNotificationEmail.getStatus()).isEqualTo(expectedNotificationEmail.getStatus());
-        assertThat(actualNotificationEmail.getCostDetails()).isNull();
 
         // phone specific items
         assertThat(actualNotificationSms.getPhoneNumber()).isEqualTo(expectedNotificationSms.getPhoneNumber());
         assertThat(actualNotificationSms.getStatus()).isEqualTo(expectedNotificationSms.getStatus());
-        assertThat(actualNotificationSms.getCostDetails()).isNull();
+        assertThat(actualNotificationSms.getCostDetails()).isNotNull();
+        assertThat(actualNotificationSms.getCostDetails().getBillableSmsFragments()).isEqualTo(expectedNotificationSms.getCostDetails().getBillableSmsFragments());
+        assertThat(actualNotificationSms.getCostDetails().getInternationalRateMultiplier()).isEqualTo(expectedNotificationSms.getCostDetails().getInternationalRateMultiplier());
+        assertThat(actualNotificationSms.getCostDetails().getSmsRate()).isEqualTo(expectedNotificationSms.getCostDetails().getSmsRate());
 
         // letter specific items
         assertThat(actualNotificationLetter.getLine1()).isEqualTo(expectedNotificationLetter.getLine1());
@@ -424,9 +426,6 @@ public class NotificationClientTest {
         assertThat(actualNotificationLetter.getCostInPounds()).isEqualTo(expectedNotificationLetter.getCostInPounds());
         assertThat(actualNotificationLetter.isCostDataReady()).isEqualTo(expectedNotificationLetter.isCostDataReady());
         assertThat(actualNotificationLetter.getCostDetails()).isNotNull();
-        assertThat(actualNotificationLetter.getCostDetails().getBillableSmsFragments()).isEqualTo(expectedNotificationLetter.getCostDetails().getBillableSmsFragments());
-        assertThat(actualNotificationLetter.getCostDetails().getInternationalRateMultiplier()).isEqualTo(expectedNotificationLetter.getCostDetails().getInternationalRateMultiplier());
-        assertThat(actualNotificationLetter.getCostDetails().getSmsRate()).isEqualTo(expectedNotificationLetter.getCostDetails().getSmsRate());
         assertThat(actualNotificationLetter.getCostDetails().getBillableSheetsOfPaper()).isEqualTo(expectedNotificationLetter.getCostDetails().getBillableSheetsOfPaper());
         assertThat(actualNotificationLetter.getCostDetails().getPostage()).isEqualTo(expectedNotificationLetter.getCostDetails().getPostage());
 

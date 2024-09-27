@@ -11,6 +11,13 @@
         "version": -1,
         "uri": "http://localhost"
       },
+      "is_cost_data_ready": true,
+      "cost_in_pounds": 1.23,
+      "cost_details": {
+        "billable_sms_fragments": 5,
+        "international_rate_multiplier": 1.2,
+        "sms_rate": 0.05
+      },
       "body": "a body",
       "created_at": "2024-05-10T16:40:14Z",
       "created_by_name": "a created_by_name",
@@ -60,9 +67,6 @@
       "is_cost_data_ready": true,
       "cost_in_pounds": 1.23,
       "cost_details": {
-        "billable_sms_fragments": 5,
-        "international_rate_multiplier": 1.2,
-        "sms_rate": 0.05,
         "billable_sheets_of_paper": 2,
         "postage": "first_class"
       }
