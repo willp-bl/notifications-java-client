@@ -17,6 +17,7 @@ import uk.gov.service.notify.domain.NotifyTemplate;
 import uk.gov.service.notify.domain.NotifyTemplateListResponse;
 import uk.gov.service.notify.domain.NotifyTemplatePreviewRequest;
 import uk.gov.service.notify.domain.NotifyTemplatePreviewResponse;
+import uk.gov.service.notify.domain.Postage;
 
 import javax.net.ssl.SSLContext;
 import java.io.ByteArrayInputStream;
@@ -254,7 +255,7 @@ public class NotificationClient implements NotificationClientApi {
         }
     }
 
-    private NotifyPrecompiledLetterResponse sendPrecompiledLetter(String reference, String base64EncodedPDFFile, String postage) throws NotificationClientException {
+    private NotifyPrecompiledLetterResponse sendPrecompiledLetter(String reference, String base64EncodedPDFFile, Postage postage) throws NotificationClientException {
         if (Objects.isNull(reference) || reference.isBlank()) {
             throw new NotificationClientException("reference cannot be null or empty");
         }
@@ -280,7 +281,7 @@ public class NotificationClient implements NotificationClientApi {
     }
 
     @Override
-    public NotifyPrecompiledLetterResponse sendPrecompiledLetter(String reference, File precompiledPDF, String postage) throws NotificationClientException {
+    public NotifyPrecompiledLetterResponse sendPrecompiledLetter(String reference, File precompiledPDF, Postage postage) throws NotificationClientException {
         if (precompiledPDF == null) {
             throw new NotificationClientException("File cannot be null");
         }
@@ -299,7 +300,7 @@ public class NotificationClient implements NotificationClientApi {
     }
 
     @Override
-    public NotifyPrecompiledLetterResponse sendPrecompiledLetterWithInputStream(String reference, InputStream stream, String postage) throws NotificationClientException {
+    public NotifyPrecompiledLetterResponse sendPrecompiledLetterWithInputStream(String reference, InputStream stream, Postage postage) throws NotificationClientException {
         if (stream == null) {
             throw new NotificationClientException("Input stream cannot be null");
         }

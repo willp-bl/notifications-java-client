@@ -12,6 +12,7 @@ import uk.gov.service.notify.domain.NotifySmsResponse;
 import uk.gov.service.notify.domain.NotifyTemplate;
 import uk.gov.service.notify.domain.NotifyTemplateListResponse;
 import uk.gov.service.notify.domain.NotifyTemplatePreviewResponse;
+import uk.gov.service.notify.domain.Postage;
 
 import java.io.File;
 import java.io.InputStream;
@@ -149,7 +150,7 @@ public interface NotificationClientApi {
      *
      * @throws NotificationClientException see https://docs.notifications.service.gov.uk/java.html#send-a-precompiled-letter-error-codes
      */
-    NotifyPrecompiledLetterResponse sendPrecompiledLetter(String reference, File precompiledPDF, String postage) throws NotificationClientException;
+    NotifyPrecompiledLetterResponse sendPrecompiledLetter(String reference, File precompiledPDF, Postage postage) throws NotificationClientException;
 
     /**
      * The sendPrecompiledLetterWithInputStream method will create an HTTPS POST request. A JWT token will be created and added as an Authorization header to the request.
@@ -180,7 +181,7 @@ public interface NotificationClientApi {
      *
      * @throws NotificationClientException see https://docs.notifications.service.gov.uk/java.html#send-a-precompiled-letter-error-codes
      */
-    NotifyPrecompiledLetterResponse sendPrecompiledLetterWithInputStream(String reference, InputStream stream, String postage) throws NotificationClientException;
+    NotifyPrecompiledLetterResponse sendPrecompiledLetterWithInputStream(String reference, InputStream stream, Postage postage) throws NotificationClientException;
 
     /**
      * The getNotificationById method will return a <code>Notification</code> for a given notification id.

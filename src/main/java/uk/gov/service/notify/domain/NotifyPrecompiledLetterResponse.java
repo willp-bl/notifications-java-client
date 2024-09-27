@@ -9,11 +9,11 @@ public class NotifyPrecompiledLetterResponse {
 
     private final UUID id;
     private final String reference;
-    private final String postage;
+    private final Postage postage;
 
     public NotifyPrecompiledLetterResponse(@JsonProperty("id") UUID id,
                                            @JsonProperty("reference") String reference,
-                                           @JsonProperty("postage") String postage) {
+                                           @JsonProperty("postage") Postage postage) {
         this.reference = reference;
         this.id = id;
         this.postage = postage;
@@ -30,7 +30,7 @@ public class NotifyPrecompiledLetterResponse {
     }
 
     @JsonProperty("postage")
-    public String getPostage() {
+    public Postage getPostage() {
         return postage;
     }
 

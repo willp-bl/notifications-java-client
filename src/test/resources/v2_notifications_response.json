@@ -68,7 +68,7 @@
       "cost_in_pounds": 1.23,
       "cost_details": {
         "billable_sheets_of_paper": 2,
-        "postage": "first_class"
+        "postage": "first"
       }
     }
   ],

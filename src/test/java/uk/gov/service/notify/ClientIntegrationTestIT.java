@@ -17,6 +17,7 @@ import uk.gov.service.notify.domain.NotifyTemplateLetter;
 import uk.gov.service.notify.domain.NotifyTemplateListResponse;
 import uk.gov.service.notify.domain.NotifyTemplatePreviewResponse;
 import uk.gov.service.notify.domain.NotifyTemplateSms;
+import uk.gov.service.notify.domain.Postage;
 
 import java.io.File;
 import java.io.IOException;
@@ -317,7 +318,7 @@ public class ClientIntegrationTestIT {
         NotificationClient client = getClient();
         NotifyPrecompiledLetterResponse response =  client.sendPrecompiledLetter(reference, file);
 
-        assertPrecompiledLetterResponse(reference, "second", response);
+        assertPrecompiledLetterResponse(reference, Postage.SECOND, response);
         assertPdfResponse(client, response.getId());
     }
 
@@ -328,9 +329,9 @@ public class ClientIntegrationTestIT {
         ClassLoader classLoader = getClass().getClassLoader();
         File file = new File(Objects.requireNonNull(classLoader.getResource("one_page_pdf.pdf")).getFile());
         NotificationClient client = getClient();
-        NotifyPrecompiledLetterResponse response =  client.sendPrecompiledLetter(reference, file, "first");
+        NotifyPrecompiledLetterResponse response =  client.sendPrecompiledLetter(reference, file, Postage.FIRST);
 
-        assertPrecompiledLetterResponse(reference, "first", response);
+        assertPrecompiledLetterResponse(reference, Postage.FIRST, response);
 
     }
 
@@ -344,7 +345,7 @@ public class ClientIntegrationTestIT {
         NotificationClient client = getClient();
         NotifyPrecompiledLetterResponse response =  client.sendPrecompiledLetterWithInputStream(reference, stream);
 
-        assertPrecompiledLetterResponse(reference, "second", response);
+        assertPrecompiledLetterResponse(reference, Postage.SECOND, response);
 
     }
 
@@ -356,9 +357,9 @@ public class ClientIntegrationTestIT {
         File file = new File(Objects.requireNonNull(classLoader.getResource("one_page_pdf.pdf")).getFile());
         InputStream stream = Files.newInputStream(file.toPath());
         NotificationClient client = getClient();
-        NotifyPrecompiledLetterResponse response =  client.sendPrecompiledLetterWithInputStream(reference, stream, "first");
+        NotifyPrecompiledLetterResponse response =  client.sendPrecompiledLetterWithInputStream(reference, stream, Postage.FIRST);
 
-        assertPrecompiledLetterResponse(reference, "first", response);
+        assertPrecompiledLetterResponse(reference, Postage.FIRST, response);
 
     }
 
@@ -517,7 +518,7 @@ public class ClientIntegrationTestIT {
                 .isIn(List.of(Sms.CREATED, Sms.SENDING, Sms.DELIVERED));
     }
 
-    private void assertPrecompiledLetterResponse(String reference, String postage, NotifyPrecompiledLetterResponse response) {
+    private void assertPrecompiledLetterResponse(String reference, Postage postage, NotifyPrecompiledLetterResponse response) {
         assertThat(response).isNotNull();
         assertThat(response.getId()).isNotNull();
         assertThat(response.getReference()).isEqualTo(reference);

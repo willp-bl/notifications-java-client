@@ -37,6 +37,7 @@ import uk.gov.service.notify.domain.NotifyTemplateLetter;
 import uk.gov.service.notify.domain.NotifyTemplateListResponse;
 import uk.gov.service.notify.domain.NotifyTemplatePreviewRequest;
 import uk.gov.service.notify.domain.NotifyTemplatePreviewResponse;
+import uk.gov.service.notify.domain.Postage;
 
 import javax.crypto.spec.SecretKeySpec;
 import java.io.File;
@@ -493,7 +494,7 @@ public class NotificationClientTest {
         NotifyPrecompiledLetterRequest requestReceivedByNotifyApi = objectMapper.readValue(request.getBodyAsString(), NotifyPrecompiledLetterRequest.class);
         assertThat(requestReceivedByNotifyApi.getReference()).isEqualTo("your-letter-reference");
         assertThat(requestReceivedByNotifyApi.getContent()).isEqualTo("JVBERi1mb28=");
-        assertThat(requestReceivedByNotifyApi.getPostage()).isEqualTo("postage-you-have-set-or-None");
+        assertThat(requestReceivedByNotifyApi.getPostage()).isEqualTo(Postage.REST_OF_WORLD);
     }
 
     @Test

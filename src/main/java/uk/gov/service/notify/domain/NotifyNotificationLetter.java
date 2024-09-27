@@ -10,10 +10,10 @@ public class NotifyNotificationLetter extends NotifyNotification {
 
     public static class CostDetails {
         private final Integer billableSheetsOfPaper;
-        private final String postage;
+        private final Postage postage;
 
         public CostDetails(@JsonProperty("billable_sheets_of_paper") Integer billableSheetsOfPaper,
-                           @JsonProperty("postage") String postage) {
+                           @JsonProperty("postage") Postage postage) {
             this.billableSheetsOfPaper = billableSheetsOfPaper;
             this.postage = postage;
         }
@@ -24,7 +24,7 @@ public class NotifyNotificationLetter extends NotifyNotification {
         }
 
         @JsonProperty("postage")
-        public String getPostage() {
+        public Postage getPostage() {
             return postage;
         }
 
