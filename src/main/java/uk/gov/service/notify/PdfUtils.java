@@ -19,8 +19,8 @@ public class PdfUtils {
     public static boolean isBase64StringPDF(String base64String) {
         final byte[] decoded = Base64.getMimeDecoder().decode(base64String);
 
-        final Scanner scanner = new Scanner(new ByteArrayInputStream(decoded));
-
-        return scanner.findAll("%PDF-").findAny().isPresent();
+        try(final Scanner scanner = new Scanner(new ByteArrayInputStream(decoded))) {
+            return scanner.findAll("%PDF-").findAny().isPresent();
+        }
     }
 }
