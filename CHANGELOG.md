@@ -1,6 +1,20 @@
 ## Next release
-* Where UUIDs are expected the types in the API have changed from String to UUID.  You can wrap strings in UUID.fromString() if necessary.
-* There is now some validation on request and response data.  That validation can be disabled by passing in a Map<String, String> to the client that sets `validation.skip` to `true`
+* Many changes have been made whilst aiming to reduce the amount of changes to this client's API
+* The client now requires Java 11
+* The client is configurable at runtime using `NotificationClientOptions`
+* New HTTP client:
+  * uses built in Java HTTP client
+  * configurable connect and request HTTP timeouts via `NotificationClientOptions`
+  * There is a new `NotificationClientHttpException` that subclasses `NotificationClientException`
+  * switched from `Proxy` to `ProxySelector`
+* All data structures to/from Notify are modelled using POJOs
+* Jackson is now used for (de)serializing all json POJOs
+* Hibernate is used for validating data to/from the Notify service and use of Hibernate is configurable at runtime via `NotificationClientOptions`
+* Hibernate validation can be disabled by passing in a `NotificationClientOptions` to the client that sets `VALIDATION_SKIP` to `true`
+* Notifications and templates are represented by a class for the specific type of notification
+* Wherever possible enums are used for values
+* Where UUIDs are expected the types in the API have changed from String to UUID.  You can wrap strings in `UUID.fromString()` if necessary.
+* `prepareUpload()` methods have been moved to a dedicated `PrepareUploadHelper` class and now use a regular Map to store parameters 
 
 ## 5.2.0-RELEASE
 * Added fields related to cost data in response:
