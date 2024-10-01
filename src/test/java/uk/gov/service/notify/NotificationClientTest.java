@@ -44,7 +44,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -670,7 +669,10 @@ public class NotificationClientTest {
     public void testConnectTimeoutCodeWorks() {
         wireMockRule.stubFor(post("/v2/notifications/sms")
                 .willReturn(unauthorized().withFixedDelay(100)));
-        NotificationClient client = new NotificationClient(COMBINED_API_KEY, BASE_URL, null, null, Duration.ofNanos(1), Duration.ofMillis(2000));
+        NotificationClientOptions clientOptions = NotificationClientOptions.defaultOptions()
+                .setOption(NotificationClientOptions.Options.HTTP_TIMEOUT_CONNECT, "PT0.0001S")
+                .setOption(NotificationClientOptions.Options.HTTP_TIMEOUT_REQUEST, "PT2S");
+        NotificationClient client = new NotificationClient(COMBINED_API_KEY, BASE_URL, null, null, clientOptions);
         UUID templateId = UUID.randomUUID();
 
         NotificationClientException e = assertThrows(NotificationClientException.class,
@@ -684,7 +686,10 @@ public class NotificationClientTest {
         final int requestTimeout = 50;
         wireMockRule.stubFor(post("/v2/notifications/sms")
                 .willReturn(unauthorized().withFixedDelay(requestTimeout*2)));
-        NotificationClient client = new NotificationClient(COMBINED_API_KEY, BASE_URL, null, null, Duration.ofMillis(1000), Duration.ofMillis(requestTimeout));
+        NotificationClientOptions clientOptions = NotificationClientOptions.defaultOptions()
+                .setOption(NotificationClientOptions.Options.HTTP_TIMEOUT_CONNECT, "PT1S")
+                .setOption(NotificationClientOptions.Options.HTTP_TIMEOUT_REQUEST, String.format("PT0.%03dS",requestTimeout));
+        NotificationClient client = new NotificationClient(COMBINED_API_KEY, BASE_URL, null, null, clientOptions);
         UUID templateId = UUID.randomUUID();
 
         NotificationClientException e = assertThrows(NotificationClientException.class,

@@ -2,6 +2,7 @@ package uk.gov.service.notify;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 
@@ -31,11 +32,15 @@ class NotifyUtils {
         return apiKey.substring(Math.max(0, apiKey.length() - LENGTH_UUID));
     }
 
-    static String getProperty(String propertyName) {
-        final String property = prop.getProperty(propertyName);
-        if(Objects.isNull(property)) {
-            throw new RuntimeException(new NotificationClientException("Property \""+propertyName+"\" was null"));
+    static String getProperty(NotificationClientOptions overrides, String propertyName) {
+        if(overrides.hasOption(propertyName)) {
+            return overrides.get(propertyName);
+        } else {
+            final String property = prop.getProperty(propertyName);
+            if (Objects.isNull(property)) {
+                throw new RuntimeException(new NotificationClientException("Property \"" + propertyName + "\" was null"));
+            }
+            return property;
         }
-        return property;
     }
 }

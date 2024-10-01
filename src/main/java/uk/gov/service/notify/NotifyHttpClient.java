@@ -37,14 +37,19 @@ class NotifyHttpClient {
     private final HttpClient httpClient;
     private final Duration requestTimeout;
 
-    NotifyHttpClient(String serviceId, String apiKey, String userAgent, ProxySelector proxySelector, SSLContext sslContext, Duration connectTimeout, Duration requestTimeout) {
+    NotifyHttpClient(String serviceId,
+                     String apiKey,
+                     String userAgent,
+                     ProxySelector proxySelector,
+                     SSLContext sslContext,
+                     NotificationClientOptions clientOptions) {
         this.bearerToken = Authentication.create(serviceId, apiKey);
         this.userAgent = userAgent;
         this.httpClient = HttpClient.newBuilder()
-                .connectTimeout(connectTimeout)
+                .connectTimeout(Duration.parse(NotifyUtils.getProperty(clientOptions, NotificationClientOptions.Options.HTTP_TIMEOUT_CONNECT.getPropertyKey())))
                 .proxy(Objects.nonNull(proxySelector)?proxySelector:ProxySelector.getDefault())
                 .build();
-        this.requestTimeout = requestTimeout;
+        this.requestTimeout = Duration.parse(NotifyUtils.getProperty(clientOptions, NotificationClientOptions.Options.HTTP_TIMEOUT_REQUEST.getPropertyKey()));
         if (Objects.nonNull(sslContext)) {
             setCustomSSLContext(sslContext);
         } else {

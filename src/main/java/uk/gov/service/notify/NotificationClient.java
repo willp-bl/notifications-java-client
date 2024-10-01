@@ -28,7 +28,6 @@ import java.net.ProxySelector;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
-import java.time.Duration;
 import java.util.Base64;
 import java.util.Map;
 import java.util.Objects;
@@ -53,17 +52,38 @@ public class NotificationClient implements NotificationClientApi {
      * @param apiKey Generate an API key by signing in to GOV.UK Notify, https://www.notifications.service.gov.uk, and going to the **API integration** page
      */
     public NotificationClient(String apiKey) {
-        this(apiKey, LIVE_BASE_URL, null);
+        this(apiKey, LIVE_BASE_URL, null, NotificationClientOptions.defaultOptions());
+    }
+
+    /**
+     * This client constructor given the api key.
+     *
+     * @param apiKey        Generate an API key by signing in to GOV.UK Notify, https://www.notifications.service.gov.uk, and going to the **API integration** page
+     * @param clientOptions Options for this Notify client
+     */
+    public NotificationClient(String apiKey, NotificationClientOptions clientOptions) {
+        this(apiKey, LIVE_BASE_URL, null, clientOptions);
     }
 
     /**
      * Use this client constructor if you require a proxy for https requests.
      *
-     * @param apiKey Generate an API key by signing in to GOV.UK Notify, https://www.notifications.service.gov.uk, and going to the **API integration** page
-     * @param proxySelector  Proxy used on the http requests
+     * @param apiKey        Generate an API key by signing in to GOV.UK Notify, https://www.notifications.service.gov.uk, and going to the **API integration** page
+     * @param proxySelector Proxy used on the http requests
      */
     public NotificationClient(String apiKey, ProxySelector proxySelector) {
-        this(apiKey, LIVE_BASE_URL, proxySelector);
+        this(apiKey, LIVE_BASE_URL, proxySelector, NotificationClientOptions.defaultOptions());
+    }
+
+    /**
+     * Use this client constructor if you require a proxy for https requests.
+     *
+     * @param apiKey        Generate an API key by signing in to GOV.UK Notify, https://www.notifications.service.gov.uk, and going to the **API integration** page
+     * @param proxySelector Proxy used on the http requests
+     * @param clientOptions Options for this Notify client
+     */
+    public NotificationClient(String apiKey, ProxySelector proxySelector, NotificationClientOptions clientOptions) {
+        this(apiKey, LIVE_BASE_URL, proxySelector, clientOptions);
     }
 
     /**
@@ -73,53 +93,68 @@ public class NotificationClient implements NotificationClientApi {
      * @param baseUrl base URL, defaults to https://api.notifications.service.gov.uk
      */
     public NotificationClient(String apiKey, String baseUrl) {
-        this(apiKey, baseUrl, null);
+        this(apiKey, baseUrl, null, NotificationClientOptions.defaultOptions());
     }
 
     /**
-     * @param apiKey  Generate an API key by signing in to GOV.UK Notify, https://www.notifications.service.gov.uk, and going to the **API integration** page
-     * @param baseUrl base URL, defaults to https://api.notifications.service.gov.uk
-     * @param proxySelector   Proxy used on the http requests
+     * This client constructor is used for testing on other environments, used by the GOV.UK Notify team.
+     *
+     * @param apiKey        Generate an API key by signing in to GOV.UK Notify, https://www.notifications.service.gov.uk, and going to the **API integration** page
+     * @param baseUrl       base URL, defaults to https://api.notifications.service.gov.uk
+     * @param clientOptions Options for this Notify client
+     */
+    public NotificationClient(String apiKey, String baseUrl, NotificationClientOptions clientOptions) {
+        this(apiKey, baseUrl, null, clientOptions);
+    }
+
+    /**
+     * @param apiKey        Generate an API key by signing in to GOV.UK Notify, https://www.notifications.service.gov.uk, and going to the **API integration** page
+     * @param baseUrl       base URL, defaults to https://api.notifications.service.gov.uk
+     * @param proxySelector Proxy used on the http requests
      */
     public NotificationClient(String apiKey,
                               String baseUrl,
                               ProxySelector proxySelector) {
-        this(apiKey, baseUrl, proxySelector, null);
+        this(apiKey, baseUrl, proxySelector, null, NotificationClientOptions.defaultOptions());
+    }
+
+    /**
+     * @param apiKey        Generate an API key by signing in to GOV.UK Notify, https://www.notifications.service.gov.uk, and going to the **API integration** page
+     * @param baseUrl       base URL, defaults to https://api.notifications.service.gov.uk
+     * @param proxySelector Proxy used on the http requests
+     * @param clientOptions Options for this Notify client
+     */
+    public NotificationClient(String apiKey,
+                              String baseUrl,
+                              ProxySelector proxySelector,
+                              NotificationClientOptions clientOptions) {
+        this(apiKey, baseUrl, proxySelector, null, clientOptions);
     }
 
     public NotificationClient(String apiKey,
                               String baseUrl,
                               ProxySelector proxySelector,
                               SSLContext sslContext) {
-        this(apiKey,
-                baseUrl,
-                proxySelector,
-                sslContext,
-                Duration.parse(NotifyUtils.getProperty("http.timeout.connect")),
-                Duration.parse(NotifyUtils.getProperty("http.timeout.request")));
+        this(apiKey, baseUrl, proxySelector, sslContext, NotificationClientOptions.defaultOptions());
     }
 
-    /**
-     * For internal use and tests
-     */
-    NotificationClient(String apiKey,
-                       String baseUrl,
-                       ProxySelector proxySelector,
-                       SSLContext sslContext,
-                       Duration connectTimeout,
-                       Duration requestTimeout) {
+    public NotificationClient(String apiKey,
+                              String baseUrl,
+                              ProxySelector proxySelector,
+                              SSLContext sslContext,
+                              NotificationClientOptions clientOptions) {
 
         this.baseUrl = baseUrl;
 
-        final String userAgent = "NOTIFY-API-JAVA-CLIENT/" + NotifyUtils.getProperty("project.version");
+        // NOTE: this is deliberately not using the clientOptions parameter as we don't want that to be overridden
+        final String userAgent = "NOTIFY-API-JAVA-CLIENT/" + NotifyUtils.getProperty(NotificationClientOptions.defaultOptions(), "project.version");
 
         this.notifyHttpClient = new NotifyHttpClient(NotifyUtils.extractServiceId(apiKey),
                 NotifyUtils.extractApiKey(apiKey),
                 userAgent,
                 proxySelector,
                 sslContext,
-                connectTimeout,
-                requestTimeout);
+                clientOptions);
     }
 
     @Override
