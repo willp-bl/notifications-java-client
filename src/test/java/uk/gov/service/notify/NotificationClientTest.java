@@ -17,6 +17,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import uk.gov.service.notify.domain.NotificationType;
+import uk.gov.service.notify.domain.NotifyApiErrorResponse;
 import uk.gov.service.notify.domain.NotifyEmailRequest;
 import uk.gov.service.notify.domain.NotifyEmailResponse;
 import uk.gov.service.notify.domain.NotifyLetterRequest;
@@ -144,9 +145,10 @@ public class NotificationClientTest {
     }
 
     @Test
-    public void testShouldThrowNotificationExceptionOnErrorResponseCodeAndNoErrorStream() {
+    public void testShouldThrowNotificationExceptionOnErrorResponseCodeAndNoErrorStream() throws IOException {
+        NotifyApiErrorResponse expected = objectMapper.readValue(this.getClass().getClassLoader().getResourceAsStream("v2_error_response.json"), NotifyApiErrorResponse.class);
         wireMockRule.stubFor(post("/v2/notifications/sms")
-                .willReturn(notFound()));
+                .willReturn(notFound().withResponseBody(new Body(objectMapper.writeValueAsString(expected)))));
         NotificationClient client = new NotificationClient(COMBINED_API_KEY, BASE_URL);
         UUID templateId = UUID.randomUUID();
 
@@ -154,7 +156,7 @@ public class NotificationClientTest {
                 () -> client.sendSms(templateId, "+44(0)12345", emptyMap(), "aReference"));
 
         assertThat(e.getHttpResult()).isEqualTo(404);
-        assertThat(e).hasMessage("Status code: 404 unexpected response code, expected 201");
+        assertThat(e).hasMessage("Status code: 404 unexpected response code, expected 201, API response: 404 [NoResultFound: No result found, NoResultFound2: No result2 found]");
 
         validateRequest();
     }

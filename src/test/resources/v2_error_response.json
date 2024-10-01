@@ -1,0 +1,7 @@
+{
+  "status_code": 404,
+  "errors": [
+    {"error": "NoResultFound", "message": "No result found"},
+    {"error": "NoResultFound2", "message": "No result2 found"}
+  ]
+}

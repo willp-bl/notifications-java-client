@@ -1,6 +1,7 @@
 package uk.gov.service.notify;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import uk.gov.service.notify.domain.NotifyApiErrorResponse;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
@@ -16,6 +17,7 @@ import java.time.Duration;
 import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 class NotifyHttpClient {
 
@@ -89,7 +91,17 @@ class NotifyHttpClient {
         }
 
         if(httpResponse.statusCode() != expectedResponseCode) {
-            throw new NotificationClientHttpException(httpResponse.statusCode(), "unexpected response code, expected "+expectedResponseCode);
+            final NotifyApiErrorResponse response;
+            final String message = "unexpected response code, expected " + expectedResponseCode;
+            try {
+                response = validatingJsonMapper.readValue(httpResponse.body(), NotifyApiErrorResponse.class);
+            } catch (IOException e) {
+                throw new NotificationClientHttpException(httpResponse.statusCode(), message, null);
+            }
+            final String apiMessage = response.getStatusCode()+" "+response.getErrors().stream()
+                    .map(e -> e.getError()+": "+e.getMessage())
+                    .collect(Collectors.joining(", ", "[", "]"));
+            throw new NotificationClientHttpException(httpResponse.statusCode(), message+", API response: "+apiMessage, response);
         }
 
         return httpResponse.body();
