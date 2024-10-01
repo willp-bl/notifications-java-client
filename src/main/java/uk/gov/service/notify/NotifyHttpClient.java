@@ -54,7 +54,7 @@ class NotifyHttpClient {
         }
     }
 
-    <T> T post(URI uri, Object requestBody, Class<T> responseClass, int expectedResponseCode) throws NotificationClientException {
+    <RequestClass, ResponseClass> ResponseClass post(URI uri, RequestClass requestBody, Class<ResponseClass> responseClass, int expectedResponseCode) throws NotificationClientException {
         final String requestBodyString;
         try {
             requestBodyString = validatingJsonMapper.writeValueAsString(requestBody);
@@ -107,7 +107,7 @@ class NotifyHttpClient {
         return httpResponse.body();
     }
 
-    <T> T get(URI uri, Class<T> responseClass) throws NotificationClientException {
+    <ResponseClass> ResponseClass get(URI uri, Class<ResponseClass> responseClass) throws NotificationClientException {
         final HttpRequest httpRequest = HttpRequest.newBuilder()
                 .uri(uri)
                 .timeout(requestTimeout)
