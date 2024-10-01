@@ -16,6 +16,7 @@
 * Where UUIDs are expected the types in the API have changed from String to UUID.  You can wrap strings in `UUID.fromString()` if necessary.
 * `prepareUpload()` methods have been moved to a dedicated `PrepareUploadHelper` class and now use a regular Map to store parameters 
 * Error messages from the API are now accessible via `NotificationClientHttpException`
+* Special numbers for testing and smoke testing are now available in code
 
 ## 5.2.0-RELEASE
 * Added fields related to cost data in response:
