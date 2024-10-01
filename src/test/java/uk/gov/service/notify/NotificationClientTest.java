@@ -640,6 +640,27 @@ public class NotificationClientTest {
     }
 
     @Test
+    public void testJsonParsingDoesFailWithUnknownValueWhenOptionConfigured() throws IOException {
+        // NOTE: we do not try and deserialise here, we want the client to do that
+        String apiResponse = new String(Objects.requireNonNull(this.getClass().getClassLoader().getResourceAsStream("v2_notifications_email_unknown_value_response.json")).readAllBytes(), StandardCharsets.UTF_8);
+        wireMockRule.stubFor(post("/v2/notifications/email")
+                .willReturn(created()
+                        .withResponseBody(new Body(apiResponse))));
+        Map<String, Object> personalisation = Map.of("application_date", "2018-01-01");
+        UUID templateId = UUID.randomUUID();
+        UUID emailReplyToId = UUID.randomUUID();
+
+        NotificationClientOptions options = NotificationClientOptions.defaultOptions()
+                .setOption(NotificationClientOptions.Options.FAIL_ON_UNKNOWN_VALUES, "true");
+        NotificationClient client = new NotificationClient(COMBINED_API_KEY, BASE_URL, options);
+
+        NotificationClientException e = assertThrows(NotificationClientException.class,
+                () -> client.sendEmail(templateId, "anEmailAddress", personalisation, "aReference", emailReplyToId));
+
+        assertThat(e).hasMessageContaining("Unrecognized field \"something\"");
+    }
+
+    @Test
     public void testBadApiKeyWouldFail() {
         // not the best test as we're effectively performing a check as the server would
         // but it does allow us to check how the client responds
@@ -698,6 +719,41 @@ public class NotificationClientTest {
         assertThat(e).hasMessageContaining("request timed out");
 
         validateRequest();
+    }
+
+    @Test
+    public void testCanSwitchValidationOff() throws IOException, NotificationClientException {
+        NotifySmsResponse expected = objectMapper.readValue(this.getClass().getClassLoader().getResourceAsStream("v2_notifications_sms_response.json"), NotifySmsResponse.class);
+        wireMockRule.stubFor(post("/v2/notifications/sms")
+                .willReturn(created()
+                        .withResponseBody(new Body(objectMapper.writeValueAsString(expected)))));
+        Map<String, Object> personalisation = Map.of("application_date", "2018-01-01");
+        UUID templateId = UUID.randomUUID();
+        UUID smsSenderId = UUID.randomUUID();
+
+        NotificationClientOptions options = NotificationClientOptions.defaultOptions()
+                .setOption(NotificationClientOptions.Options.VALIDATION_SKIP, "true");
+        NotificationClient client = new NotificationClient(COMBINED_API_KEY, BASE_URL, options);
+
+        String phoneNumber = "this phone number should fail validation but we have switched that validation off";
+        NotifySmsResponse actual = client.sendSms(templateId, phoneNumber, personalisation, "aReference", smsSenderId);
+
+        assertThat(actual.getNotificationId()).isEqualTo(expected.getNotificationId());
+        assertThat(actual.getReference()).isEqualTo(expected.getReference());
+        assertThat(actual.getContent().getBody()).isEqualTo(expected.getContent().getBody());
+        assertThat(actual.getContent().getFromNumber()).isEqualTo(expected.getContent().getFromNumber());
+        assertThat(actual.getUri()).isEqualTo(expected.getUri());
+        assertThat(actual.getTemplate().getId()).isEqualTo(expected.getTemplate().getId());
+        assertThat(actual.getTemplate().getVersion()).isEqualTo(expected.getTemplate().getVersion());
+        assertThat(actual.getTemplate().getUri()).isEqualTo(expected.getTemplate().getUri());
+
+        LoggedRequest request = validateRequest();
+        NotifySmsRequest requestReceivedByNotifyApi = objectMapper.readValue(request.getBodyAsString(), NotifySmsRequest.class);
+        assertThat(requestReceivedByNotifyApi.getPhoneNumber()).isEqualTo(phoneNumber);
+        assertThat(requestReceivedByNotifyApi.getTemplateId()).isEqualTo(templateId);
+        assertThat(requestReceivedByNotifyApi.getPersonalisation()).isEqualTo(personalisation);
+        assertThat(requestReceivedByNotifyApi.getReference()).isEqualTo("aReference");
+        assertThat(requestReceivedByNotifyApi.getSmsSenderId()).isEqualTo(smsSenderId);
     }
 
     private void validateBearerToken(String token) throws InvalidJwtException {
