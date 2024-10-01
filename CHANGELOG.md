@@ -17,6 +17,7 @@
 * `prepareUpload()` methods have been moved to a dedicated `PrepareUploadHelper` class and now use a regular Map to store parameters 
 * Error messages from the API are now accessible via `NotificationClientHttpException`
 * Special numbers for testing and smoke testing are now available in code
+* If the API sends an unknown value for an enum it will be deserialized as UNKNOWN.  That can be disabled via `NotificationClientOptions` by setting the option to not ignore unknown values from the API.
 
 ## 5.2.0-RELEASE
 * Added fields related to cost data in response:

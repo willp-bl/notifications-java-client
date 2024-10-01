@@ -499,6 +499,53 @@ public class NotificationClientTest {
     }
 
     @Test
+    public void testEnumUnknownValueWorksWhenConfigured() throws IOException, NotificationClientException {
+        String expected = new String(this.getClass().getClassLoader().getResourceAsStream("v2_unknown_enum_value_postage_response.json").readAllBytes());
+        wireMockRule.stubFor(post("/v2/notifications/letter")
+                .willReturn(created()
+                        .withResponseBody(new Body(expected))));
+        final File pdfFile = new File(Objects.requireNonNull(this.getClass().getClassLoader().getResource("small.pdf.txt")).getFile());
+
+        NotificationClientOptions clientOptions = NotificationClientOptions.defaultOptions()
+                .setOption(NotificationClientOptions.Options.FAIL_ON_UNKNOWN_VALUES, "false");
+        NotificationClient client = new NotificationClient(COMBINED_API_KEY, BASE_URL, clientOptions);
+
+        NotifyPrecompiledLetterResponse actual = client.sendPrecompiledLetter("a reference", pdfFile, Postage.FIRST);
+
+        assertThat(actual.getPostage()).isEqualTo(Postage.UNKNOWN);
+
+        LoggedRequest request = validateRequest();
+        NotifyPrecompiledLetterRequest requestReceivedByNotifyApi = objectMapper.readValue(request.getBodyAsString(), NotifyPrecompiledLetterRequest.class);
+        assertThat(requestReceivedByNotifyApi.getReference()).isEqualTo("a reference");
+        assertThat(requestReceivedByNotifyApi.getContent()).isEqualTo("JVBERi1mb28=");
+        assertThat(requestReceivedByNotifyApi.getPostage()).isEqualTo(Postage.FIRST);
+    }
+
+    @Test
+    public void testEnumUnknownValueFailsWhenConfiguredToDoSo() throws IOException, NotificationClientException {
+        String expected = new String(this.getClass().getClassLoader().getResourceAsStream("v2_unknown_enum_value_postage_response.json").readAllBytes());
+        wireMockRule.stubFor(post("/v2/notifications/letter")
+                .willReturn(created()
+                        .withResponseBody(new Body(expected))));
+        final File pdfFile = new File(Objects.requireNonNull(this.getClass().getClassLoader().getResource("small.pdf.txt")).getFile());
+
+        NotificationClientOptions clientOptions = NotificationClientOptions.defaultOptions()
+                .setOption(NotificationClientOptions.Options.FAIL_ON_UNKNOWN_VALUES, "true");
+        NotificationClient client = new NotificationClient(COMBINED_API_KEY, BASE_URL, clientOptions);
+
+        NotificationClientException e = assertThrows(NotificationClientException.class,
+                () -> client.sendPrecompiledLetter("a reference", pdfFile, Postage.FIRST));
+
+        assertThat(e).hasMessageContaining("Cannot deserialize value of type `uk.gov.service.notify.domain.Postage` from String \"third\": not one of the values accepted for Enum class");
+
+        LoggedRequest request = validateRequest();
+        NotifyPrecompiledLetterRequest requestReceivedByNotifyApi = objectMapper.readValue(request.getBodyAsString(), NotifyPrecompiledLetterRequest.class);
+        assertThat(requestReceivedByNotifyApi.getReference()).isEqualTo("a reference");
+        assertThat(requestReceivedByNotifyApi.getContent()).isEqualTo("JVBERi1mb28=");
+        assertThat(requestReceivedByNotifyApi.getPostage()).isEqualTo(Postage.FIRST);
+    }
+
+    @Test
     public void testGetTemplateById() throws IOException, NotificationClientException {
         NotifyTemplateLetter expected = (NotifyTemplateLetter)objectMapper.readValue(this.getClass().getClassLoader().getResourceAsStream("v2_template_byid_response_letter.json"), NotifyTemplate.class);
         UUID templateId = expected.getId();

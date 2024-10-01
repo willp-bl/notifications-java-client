@@ -40,7 +40,10 @@ class ValidatingJsonMapper {
                 .registerModule(new JavaTimeModule())
                 .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
                 // this allows the client to ignore unknown values sent in API responses
-                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, failOnUnknownValues);
+                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, failOnUnknownValues)
+                // if the API sends an unknown response for something we use an enum for then map it
+                // to the default enum value in each enum: UNKNOWN
+                .configure(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_USING_DEFAULT_VALUE, !failOnUnknownValues);
     }
 
     <ValueType> String writeValueAsString(ValueType value) throws JsonProcessingException, NotificationClientException {

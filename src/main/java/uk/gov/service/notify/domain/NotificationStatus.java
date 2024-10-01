@@ -1,5 +1,6 @@
 package uk.gov.service.notify.domain;
 
+import com.fasterxml.jackson.annotation.JsonEnumDefaultValue;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class NotificationStatus {
@@ -15,7 +16,8 @@ public class NotificationStatus {
         @JsonProperty("delivered") DELIVERED("delivered"),
         @JsonProperty("permanent-failure") PERMANENT_FAILURE("permanent-failure"),
         @JsonProperty("temporary-failure") TEMPORARY_FAILURE("temporary-failure"),
-        @JsonProperty("technical-failure") TECHNICAL_FAILURE("technical-failure");
+        @JsonProperty("technical-failure") TECHNICAL_FAILURE("technical-failure"),
+        @JsonEnumDefaultValue UNKNOWN("unknown");
 
         private final String status;
 
@@ -41,7 +43,8 @@ public class NotificationStatus {
         // pre-compiled letter statuses
         @JsonProperty("pending-virus-check") PENDING_VIRUS_CHECK("pending-virus-check"),
         @JsonProperty("virus-scan-failed") VIRUS_SCAN_FAILED("virus-scan-failed"),
-        @JsonProperty("validation-failed") VALIDATION_FAILED("validation-failed");
+        @JsonProperty("validation-failed") VALIDATION_FAILED("validation-failed"),
+        @JsonEnumDefaultValue UNKNOWN("unknown");
 
         private final String status;
 
@@ -65,7 +68,8 @@ public class NotificationStatus {
         @JsonProperty("delivered") DELIVERED("delivered"),
         @JsonProperty("permanent-failure") PERMANENT_FAILURE("permanent-failure"),
         @JsonProperty("temporary-failure") TEMPORARY_FAILURE("temporary-failure"),
-        @JsonProperty("technical-failure") TECHNICAL_FAILURE("technical-failure");
+        @JsonProperty("technical-failure") TECHNICAL_FAILURE("technical-failure"),
+        @JsonEnumDefaultValue UNKNOWN("unknown");
 
         private final String status;
 
