@@ -31,12 +31,12 @@ class NotifyHttpClient {
 
     NotifyHttpClient(String serviceId,
                      String apiKey,
-                     String userAgent,
                      ProxySelector proxySelector,
                      SSLContext sslContext,
                      NotificationClientOptions clientOptions) {
         this.bearerToken = Authentication.create(serviceId, apiKey);
-        this.userAgent = userAgent;
+        // NOTE: this is deliberately not using the clientOptions parameter as we don't want the version to be easily overridden
+        this.userAgent = "NOTIFY-API-JAVA-CLIENT/" + NotifyUtils.getProperty(NotificationClientOptions.defaultOptions(), "project.version");
         this.validatingJsonMapper = new ValidatingJsonMapper(clientOptions);
         this.httpClient = HttpClient.newBuilder()
                 .connectTimeout(Duration.parse(NotifyUtils.getProperty(clientOptions, NotificationClientOptions.Options.HTTP_TIMEOUT_CONNECT.getPropertyKey())))

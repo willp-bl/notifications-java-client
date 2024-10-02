@@ -143,15 +143,9 @@ public class NotificationClient implements NotificationClientApi {
                               ProxySelector proxySelector,
                               SSLContext sslContext,
                               NotificationClientOptions clientOptions) {
-
         this.baseUrl = baseUrl;
-
-        // NOTE: this is deliberately not using the clientOptions parameter as we don't want that to be overridden
-        final String userAgent = "NOTIFY-API-JAVA-CLIENT/" + NotifyUtils.getProperty(NotificationClientOptions.defaultOptions(), "project.version");
-
         this.notifyHttpClient = new NotifyHttpClient(NotifyUtils.extractServiceId(apiKey),
                 NotifyUtils.extractApiKey(apiKey),
-                userAgent,
                 proxySelector,
                 sslContext,
                 clientOptions);
@@ -348,5 +342,4 @@ public class NotificationClient implements NotificationClientApi {
 
         return sendPrecompiledLetter(reference, encoded, postage);
     }
-
 }
